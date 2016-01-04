@@ -1,0 +1,33 @@
+<apex:page controller="AddAttachmentController" tabStyle="Case" >
+        <apex:sectionHeader title="{!$Label.AttachFileToCase}"/>
+        <apex:form >
+            <apex:pageBlock id="page" >
+                 <br> <apex:OutputLabel ><b>{!$Label.SelectTheFile}</b></apex:OutputLabel> </br><br></br>
+                 <apex:OutputLabel >&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.TypePath}</apex:OutputLabel>
+                 <br> <apex:inputFile value="{!attachmentObj.body}" filename="{!attachmentObj.name}" id="file"/></br><br></br><br></br>
+                 <br> <apex:OutputLabel ><b>{!$Label.ClickAttach}</b></apex:OutputLabel> </br><br></br>
+                 <apex:OutputLabel >&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.RepeatSteps}</apex:OutputLabel> <br/>
+                 <apex:OutputLabel >&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.FileInfo}</apex:OutputLabel> 
+                 <br>&nbsp;&nbsp;&nbsp;&nbsp; <apex:commandButton action="{!upload}" value="{!$Label.AttachFile}"/></br><br></br><br></br>
+                 </apex:pageBlock>
+                 <br> <apex:OutputLabel ><b>{!$Label.ClickDone}</b></apex:OutputLabel></br><br></br>
+                 <apex:OutputLabel >&nbsp;&nbsp;&nbsp;&nbsp;    {!$Label.CancelUpload}</apex:OutputLabel>
+                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:commandButton action="{!cancel}" value="{!$Label.Done}"/><br/><br/>
+            
+            <br/><apex:pageBlock rendered="{!if(flag==true,true,false)}">
+                <apex:pageBlockSection title="{!$Label.FileUploaded}" columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:OutputLabel ><b> {!$Label.FileName}</b></apex:OutputLabel>
+                        <apex:OutputLabel > {!attachmentInCase.Name}  </apex:OutputLabel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                         <apex:OutputLabel ><b> {!$Label.Size} </b></apex:OutputLabel>
+                        <apex:OutputLabel > {!attachmentInCase.BodyLength } {!$Label.Bytes}  </apex:OutputLabel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>                
+            </apex:pageBlock>
+            <apex:pageBlock rendered="{!if(flag!=true,true,false)}">
+                <apex:outputLabel value="{!$Label.SelectFile}"/>                 
+            </apex:pageBlock>
+        </apex:form>
+</apex:page>

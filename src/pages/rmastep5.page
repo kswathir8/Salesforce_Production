@@ -1,0 +1,59 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case" sidebar="false" wizard="true" >
+ 
+  <apex:sectionHeader title="RMA Wizard" subtitle="Step 5 of 6"/>
+  <apex:form id="theForm" > 
+      
+      
+      <apex:pageBlock id="theSearchBlock" title="Shipping Address Confirmation" mode="edit" >
+          <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!step4}" value="Previous" />          
+           <apex:commandButton action="{!step7}" value="Next" />
+          </apex:pageBlockButtons>
+          
+      
+      <apex:pageBlockSection id="Q4" columns="1" title="Partner Information"  collapsible="false" rendered="{!QW.Ship_To__c = 'Partner'}" >
+     <apex:inputField value="{!QW.ATTN__c}"/>
+      <apex:inputField value="{!QW.Ship_to_Company__c}"/>
+      <apex:inputField value="{!QW.ShippingStreet__c}" />
+      <apex:inputField value="{!QW.ShippingCity__c}" />
+      <apex:inputField value="{!QW.ShippingState__c}" />
+      <apex:inputField value="{!QW.ShippingPostalCode__c}"/>
+      <apex:inputField value="{!QW.ShippingCountry__c}"/>
+      <apex:inputField value="{!QW.Priority__c}"/>
+      <apex:inputfield value="{!QW.Shipment__c}"/>
+
+      </apex:pageBlockSection>
+      
+      <apex:pageBlockSection id="iQ" columns="1" title="End Customer Information"  collapsible="false" rendered="{!QW.Ship_To__c = 'End Customer'}" >
+      
+      <apex:pageBlockSectionItem >
+      <apex:outputLabel >Please confirm the End Customer: </apex:outputLabel>
+       <apex:inputField value="{!QW.Account__c}" required="true"/>
+      </apex:pageBlockSectionItem>
+      <apex:inputField value="{!QW.ATTN__c}"/>
+      <apex:inputField value="{!QW.Ship_to_Company__c}"/>
+      <apex:inputField value="{!QW.ShippingStreet__c}" required="true"/>
+      <apex:inputField value="{!QW.ShippingCity__c}" required="true"/>
+      <apex:inputField value="{!QW.ShippingState__c}" required="true"/>
+      <apex:inputField value="{!QW.ShippingPostalCode__c}" required="true"/>
+      <apex:inputField value="{!QW.ShippingCountry__c}"/>
+      <apex:inputField value="{!QW.Priority__c}"/>
+      <apex:inputfield value="{!QW.Shipment__c}"/>
+
+      </apex:pageBlockSection>
+      
+      <apex:pageBlockSection id="Q42" columns="1" title="Additional Emails"  collapsible="false"  >
+      <apex:inputField value="{!QW.Additional_Email_1__c}" />
+      <apex:inputField value="{!QW.Additional_Email_2__c}" />
+      <apex:inputField value="{!QW.Additional_Email_3__c}" />
+
+      </apex:pageBlockSection>
+  
+      
+       
+        </apex:pageBlock>
+        
+       
+       
+  </apex:form>
+</apex:page>

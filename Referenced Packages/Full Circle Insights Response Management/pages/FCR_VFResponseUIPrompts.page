@@ -1,0 +1,88 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Response UI Campaigns" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:SectionHeader title="Full Circle CRM Response UI Prompt Campaign Configuration" help="https://www.fullcirclecrm.com/fcrm/app/response-prompts/">
+    <apex:pageMessages />
+    <apex:form >
+		<apex:actionFunction name="roleFilterChanged" action="{!roleFilterChanged}"  reRender="idTheContent" />
+		<apex:actionFunction name="roleToFilterChanged" action="{!roleToFilterChanged}"  reRender="" >
+		    <apex:param name="prompt" value="" assignTo="{!changedPrompt}"/>
+		    <apex:param name="newRoleFilter" value="" assignTo="{!changedToRoleFilter}"/>
+		</apex:actionFunction>		
+        <apex:pageblock mode="edit" >
+            <apex:pageBlockSection columns="2" title="Response Prompt Display" >
+                <apex:inputCheckbox label="Disable response prompt if there is an active response" value="{!DisablePromptOnActiveResponse}"/>
+                <apex:outputtext >
+                When checked, the response prompt will be unavailable when a Lead or Contact has an Active Response. 
+                Use this to prevent Sales reps from associating additional responses to an active Lead/Contact. 
+                This setting applies to all active responses including those associated to opportunities. 
+                To enable the display when the only responses on a contact are associated to opportunities, go to the Contact Response Rules Section 
+                on the Response Processing configuration page.
+                </apex:outputtext>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" id="idTheContent" title="Response Prompt Mappings">
+                <apex:datatable cellspacing="4px" value="{!ResponsePromptDisplay}" var="disp">
+                    <apex:column headerValue="Prompt" value="{!disp.name}" />
+                    <apex:column width="10px"/>
+                    <apex:column headerValue="Campaign" value="{!disp.value}"/>
+                    <apex:column width="10px"/>
+                    <apex:column headerValue="Filter conditions" styleclass="CenterHeader">
+                        <apex:selectList value="{!disp.filtercondition}" size="1" onchange="roleFilterChanged();">
+                        	<apex:selectOptions value="{!FilterConditionOptionsByPrompt[disp.name]}" />
+                        </apex:selectList>                                                          
+                    </apex:column>                                         
+                    <apex:column headerValue="User Role to filter">                    
+                        <apex:selectList value="{!disp.filterrolename}" label="{!disp.name}" onchange="roleToFilterChanged(this.label, this.value);"  rendered="{!AND(disp.filtercondition != 'No Filter', disp.filtercondition != 'Campaign Owner Only', disp.filtercondition != null)}" size="1" multiselect="false" > 
+                            <apex:selectOptions value="{!RoleFilterOptionsByPrompt[disp.name]}" />
+                        </apex:selectList>
+                        <apex:outputText rendered="{!OR(disp.filtercondition == 'No Filter', disp.filtercondition == 'Campaign Owner Only')}"></apex:outputText>
+                    </apex:column>                                                                
+                    <apex:column headerValue="Taxonomy label">
+                        <apex:inputtext value="{!disp.othervalue}" maxlength="64" />
+                    </apex:column> 
+                    <apex:column width="10px"/>  
+                    <apex:column >
+                        <apex:commandButton value="Remove" action="{!RemoveResponsePrompt}" reRender="idTheContent">
+                            <apex:param name="removeprompt" value="{!disp.name}"/>
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:datatable>
+                <apex:outputPanel >This table defines the sales campaign prompts that appear in the Response Information section of the Lead or Contact. 
+                    The prompts allow Leads or Contacts to be associated with a Campaign and to become the Active Response if there is not already an existing active response. 
+                    Add a sales campaign prompt name and then map the prompt to an existing Campaign.<br /><br />
+                    The optional Taxonomy label allows you to specify a label in the ResponsePrompts setting of your taxonomy file to use to look up localized 
+                    response prompts.
+                </apex:outputPanel>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idprompt" value="Prompt" />
+                    <apex:inputtext maxlength="35" id="idprompt" value="{!NewResponsePromptName}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Enter a new sales Campaign prompt.</apex:outputText>
+                <apex:inputfield label="Campaign" id="idCampaign" value="{!dummycm2.FCRM__FCR_Precedence_Campaign__c}" />
+                <apex:outputText >Select a Campaign which maps to the sales campaign prompt.</apex:outputText>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel />
+                    <apex:commandButton id="idaddprompt" action="{!AddResponsePrompt}" value="Add prompt"  reRender="idTheContent"/>
+                </apex:pageBlockSectionItem>
+                <apex:outputText />
+                <apex:pageMessage severity="Error" summary="{!NewResponseError}" rendered="{!Not(IsBlank(NewResponseError))}" />
+            </apex:pageBlockSection>
+
+            <apex:pageblockSection columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on the currently saved data. Save the page and then return to the page for an updated report.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!ResponsePromptDiagnosticInfo}" />
+            </apex:pageblockSection>
+            
+        
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!ResponsePromptSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    </apex:SectionHeader>
+ 
+    <script type="text/javascript"> 
+        swapicontitle('Precedence','Select Campaign');
+    </script>
+</apex:page>

@@ -1,0 +1,11 @@
+<apex:page Controller="dsfs.ErrorController" showHeader="true" sidebar="false" tabStyle="dsfs__DocuSign_Status__c">
+   <apex:stylesheet value="{!$Resource.dsfs__styles}" />
+   <div class="docusign-container">
+	   	<div id="dsAlert">
+			<ul class="alert-messages">
+				<li><p><apex:outputText value="{!(errorMsg)}" escape="false"/></p></li>
+			</ul>
+			<a href="/{!(sourceId)}" id="backButton" class="secondary button">{!$Label.Back}</a>
+		</div>
+	</div>
+</apex:page>

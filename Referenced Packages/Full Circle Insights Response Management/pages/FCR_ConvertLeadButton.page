@@ -1,0 +1,44 @@
+<apex:page standardController="Lead" extensions="FCRM.FCR_VFLeadContactGatingController"  action="{!DoRedirect}" >
+    <style type="text/css">
+        body .bPageBlock .detailList tr th { 
+            border-color: transparent; 
+            }
+        body .bPageBlock .detailList tr td { 
+            border-color: transparent; 
+            }
+    </style>
+   <c:FCR_VFResponseInfo record="{!Lead}" showUI="false" />
+   <script type="text/javascript">
+       var noalert;
+       if({!ActiveResponseCount}>0)
+       {
+           noalert = true;
+           setTimeout('window.location.reload()',500);
+       }
+   </script>
+   <apex:pageBlock rendered="{! UseGatingAlerts }">
+       <script type="text/javascript">
+           var returl = '{! JSEncode(ReturnURLString) }';
+           if(returl!='' && !noalert) 
+           {
+               window.alert('{!$Label.fcrm__FCR_GatingANoResponseConversion} {FCRM-101181}');
+               if(window.parent!=null) window.parent.location = returl; else window.location = returl;
+           }
+       </script>
+   </apex:pageBlock>
+   <apex:form rendered="{! NOT(UseGatingAlerts) }" >
+   <script type="text/javascript">
+       function responsePromptSelected()
+       {
+           window.location.reload();    // Force reload the page to get a true redirection
+       }
+   </script>
+    <apex:pageBlock >
+        <apex:outputText >{!$Label.fcrm__FCR_GatingANoResponseConversion} {FCRM-101181}</apex:outputText><br />
+        <c:FCR_VFGlobalResponsePrompt rendered="{!IncludePromptOnConversionValidationPage}" 
+        id="idThePrompt" recordId="{!Lead.id}" showRecent="false" showActive="false" buttonText="Convert"
+        onProcessCompleteFunction="responsePromptSelected" />
+        <apex:commandButton value="{!$Label.fcrm__FCR_Gating_Return_to_Previous}" action="{!getReturnUrl}" />
+    </apex:pageBlock>
+   </apex:form> 
+</apex:page>

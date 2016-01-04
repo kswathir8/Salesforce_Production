@@ -1,0 +1,733 @@
+<apex:page controller="n2de.ChartDistributionController" sidebar="false" tabstyle="Distribution_Analytics__tab" action="{!init}">
+<head>
+<script type="text/javascript" src='https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["corechart", "timeline"]}]}'/>
+<c:CommonHeader />
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[]}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'jstree/jquery.jstree.js')}"></script>
+<style>
+.chart{
+    float: left;
+    min-width: 500px;
+    margin-left: 20px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    border: 1px solid lightgray;
+}
+#chart_settings{
+    float: left;
+    border: 1px solid lightgray;
+    padding: 5px;
+    min-width: 210px;
+    height: 70%;
+    right: -5px;
+    top: 120px;
+    display: none;
+}
+
+#chart_settings .title{
+    color: gray;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.jstree-default.jstree-focused{
+    background: none !important;
+}
+.setting{
+    border: solid 1px lightgray;
+    padding: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.setting_label{
+    color: gray;
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+#chart_header{
+    border-radius: 5px;
+    width: 70%;
+    color: black;
+    margin: 10px;
+    text-align: center;
+    padding: 10px;
+    margin-left: 20px;
+    font-weight: bold;
+}
+#reset_chart{
+    display: none;
+}
+#engine_container{
+    height: 100%;
+}
+#filler{
+    float: left;
+    clear: both;
+    padding: 10px;
+}
+#reset_chart{
+        
+}
+#select_distributor{
+    display: none;
+}
+#select_users_tree{
+    display: none;
+}
+#chart_container{
+    float: left;
+    display:none;
+}
+#clear{
+    clear: both;
+}
+.sf_button{
+    color: #333;
+    margin: 1px;
+    padding: 3px 5px;
+    border: 1px solid #B5B5B5;
+    border-bottom-color: #7F7F7F;
+    background: #E8E8E9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top;
+    font-weight: bold;
+    font-size: .9em;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    min-width: 60px;
+}
+</style> 
+</head> 
+<div id="engine_container">
+    <apex:sectionHeader title="Analytics" subtitle="Distribution"/>
+    <c:CommonHelp help_page="distribution-analytics"/>
+    <c:CommonMask />
+    <apex:pageBlock title="Distribution data">
+    <apex:pageMessages />
+    <apex:form >
+     <div id="chart_settings">
+            <apex:actionFunction name="updateTeam" action="{!updateSettings}"/>
+        
+        <p class="setting_label">Team</p>
+        <div class="setting">
+        <table> 
+        <tr>
+        <td>
+            <apex:selectList id="team_id" value="{!currentTeamId}" onchange="updateTeam()" size="1">
+                <apex:selectOptions value="{!teams}"/>
+            </apex:selectList>
+        </td>
+        </tr>
+        </table>
+        </div>
+        
+        <p class="setting_label">Chart type</p>
+        <div class="setting">
+        <table> 
+        <tr>
+        <td>
+            <apex:selectList id="trend_type" styleClass="trend_type" onchange="updateTeam()" size="1">
+                <apex:selectOptions value="{!chartTypeOptions}"/>
+            </apex:selectList>
+        </td>
+        </tr>
+        </table>
+        </div>
+        
+        <p class="setting_label chart-type">Split data by</p>
+        <div class="setting chart-type">
+        <table> 
+        <tr>
+        <td>
+            <select id="chart_type" onchange="resetChart();">
+                <option value="Distributor">By distributor</option>
+                <option value="User">By user</option>
+            </select>
+        </td>
+        </tr>
+        </table>
+        </div>
+        
+        <p class="setting_label">Date range</p>
+        <div class="setting">
+        <table> 
+        <tr>
+        <td>
+            <select id="period" onchange="resetChart();">
+                <option value="0">Today</option>
+                <option value="7">Last 7 days</option>
+                <option value="15">Last 15 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="60">Last 60 days</option>
+                <option value="90">Last 90 days</option>
+            </select>
+            
+            <select id="date_range" style="display: none;" onchange="resetChart()">
+				<option value="today">Today</option>
+				<option value="yesterday">Yesterday</option>
+				<option value="this_week">This week</option>
+				<option value="last_week">Last week</option>
+				<option value="this_month">This month</option>
+			</select>
+        </td>
+        </tr>
+        </table>
+        </div>
+        
+        <div id="select_distributors_tree">
+            <p class="setting_label">Distributors</p>
+            <div id="distributors" class="setting tree">
+            <ul class="team_node">
+            <apex:repeat value="{!distributors}" var="distributor">
+                <li id="{!distributor.id}" class="jstree-checked_not ">
+                    <a href="#">{!distributor.name}</a>
+                </li>
+            </apex:repeat>
+            </ul>
+            </div>
+        </div>
+        
+        <div id="select_users_tree">
+            <p class="setting_label">Users</p>
+            <div id="users" class="setting tree">
+            <ul class="team_node">
+            <apex:repeat value="{!users}" var="thisUser">
+            <li id="{!thisUser.id}" class="jstree-checked_not ">
+                <a href="#">
+                    {!thisUser.name}
+                </a>
+            </li>
+            </apex:repeat>
+            </ul>
+        </div>
+        </div>
+        
+        <div id="select_user">
+            <p class="setting_label">Filter by user</p>
+            <div class="setting">
+            <table> 
+            <tr>
+            <td>
+                <select id="userId" onchange="resetChart();">
+                    <option value="All">All users</option>
+                    <apex:repeat value="{!users}" var="u">
+                        <option value="{!u.id}">{!u.Name}</option>
+                    </apex:repeat>
+                </select>
+            </td>
+            </tr>
+            </table>
+            </div>
+        </div>
+        <div id="select_distributor">
+            <p class="setting_label">Filter by distributor</p>
+            <div class="setting">
+            <table> 
+            <tr>
+            <td>
+                <select id="distributorId" onchange="resetChart();">
+                    <option value="All">All distributors</option>
+                    <apex:repeat value="{!distributors}" var="d">
+                        <option value="{!d.id}">{!d.Name}</option>
+                    </apex:repeat>
+                </select>
+            </td>
+            </tr>
+            </table>
+            </div>
+        </div>
+        
+    </div>
+    </apex:form>
+    
+    <div id="chart_container">
+        <!-- Google Charts will be drawn in this DIV -->
+        <div id="chartBlock" class="chart"/>
+            <div id="chart_header">
+            <span id="chart_title"></span>
+            <input type="button" id="reset_chart" class="sf_button" value="Back"/>
+        </div>
+     </div>
+     <div id="activity_container" style="display: none; float:left; width: 75%; margin-left: 10px;">
+       	<div id="error_cont"></div>
+		<div id="user_activity" style="height: 2000px; width: 100%;"></div>
+	</div> 
+    <div id="clear" />
+    </apex:pageBlock>
+    
+    <script type="text/javascript">
+    /* Global variables */
+    var selectedIds = '';
+    var visualization;
+    var data;
+    var chartOptions = chartOptionsByDay;
+    var daySelected = '';
+    var chartType;
+    var trendType = '';
+    var timezone = '{!JSENCODE(timezone)}';
+    var windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var viewportHeight = windowHeight - 350;
+    var viewportWidth = windowWidth - $("#chart_settings").width() - 200;
+    if($.browser.msie || (/Trident\/7\./).test(navigator.userAgent)){
+    	viewportWidth -= 200;
+    }
+    showMask();
+
+	google.setOnLoadCallback(initCharts);    
+
+    /* Google charts initialisation callback function */
+    function initCharts() { 
+        visualization = new google.visualization.AreaChart(document.getElementById('chartBlock'));
+        google.visualization.events.addListener(visualization, 'select', selectHandler);
+        init();
+    } 
+    
+    /* Initialise the page */
+    function init(){
+    
+    	 var trendType = $('.trend_type').val();
+        //initiate the tree control 
+        initTreeControl();
+        
+        //Default charting period
+        $("#period").val("7");
+        
+		if ('{!currentTeamId}' != '' || trendType == 'User activity') {
+	        makeChart();
+	    } else {
+	    	hideMask();
+	    }
+        
+        //Show the settings - hidden while tree control loads
+        $("#chart_settings").show();
+        
+        //Setup the back button to reset chart from hourly view to date view
+        $("#reset_chart").click(function(){
+            daySelected = '';
+            drawChart();
+	    });
+
+        if (trendType == 'User activity') {
+        	$('#chart_type').val('User');
+            $("#select_distributor").hide();
+            $("#select_users_tree").show();
+            $("#select_distributors_tree").hide();
+            $("#select_user").hide();
+        	$('.chart-type').hide();
+        	$('#date_range').show();
+        	$('#period').hide();
+        }
+    }
+    
+    /* Convert the passed in JSON into google chart DataTable and render the chart */ 
+    function loadChartData(dataSourceList){  
+        
+        var dataTableColCount = dataSourceList.length + 1;
+        var dataTableRowCount = dataSourceList[0].DistributionData.length;
+        
+        // load Column chart
+        // Prepare table model for chart with columns
+        data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        // add rows from the remoting dataSourceLists
+        for(var sourceIndex=0; sourceIndex<dataSourceList.length; sourceIndex++){
+           data.addColumn('number',  dataSourceList[sourceIndex].sourceName);
+        }
+        
+        data.addRows(dataTableRowCount);
+        
+        for(var rowIndex=0; rowIndex<dataTableRowCount; rowIndex++){
+            var dayOfYear = dataSourceList[0].DistributionData[rowIndex].dayOfYear;
+            data.setCell(rowIndex, 0, dayOfYear);
+            for(var colIndex=0; colIndex<dataTableColCount-1; colIndex++){
+                var recordCount = dataSourceList[colIndex].DistributionData[rowIndex].recordCount;
+                data.setCell(rowIndex, colIndex+1, recordCount);
+            }
+        }
+        
+        // all done, lets draw the chart with some options to make it look nice.
+        visualization.draw(data, chartOptions);
+        
+        $("#chart_container").show();
+        hideMask();
+    }
+    
+    function changeTeam(teamId){
+        $("[id$='team_id']").val(teamId);
+        updateTeam();
+        resetChart();
+    }
+    
+    /* Callback function to handle clicks into the chart */ 
+    function selectHandler() {
+        var selection = visualization.getSelection();
+        var row = selection[0].row;
+        daySelected = data.getValue(row, 0);
+        if(daySelected.indexOf('/') != -1){
+            drawChart();
+        }else{
+            alert('You are already in the hourly view. You can\'t drill down any further from here.');
+        }
+    }
+    
+    /* Initialise the tree control, including event handling toggling check boxes */
+    function initTreeControl(eventHandler){
+    	var trendType = $('.trend_type').val();
+    
+        /* Bind to change checkbox event */
+        $(".tree").bind("change_state.jstree", function (e, d) {
+            var tagName = d.args[0].tagName;
+            var refreshing = d.inst.data.core.refreshing;
+            if ((tagName == "A" || tagName == "INS") &&
+                (refreshing != true && refreshing != "undefined")) {
+                    if (trendType != 'User activity') {
+                    	drawChart();
+                    } else {
+                    	drawUserActivityChart();
+                    }
+            }
+        });
+      
+        /* Instantiate the tree control */
+        $(".tree").jstree({
+            "themes" : {
+            "theme" : "default",
+            "dots" : false,
+            "icons" : false},
+            checkbox : {
+                "real_checkboxes" : "false",
+                "real_checkboxes_names" : function(n){
+                    return[(n[0].id),n[0].id];
+                }
+            },
+            "plugins" : [ "themes", "html_data", "checkbox" ]
+        });
+    }
+    
+    /* Set the chart title depending on the period and whether they have clicked into a specific day */
+    function setTitle(){
+        var titleText = $("#period option:selected").text().toLowerCase();
+        var filterText = $("#userId option:selected").text();
+        if(chartType == 'User'){
+            filterText = $("#distributorId option:selected").text();
+        }
+        
+        if(daySelected != ''){
+            titleText = daySelected;
+            $("#reset_chart").show();
+        }else{
+            $("#reset_chart").hide();
+        }
+        
+        titleText += ' - ' + filterText;
+        $("#chart_title").text('Showing data for ' + titleText);
+    }
+    
+    /* Reset and redraw chart when a setting changes */
+    function resetChart(){
+        
+        showMask();
+        
+        daySelected = '';
+        
+        chartType = $("#chart_type").val();
+        trendType = $(".trend_type").val();
+        
+        if (chartType == 'User'){
+        	if (trendType != 'User activity') {
+            	$("#select_distributor").show();
+            }
+            $("#select_users_tree").show();
+            $("#select_distributors_tree").hide();
+            $("#select_user").hide();
+        } else {
+            $("#select_distributor").hide();
+            $("#select_users_tree").hide();
+            $("#select_distributors_tree").show();
+            $("#select_user").show();
+        }
+        makeChart();
+    }
+    
+    function makeChart() {
+    	var trendType = $('.trend_type').val();
+    	if (trendType == 'User activity') {
+    		drawUserActivityChart();
+    	} else {
+    		drawChart();
+    	}
+    }
+    
+    /** 
+    * Overall method to redraw the chart retrieving the relevant settings, calling the apex javascript remote
+    * method and then calling loadChartData to load and draw the chart 
+    **/  
+    function drawChart(){
+        trendType = $(".trend_type").val();
+        var groupByFn;
+        var selectedIdList;
+        var teamId = $("[id$='team_id']").val();
+        var period = $("#period").val();
+        var userId = $("#userId").val();
+        var distributorId = $("#distributorId").val();
+        
+        if(chartType == 'User'){
+            selectedIdList = $("#users .jstree-checked");
+        } else {
+            selectedIdList = $("#distributors .jstree-checked");
+        }
+        
+        //Set the selected id comma separated list
+        selectedIds = '';
+        if(selectedIdList.size() == 0){
+            selectedIds = 'All';
+        } else {
+            selectedIdList.each(function(index) {
+                selectedIds += $(this).attr("id") + ',';
+            });
+        }
+        
+        if(daySelected != ''){
+            period = daySelected;
+            chartOptions = chartOptionsByHour;
+            groupByFn = 'HOUR_IN_DAY';
+        } else if(period == '0'){
+            chartOptions = chartOptionsByHour;
+            groupByFn = 'HOUR_IN_DAY';
+        }else{
+            chartOptions = chartOptionsByDay;
+            groupByFn = 'DAY_IN_YEAR';
+        }
+        
+        if(trendType == 'Hour'){
+            groupByFn = 'HOUR_IN_DAY';
+        }
+        
+        if(trendType != 'Hour' && trendType != 'Time'){
+            chartOptions = chartOptionsTimeToAction;
+        }
+        
+        if(chartType == 'User'){
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartDistributionController.loadDistributionTrendByUserRO}',
+                teamId, trendType, period, groupByFn, selectedIds, distributorId,
+            function(result, event){  
+                loadChartData(result);
+            }, {escape:true});
+        } else {
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartDistributionController.loadDistributionTrendBySourceRO}', 
+                teamId, trendType, period, groupByFn, selectedIds, userId,
+                function(result, event){  
+                    loadChartData(result);
+            }, {escape:true});
+        }
+        
+        setTitle();
+    }
+    
+    //Google chart options for the date range view
+    var chartOptionsByDay = {
+        animation:{
+            duration: 1000,
+            easing: 'Out'
+        },
+        titleTextStyle:{
+            color: 'gray'
+        }, 
+        chartArea:{left:60,top:20,width:"75%",height:"75%"},
+        pointSize: 6, 
+        interpolateNulls: true,  
+        curveType: 'none', 
+        legend : {
+            position: 'right', 
+            alignment: 'center', 
+            textStyle: {
+                color: 'blue', 
+                fontSize: 12
+            }
+        }, 
+        width:viewportWidth, 
+        height: viewportHeight,
+        vAxis:{
+            title: 'Records distributed', 
+            textStyle:{
+                fontSize: 10
+            },
+            viewWindow: {
+                min: 0
+            }
+        },
+        hAxis:{
+            title: 'Date (' + timezone + ')', 
+            textStyle:{
+                fontSize: 10
+            },
+            showTextEvery:7,
+            slantedText:true
+        }
+     };
+     
+     //Google chart options for the hourly view
+     var chartOptionsByHour = {
+        animation:{
+            duration: 1000,
+            easing: 'Out'
+        },
+        titleTextStyle:{
+            color: 'gray'
+        }, 
+        chartArea:{left:60,top:20,width:"75%",height:"75%"},
+        pointSize: 0, 
+        interpolateNulls: true,  
+        curveType: 'none', 
+        legend : {
+            position: 'right', 
+            alignment: 'center', 
+            textStyle: {
+                color: 'blue', 
+                fontSize: 12
+            }
+        }, 
+        width:viewportWidth, 
+        height:viewportHeight,
+        vAxis:{
+            title: 'Records distributed', 
+            textStyle:{
+                fontSize: 10
+            },
+            viewWindow: {
+                min: 0
+            }
+        },
+        hAxis:{
+            title: 'Time (' + timezone + ')', 
+            textStyle:{
+                fontSize: 10
+            },
+            showTextEvery:1,
+            slantedText:true
+        }
+     };
+     
+     //Google chart options for the date range view
+    var chartOptionsTimeToAction = {
+        animation:{
+            duration: 1000,
+            easing: 'Out'
+        },
+        titleTextStyle:{
+            color: 'gray'
+        }, 
+        chartArea:{left:60,top:20,width:"75%",height:"75%"},
+        pointSize: 6, 
+        interpolateNulls: true,  
+        curveType: 'none', 
+        legend : {
+            position: 'right', 
+            alignment: 'center', 
+            textStyle: {
+                color: 'blue', 
+                fontSize: 12
+            }
+        }, 
+        width:viewportWidth, 
+        height:viewportHeight,
+        vAxis:{
+            title: 'Time taken to action (mins)', 
+            textStyle:{
+                fontSize: 10
+            },
+            viewWindow: {
+                min: 0
+            }
+        },
+        hAxis:{
+            title: 'Date (' + timezone + ')', 
+            textStyle:{
+                fontSize: 10
+            },
+            showTextEvery:7,
+            slantedText:true
+        }
+     };
+     
+    function drawUserActivityChart() {
+		var dateRange = $("#date_range").val();
+		var selectedIdList = $("#users .jstree-checked");
+		var selectedUserIds = [];
+		if(selectedIdList.length > 0){
+            selectedIdList.each(function(index) {
+                selectedUserIds.push($(this).attr("id"));
+            });
+        }
+		
+		Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartDistributionController.getUserActivity}', '{!currentTeamId}', dateRange,
+			selectedUserIds, function(result, event){ 
+				$('#activity_container').show(); 
+	  			if (result && result.length > 0) {
+	  				$('#error_cont').html('');
+					var container = document.getElementById('user_activity');
+					var chart = new google.visualization.Timeline(container);
+					var dataTable = new google.visualization.DataTable();
+		
+					dataTable.addColumn({ type: 'string', id: 'Name' });
+					dataTable.addColumn({ type: 'string', id: 'Activity' });
+					dataTable.addColumn({ type: 'date', id: 'Start Activity' });
+					dataTable.addColumn({ type: 'date', id: 'End Activity' });
+					for(var i=0; i<result.length; i++){
+					   var thisRow = result[i];
+					   	if(thisRow.activityList != undefined){
+							for(var j=0; j<thisRow.activityList.length; j++){
+					    		var thisActivity = thisRow.activityList[j];
+					    		var thisDate = thisActivity.startDate;
+					    		thisDate.month = thisDate.month - 1;
+					    		var nextDate = thisActivity.endDate;
+					    		nextDate.month = nextDate.month - 1;
+					  			dataTable.addRow([ thisRow.userName,  thisActivity.actionName,  new Date(thisDate.year,thisDate.month,thisDate.day,thisDate.hour,thisDate.minute,thisDate.second), 
+					  				new Date(nextDate.year,nextDate.month,nextDate.day,nextDate.hour,nextDate.minute,nextDate.second) ]);
+					    	}
+						}
+					}
+		
+					var colours = [];
+					var startsWithLogIn = false;
+					var numberRows = dataTable.getNumberOfRows();
+					if (numberRows >= 1) {
+						var firstAction = dataTable.getValue(0, 1);
+						if (firstAction == 'Log in') {
+							colours.push('#9dcc58');
+							startsWithLogIn = true;
+						} else {
+							colours.push('#708090');
+						}
+			
+						if (startsWithLogIn) {
+							colours.push('#708090');
+						} else {
+							colours.push('#9dcc58');
+						}
+					} else {
+						colours = ['#708090','#9dcc58'];
+		 			}
+		 
+					var options = {
+						colors: colours,
+						timeline: { colorByRowLabel: false, groupByRowLabel: true, avoidOverlappingGridLines: false },
+					};
+					
+					chart.draw(dataTable, options);
+				} else {
+					var msg = 'No user activity data for the selected team or period.';
+					if (selectedUserIds.length > 0) {
+						msg = 'No user activity data for the selected users for this period.';
+					}
+					$('#error_cont').html('<span>' + msg + '</span>');
+				}
+				hideMask();
+			}, 
+			{escape:true});
+		}
+    </script>
+</div>
+<c:StatusPanel />
+</apex:page>

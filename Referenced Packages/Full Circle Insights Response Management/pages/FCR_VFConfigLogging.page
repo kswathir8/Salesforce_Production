@@ -1,0 +1,91 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Diagnostic and Error Logging" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle Diagnostic and Error Logging" help="https://www.fullcirclecrm.com/fcrm/app/event-logs/">
+    <apex:form >
+        <apex:pageblock mode="edit" >
+            <apex:outputPanel layout="block" rendered="{!DeferredUpdateObjectCount>0}" >
+                <p>
+                <apex:outputText style="color:red;font-weight:bold;margin-left:10px" value="{!DeferredUpdateObjectCount} items in the Update Error list" />
+                </p><br />
+            </apex:outputPanel>
+            <apex:tabPanel id="idDiagPanel" value="{!DiagActiveTab}">
+                <apex:tab name="Diagnostic" label="Diagnostic Logs" switchType="server">
+                    <apex:dataTable first="{!DiagDisplayPage * DiagLinesPerPage}" rows="{!DiagLinesPerPage}" value="{!DiagEntries}" var="entry" rendered="{!DiagDataPresent}">
+                        <apex:column headerValue="Entries" >
+                            <apex:outputText value="{!entry}" />
+                        </apex:column>
+                        <apex:facet name="footer">
+                            <apex:outputPanel rendered="{DiagPageCount > 1}">
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" << " >
+                                    <apex:param name="first" value="1"/>
+                                </apex:commandLink>&nbsp;
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" < ">
+                                    <apex:param name="down" value="1"/>
+                                </apex:commandLink>&nbsp;
+                                <apex:outputText value=" Page {!DiagDisplayPage + 1} " />&nbsp;
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" > ">
+                                    <apex:param name="up" value="1"/>
+                                </apex:commandLink>&nbsp;
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" >> ">
+                                    <apex:param name="last" value="1"/>
+                                </apex:commandLink>
+                            </apex:outputPanel>
+                        </apex:facet>
+                    </apex:dataTable>
+                    <apex:commandLink rendered="{!DiagDataPresent}" target="_blank" value="Download log" action="{!URLFOR($Page.FCR_VFLogSave) + '?logtype=' + DiagActiveTab}" />
+                    <apex:outputText rendered="{!Not(DiagDataPresent)}" value="No diagnostic events found" />
+
+                </apex:tab>
+                <apex:tab name="Crash" label="Exception Logs">
+                    <apex:dataTable first="{!DiagDisplayPage * DiagLinesPerPage}" rows="{!DiagLinesPerPage}" value="{!DiagEntries}" var="entry" rendered="{!DiagDataPresent}">
+                        <apex:column headerValue="Entries" >
+                            <apex:outputText value="{!entry}" />
+                        </apex:column>
+                        <apex:facet name="footer">
+                            <apex:outputPanel rendered="{!DiagPageCount > 1}">
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" << " >
+                                    <apex:param name="first" value="1"/>
+                                </apex:commandLink>&nbsp;
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" < ">
+                                    <apex:param name="down" value="1"/>
+                                </apex:commandLink>&nbsp;
+                                <apex:outputText value=" Page {!DiagDisplayPage + 1} " />&nbsp;
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" > ">
+                                    <apex:param name="up" value="1"/>
+                                </apex:commandLink>&nbsp;
+                                <apex:commandLink action="{!DiagPagination}" reRender="idDiagPanel" value=" >> ">
+                                    <apex:param name="last" value="1"/>
+                                </apex:commandLink>
+                            </apex:outputPanel>
+                        </apex:facet>
+                    </apex:dataTable>
+                    <apex:commandLink rendered="{!DiagDataPresent}" target="_blank" value="Download log" action="{!URLFOR($Page.FCR_VFLogSave) + '?logtype=' + DiagActiveTab}" />
+                    <apex:outputText rendered="{!Not(DiagDataPresent)}" value="No exception events found" />                
+                </apex:tab>
+            </apex:tabPanel>
+            <apex:pageBlockSection columns="2" title="Configure Diagnostic Notification">
+                <apex:pageBlockSectionItem >
+                    <apex:outputlabel for="idAutoNotify"  value="Allow automatic notifications" />
+                    <apex:inputcheckbox id="idAutoNotify" value="{!DiagAutoNotification}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Allows automatic sending of diagnostic information to Full Circle CRM. This may include error information,
+                diagnostic stack traces and application configuration information along with your organiztion name, ID and the SFDC ID of the object 
+                that caused the error. No customer data, user data or other organization data is included.
+                </apex:outputText>
+                <apex:commandButton action="{!SendDiagnosticLog}" value="Send notifications now"/>
+                <apex:outputtext >Send Critical diagnostic and error information to Full Circle CRM now.
+                </apex:outputtext>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!DiagnosticPageSave}"/>
+                <apex:commandButton value="Cancel" action="{!getConfigMainReference}"/>
+                <apex:commandButton value="Clear Log Entries" action="{!DeleteDiagnosticLog}" reRender="idDiagPanel" />
+                <apex:commandButton rendered="false" value="View Update Errors" action="{!ShowDeferredUpdateObjects}" title="View a list of object update or insertion errors and attempt reprocessing"/>
+                <apex:commandButton value="View Update Errors" onclick="if(!window.open('{!DeferredUpdateObjectsPrefix}')) window.parent.location='{!DeferredUpdateObjectsPrefix}'" title="View a list of object update or insertion errors and attempt reprocessing"/>
+                <apex:commandButton rendered="false" value="Test" action="{!DiagTest}" reRender="idDiagPanel"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+    </apex:form>
+    </apex:SectionHeader>
+</apex:page>

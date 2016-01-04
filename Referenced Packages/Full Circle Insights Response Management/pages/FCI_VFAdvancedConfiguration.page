@@ -1,0 +1,87 @@
+<apex:page docType="html-5.0" controller="FCRM.FCI_MainConfigurationController" tabStyle="Full_Circle_Campaign_Influence__tab" action="{!redirectToOldModel}">
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCI_StyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle Campaign Influence Advanced Settings"/>
+    <style>
+    .ct{text-align:center;}
+    </style>    
+    <apex:pagemessages />    
+    <apex:form id="idTheForm" >
+        <apex:pageblock title="Advanced Settings" id="idInProgress" mode="edit" rendered="{!AsyncRebuildStatus > 0}" >
+            <apex:actionPoller interval="30" action="{!Poll}" reRender="idTheForm"/>
+                <apex:pageBlockSection id="idProg" title="Influence refresh is in progress" columns="1">
+                    <br />
+                    <apex:outputText style="font-weight:bold" value="Current Status : {!Status}" />
+                    <apex:outputText value="Influence data refresh started: {!LastDatabaseBuild}" />
+                    <apex:outputText value="Configuration changes are disabled during campaign influence refresh." />
+                    <br />
+                </apex:pageBlockSection>                               
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="Return to Main Configuration" action="{! URLFOR($Page.FCI_VFMainConfiguration)}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>        
+        
+        <apex:pageblock title="Advanced Settings" id="idThePage" mode="edit" rendered="{!AsyncRebuildStatus = 0}" >
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton action="{!SaveScopes}" value="Save and Return" />
+                <apex:commandButton action="{!SetDefaultsForAdvancedConfig}" value="Load Default Values" immediate="true" />
+                <apex:commandButton action="{!ReturnToCIMain}" value="Cancel" immediate="true" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Manage Display" columns="1">
+                <apex:inputCheckbox label="Display Deal Explorer model details" value="{!displayDealExplorerLogging}" />
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="idCalc" title="Advanced Campaign Influence Settings" columns="1">
+                <apex:inputCheckbox label="Clear Primary Campaign for Non-Response Record Types" value="{!dontClearPrimaryNonResponse}" />                
+                <apex:inputCheckbox label="Allow Primary Campaign Defaults for Non-Active Response Opportunities" value="{!dontClearPrimaryPassive}" />
+                <apex:inputText label="First Touch Campaign Days to Filter" value="{!firstTouchCampaignDaysFilter}" /> 
+                <apex:input type="date" label="Only consider opportunities influential from this date on" value="{!earliestInfluenceOpDate}" /> 
+                <apex:inputCheckbox label="Consider above opportunities based on close date" value="{!earliestInfluenceByCloseDate}" /> 
+                <br/>                              
+            </apex:pageBlockSection>             
+            
+            <apex:pageBlockSection id="idCalc2" title="Manage Batch and Limit Sizes" columns="1">
+                <br/> 
+                <apex:outputText style="font-weight:bold" value="Maximum number of records per batch in response database processing" />
+                <apex:inputText label="Response DB Batch Size" value="{!responseDbBatchSize}" />                
+                <apex:outputText style="font-weight:bold" value="Size of influence batch operations" />
+                <apex:inputText label="Accounts in an influence batch" value="{!accountInfluenceScope}" />
+                <apex:inputText label="Opportunities in an influence batch" value="{!opportunityInfluenceScope}" />
+                <apex:outputText style="font-weight:bold" value="Account based model query limits" />
+                <apex:inputText label="Max # of responses per contact (blank or < 5 to ignore)" value="{!contactResponsesLimit}" />
+                <apex:inputText label="Max # of responses per lead (blank or < 5 to ignore)" value="{!leadResponsesLimit}" />
+                <apex:inputText label="Max # of responses for all account contacts (detects account skew)" value="{!accountSkewLimit}" />
+                <br/>                              
+            </apex:pageBlockSection>                                   
+        </apex:pageblock>
+        
+        <apex:pageblock title="Manage Custom Influence Models" mode="edit" rendered="{!AsyncRebuildStatus=0}">
+
+         <apex:pageBlockSection title="Install a Custom Influence Model" columns="1" id="section_influence_configuration_management">
+             <br/>           
+             <apex:panelGrid columns="5" >
+                 <apex:outputText value="Enter the influence model's class name"/>
+                 &nbsp;&nbsp;&nbsp;
+                 <apex:inputText value="{!configurationTypeToAddClassName}" />
+                 &nbsp;&nbsp;&nbsp;
+                 <apex:commandButton value="Install Influence Model" action="{!addConfigurationType}" />
+             </apex:panelGrid>
+             <br/>                    
+         </apex:pageBlockSection>          
+         
+         <apex:pageBlockSection title="Uninstall an Influence Model" columns="1" id="uninstall_configuration_type">
+             <br/>
+             <apex:outputText style="font-style:italic;" rendered="{!installedConfigurationTypes.size = 1}" value="No Influence Models To Uninstall"/>                
+             <apex:outputText rendered="{!installedConfigurationTypes.size > 1}" value="Uninstalling an influence model will also remove all its configurations" />
+             <br/>
+             <apex:panelGrid columns="3" >
+                 <apex:selectList rendered="{!installedConfigurationTypes.size > 1}" value="{!selectedConfigurationTypeToUninstall}" size="1" multiselect="false"> 
+                     <apex:selectOptions value="{!installedConfigurationTypes}" />
+                 </apex:selectList>              
+                 &nbsp;&nbsp;&nbsp;
+                 <apex:commandButton value="Uninstall Influence Model"  action="{!uninstallConfigurationType}" rendered="{!installedConfigurationTypes.size > 1}"/>
+             </apex:panelGrid>                                               
+         </apex:pageBlockSection>                                      
+        </apex:pageblock>  
+    </apex:form>
+    <c:FCI_PageFooter />
+</apex:page>

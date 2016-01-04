@@ -1,0 +1,58 @@
+<apex:page controller="n2de.OutOfOfficeDev" sidebar="false" docType="html-5.0">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		
+	<script type="text/javascript">
+	function toggleStartTime() {
+		if ($('.start_all_day').attr('checked')) {
+			$('.start_time').prop('disabled', true);	
+		} else {
+			$('.start_time').prop('disabled', false);
+		}
+	}
+	
+	function toggleEndTime() {
+		if ($('.end_all_day').attr('checked')) {
+			$('.end_time').prop('disabled', true);	
+		} else {
+			$('.end_time').prop('disabled', false);
+		}
+	}
+	</script>
+	
+	
+<apex:form >
+		<apex:sectionHeader title="Out of Office - Developer Page"/>
+		
+		<apex:pageBlock title="Out of Office Edit" mode="edit">
+		
+			<apex:pageMessages />
+		
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton value="Save" action="{!multiAddOutOfOffice}"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Out of Office Information" columns="2" collapsible="false">
+				<apex:inputText label="User Ids (comma separated list)" value="{!userIdString}" styleClass="requiredIndicator"/>
+				<apex:inputText label="Reason" value="{!reason}" styleClass="requiredIndicator"/>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Timezone"/>
+					<apex:selectList value="{!timezone}" size="1">
+						<apex:selectOptions value="{!timezoneList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				
+				<apex:input type="date" label="Start date" value="{!startDate}"/>
+				<apex:pageBlockSectionItem />
+				<apex:input type="time" label="Start time" value="{!startTime}" styleClass="start_time"/>
+				<apex:inputCheckbox label="Start all day" value="{!startIsAllDay}" styleClass="start_all_day" onchange="toggleStartTime();"/>
+				
+				<apex:input type="date" label="End date" value="{!endDate}"/>
+				<apex:pageBlockSectionItem />
+				<apex:input type="time" label="End time" value="{!endTime}" styleClass="end_time"/>
+				<apex:inputCheckbox label="End all day" value="{!endIsAllDay}" styleClass="end_all_day" onchange="toggleEndTime();"/>
+			</apex:pageBlockSection>
+			
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

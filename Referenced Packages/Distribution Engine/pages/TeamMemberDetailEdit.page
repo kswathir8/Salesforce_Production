@@ -1,0 +1,129 @@
+<apex:page standardController="n2de__Team_member__c" extensions="n2de.TeamMemberDetailController" sidebar="false">
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/requiredBlockUtil.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4.css')}" type="text/css" />
+	
+<c:CommonMask />
+<!-- Replace default header icon -->
+<style>
+<!-- Replace default header icon -->
+img.pageTitleIcon{
+	display: none;
+}
+.content{
+	background-image: url({!URLFOR($Resource.DEResources, 'images/teammember32.png')});
+	background-repeat: no-repeat;
+	background-position-x: 2px;
+}
+</style>
+	<script>
+		$(document).ready(function() {
+			$('.tm_form').on("keyup keypress", function(e) {
+			  	var code = e.keyCode || e.which; 
+			  	if (code  == 13) {               
+			    	e.preventDefault();
+			    	return false;
+				}
+			});	
+		});
+	
+		function toggleHoursEnabled(value) {
+			if (value && value != '') { 
+				disableHoursTable();
+			}
+		}
+	</script>
+	<apex:form styleClass="tm_form">
+		<apex:sectionHeader title="Distribution Team Member Edit" subtitle="{!MemberName}"/>
+		<apex:pageBlock id="team_member" title="Team Member Edit" mode="edit">
+		
+			<apex:pageMessages escape="false"/>
+		
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!saveTeamMember}" value="Save"/>
+				<apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Information" columns="2" collapsible="false">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team_member__c.Fields.n2de__User__c.InlineHelpText}" rendered="{!NOT(IsDistributeToQueue)}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team_member__c.Fields.n2de__User__c.Label}"/>
+					<apex:outputPanel >
+						<apex:outputPanel styleClass="requiredIndicator">
+							<apex:inputField value="{!teamMember.n2de__User__c}" rendered="{!teamMember.Id==null}"/>
+						</apex:outputPanel>
+						<apex:outputText value="{!MemberName}" rendered="{!teamMember.Id!=null}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team_member__c.Fields.n2de__Queue_id__c.InlineHelpText}" rendered="{!IsDistributeToQueue}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team_member__c.Fields.n2de__Queue_id__c.Label}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!teamMember.n2de__Queue_id__c}" size="1" styleClass="requiredIndicator" rendered="{!teamMember.Id==null}">
+							<apex:selectOptions value="{!ObjectQueueOptions}"/>
+						</apex:selectList>
+						<apex:outputText value="{!MemberName}" rendered="{!teamMember.Id!=null}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!teamMember.n2de__Team__c}"/>
+				<apex:inputField value="{!teamMember.n2de__Is_active__c}" />
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="Distribution settings" columns="1" collapsible="false" rendered="false">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team_member__c.Fields.n2de__Quota__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team_member__c.Fields.n2de__Quota__c.Label}"/>
+					<apex:inputText value="{!TeamMemberQuotaText}"/>
+				</apex:pageBlockSectionItem>
+				<!-- <apex:pageBlockSectionItem helpText="{!$ObjectType.Team_member__c.Fields.Member_cap__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.Team_member__c.Fields.Member_cap__c.Label}"/>
+					<apex:inputText value="{!TeamMemberDailyMaxText}"/>
+				</apex:pageBlockSectionItem>	-->
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="Distribution hours" columns="1" collapsible="false" rendered="{!NOT(IsDistributeToQueue)}" id="working_hours">
+				<apex:inputField value="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:actionSupport event="onchange" reRender="team_member, script_panel" onsubmit="showMask();"/>
+				</apex:inputField>
+				<!-- <apex:pageBlockSectionItem helpText="Select an existing set of shift hours or enter custom hours. Create shift hours using 'Manage shift hours' on the detail view page." rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Shift hours"/>
+					<apex:selectList value="{!shiftHoursId}" size="1">
+						<apex:selectOptions value="{!ShiftPatternsList}"/>
+						<apex:actionSupport event="onchange" action="{!loadDistributionHours}" onsubmit="showMask();" oncomplete="toggleHoursEnabled($(this).val())" reRender="working_hours,script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:outputPanel rendered="{!teamMember.n2de__Is_member_distribution_hours__c}" id="hours_comp">
+					<c:CommonHoursSelect shiftHours="{!DistributionHours}" timezones="{!TimezoneOptionList}" availability="{!DistributionHoursAvailabilityOptionList}" startHours="{!DistributionHoursStartHoursOptionList}" endHours="{!DistributionHoursEndHoursOptionList}"  minutes="{!DistributionHoursMinutesOptionList}" disableInputs="{!DistributionHours.n2de__Is_shift_hours__c}"/>
+				</apex:outputPanel>-->
+				
+				<apex:outputPanel layout="block" style="padding-left: 15px" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<table class="hours_table">
+						<tbody>
+							<tr>
+								<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Shift hours"/></th>
+								<td>
+									<apex:selectList value="{!shiftHoursId}" size="1">
+										<apex:selectOptions value="{!ShiftPatternsList}"/>
+										<apex:actionSupport event="onchange" action="{!loadDistributionHours}" onsubmit="showMask();" oncomplete="toggleHoursEnabled($(this).val())" reRender="working_hours,script_panel"/>
+									</apex:selectList>
+									<img src="/s.gif" alt="" class="helpIcon" title="Select an existing set of shift hours or enter custom hours. Create shift hours using 'Manage shift hours' on the detail view page."/>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<apex:outputPanel rendered="{!teamMember.n2de__Is_member_distribution_hours__c}" id="hours_comp">
+						<c:CommonHoursSelect shiftHours="{!DistributionHours}" timezones="{!TimezoneOptionList}" availability="{!DistributionHoursAvailabilityOptionList}" startHours="{!DistributionHoursStartHoursOptionList}" endHours="{!DistributionHoursEndHoursOptionList}"  minutes="{!DistributionHoursMinutesOptionList}" disableInputs="{!DistributionHours.n2de__Is_shift_hours__c}"/>
+					</apex:outputPanel>
+				</apex:outputPanel>
+			</apex:pageBlockSection>
+			
+			<apex:outputPanel id="script_panel">
+				<script>
+					jQuery(document).ready(function($){
+						//Add default required field identifier
+						RequiredBlockUtil.addRequiredBlock('.requiredIndicator');
+						hideMask();
+					});
+				</script>
+			</apex:outputPanel>
+			
+		</apex:pageBlock>
+	</apex:form>
+<c:StatusPanel />
+</apex:page>

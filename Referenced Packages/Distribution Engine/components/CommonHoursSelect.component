@@ -1,0 +1,409 @@
+<apex:component >
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/select2.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/combobox.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/combobox.css')}" type="text/css" />
+	
+	<apex:attribute name="shiftHours" description="" required="true" type="n2de__Distribution_hours__c"/>
+	<apex:attribute name="timezones" description="" required="true" type="SelectOption[]"/>
+	<apex:attribute name="availability" description="" required="true" type="SelectOption[]"/>
+	<apex:attribute name="startHours" description="" required="true" type="SelectOption[]"/>
+	<apex:attribute name="endHours" description="" required="true" type="SelectOption[]"/>
+	<apex:attribute name="minutes" description="" required="true" type="SelectOption[]"/>
+	<apex:attribute name="disableInputs" description="" required="false" type="boolean"/>
+	
+	<style>
+		.hours_table th {
+			text-align: right;
+			width: 300px;
+			padding-top: 3px; 
+			padding-bottom: 3px;
+		}
+		.hours_table th label.labelCol {
+			padding-right: 0px !important;
+		}
+		.hours_table td {
+			padding-left: 15px;
+		}
+	</style>
+
+	<script>
+	$(document).ready(function($){
+		initialiseShiftHours();
+	});
+	
+	function initialiseShiftHours() {
+		//Add default required field identifier
+		RequiredBlockUtil.addRequiredBlock('.requiredIndicator');
+		
+		$('.hours_sel option[value="24:30"]').remove();
+
+		var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+		for (var i = 0; i < days.length; i++) {
+			var day = days[i];	
+
+			var dayAv = $('.' + day + '_av').val();
+			
+			if (dayAv != 'Set hours') {
+				createComboBoxes(day);
+			
+				$('.' + day +'_block .custom-combobox-input').hide();
+				$('.' + day +'_to').hide();
+			} else {
+				var startHr = $('[id$=' + day + '_start_hour_val]').val();
+				var startMin = $('[id$=' + day + '_start_min_val]').val();
+				startHr = startHr + ':' + startMin;
+				
+				var endHr = $('[id$=' + day + '_end_hour_val]').val();
+				var endMin = $('[id$=' + day + '_end_min_val]').val();
+				endHr = endHr + ':' + endMin;
+
+				$('#' + day + '_start_cb option[value="' + startHr + '"]').attr('selected', 'selected');
+				$('#' + day + '_end_cb option[value="' + endHr + '"]').attr('selected', 'selected');
+				
+				var startTime = startHr != ':' ? startHr : null;
+				var endTime = endHr != ':' ? endHr : null; 
+				createComboBoxes(day, startTime, endTime);
+			}
+		}
+		
+		if ('{!disableInputs}' == 'true') {
+			disableHoursTable();
+		}
+	}
+	
+	function createComboBoxes(day, startTime, endTime) {
+		$('#' + day + '_start_cb').combobox({
+			day: day,
+			isstart: true,
+			placeholder: '--:--',
+			presetValue: startTime,
+			onchange: function(options, value) {
+				setHoursMins(options.day, value, options.isstart);
+			}
+		});
+		$('#' + day + '_end_cb').combobox({
+			day: day,
+			isstart: false,
+			placeholder: '--:--',
+			presetValue: endTime,
+			onchange: function(options, value) {
+				setHoursMins(options.day, value, options.isstart);
+			}
+		});
+	}
+		
+	function changeDayAvailability(day, avSelect) {
+		var availability = avSelect.value;
+		if (availability == 'Set hours') {
+			$('.' + day +'_block .custom-combobox-input').show();
+			$('.' + day +'_to').show();
+		} else {
+			$('.' + day +'_block .custom-combobox-input').hide();
+			$('.' + day +'_to').hide();
+		}
+		hideMask();
+	}
+	
+	function setHoursMins(day, time, isStart) {
+		var splitTime = time.split(':');
+		if (splitTime.length == 2) {
+			if (isStart) {
+				$('[id$=' + day + '_start_hour_val]').val(splitTime[0]);
+				$('[id$=' + day + '_start_min_val]').val(splitTime[1]);
+			} else {
+				$('[id$=' + day + '_end_hour_val]').val(splitTime[0]);
+				$('[id$=' + day + '_end_min_val]').val(splitTime[1]);
+			}
+		} else {
+			if (isStart) {
+				$('[id$=' + day + '_start_hour_val]').val('');
+				$('[id$=' + day + '_start_min_val]').val('');
+			} else {
+				$('[id$=' + day + '_end_hour_val]').val('');
+				$('[id$=' + day + '_end_min_val]').val('');
+			}
+		}
+	}
+	
+	function disableHoursTable() {
+		$('.timezone_select').attr('disabled', true);
+		var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+		for (var i = 0; i < days.length; i++) {
+			var day = days[i];	
+			$('.' + day + '_av').attr('disabled', true);
+			$('#' + day + '_start_cb').combobox('disable');
+			$('#' + day + '_end_cb').combobox('disable');
+		}
+	}
+	</script>
+
+	<table class="hours_table">
+		<tbody>
+			<tr>
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Timezone__c.Label}"/></th>
+				<td>
+					<apex:selectList value="{!shiftHours.n2de__Timezone__c}" size="1" styleClass="requiredIndicator timezone_select">
+						<apex:selectOptions value="{!timezones}"/>
+					</apex:selectList>
+				</td>
+			</tr>
+			
+			<tr class="monday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Monday"/></th>
+				<td>
+					<apex:outputPanel styleClass="monday_block">
+						<apex:selectList value="{!shiftHours.n2de__Mon_availability__c}" size="1" styleClass="monday_av avail" onchange="showMask(); changeDayAvailability('monday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="monday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="monday_to"/>
+						
+						<select id="monday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Mon_start_hour__c}" id="monday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Mon_start_min__c}" id="monday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Mon_end_hour__c}" id="monday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Mon_end_min__c}" id="monday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+			
+			<tr class="tuesday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Tuesday"/></th>
+				<td>
+					<apex:outputPanel styleClass="tuesday_block">
+						<apex:selectList value="{!shiftHours.n2de__Tue_availability__c}" size="1" styleClass="tuesday_av avail" onchange="showMask(); changeDayAvailability('tuesday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="tuesday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="tuesday_to"/>
+						
+						<select id="tuesday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Tue_start_hour__c}" id="tuesday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Tue_start_min__c}" id="tuesday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Tue_end_hour__c}" id="tuesday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Tue_end_min__c}" id="tuesday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+			
+			<tr class="wednesday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Wednesday"/></th>
+				<td>
+					<apex:outputPanel styleClass="wednesday_block">
+						<apex:selectList value="{!shiftHours.n2de__Wed_availability__c}" size="1" styleClass="wednesday_av avail" onchange="showMask(); changeDayAvailability('wednesday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="wednesday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="wednesday_to"/>
+						
+						<select id="wednesday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Wed_start_hour__c}" id="wednesday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Wed_start_min__c}" id="wednesday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Wed_end_hour__c}" id="wednesday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Wed_end_min__c}" id="wednesday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+			
+			<tr class="thursday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Thursday"/></th>
+				<td>
+					<apex:outputPanel styleClass="thursday_block">
+						<apex:selectList value="{!shiftHours.n2de__Thu_availability__c}" size="1" styleClass="thursday_av avail" onchange="showMask(); changeDayAvailability('thursday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="thursday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="thursday_to"/>
+						
+						<select id="thursday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Thu_start_hour__c}" id="thursday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Thu_start_min__c}" id="thursday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Thu_end_hour__c}" id="thursday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Thu_end_min__c}" id="thursday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+			
+			<tr class="friday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Friday"/></th>
+				<td>
+					<apex:outputPanel styleClass="friday_block">
+						<apex:selectList value="{!shiftHours.n2de__Fri_availability__c}" size="1" styleClass="friday_av avail" onchange="showMask(); changeDayAvailability('friday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="friday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="friday_to"/>
+						
+						<select id="friday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Fri_start_hour__c}" id="friday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Fri_start_min__c}" id="friday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Fri_end_hour__c}" id="friday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Fri_end_min__c}" id="friday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+			<tr class="saturday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Saturday"/></th>
+				<td>
+					<apex:outputPanel styleClass="saturday_block">
+						<apex:selectList value="{!shiftHours.n2de__Sat_availability__c}" size="1" styleClass="saturday_av avail" onchange="showMask(); changeDayAvailability('saturday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="saturday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="saturday_to"/>
+						
+						<select id="saturday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Sat_start_hour__c}" id="saturday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Sat_start_min__c}" id="saturday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Sat_end_hour__c}" id="saturday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Sat_end_min__c}" id="saturday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+			<tr class="sunday_row">
+				<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Sunday"/></th>
+				<td>
+					<apex:outputPanel styleClass="sunday_block">
+						<apex:selectList value="{!shiftHours.n2de__Sun_availability__c}" size="1" styleClass="sunday_av avail" onchange="showMask(); changeDayAvailability('sunday', this)">
+							<apex:selectOptions value="{!availability}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						
+						<select id="sunday_start_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!startHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:outputLabel value=" to " styleClass="sunday_to"/>
+						
+						<select id="sunday_end_cb" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!endHours}" var="h">
+								<apex:repeat value="{!minutes}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+		
+						<apex:inputHidden value="{!shiftHours.n2de__Sun_start_hour__c}" id="sunday_start_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Sun_start_min__c}" id="sunday_start_min_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Sun_end_hour__c}" id="sunday_end_hour_val"/>
+						<apex:inputHidden value="{!shiftHours.n2de__Sun_end_min__c}" id="sunday_end_min_val"/>
+					</apex:outputPanel>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</apex:component>

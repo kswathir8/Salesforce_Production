@@ -1,0 +1,119 @@
+<apex:page standardController="Case" extensions="DASRequestController" > 
+    
+    <apex:includeScript value="{!$Resource.JQuery}"/>
+    <script>
+    
+    var contactID;
+    var lookup = false;
+    var updatedCustomer = {!updatedCustomer};
+    console.log('{!chosenContactID}');
+    console.log('{!thisCase.ContactID}');
+        
+    $(document).ready(function(){
+        
+        contactID = $('span[id$="chosenContactID"]').text();
+        
+        if($('select[id$="inputContact_lkid"]').length > 0){
+            contactID = $('select[id$="inputContact_lkid"]').children('option[selected=selected]').val();
+        }
+        console.log(contactID);
+        if(contactID != undefined && contactID != '') updateContactFields();
+        
+        $('select[id$="inputContact_lkid"]').change(function(){
+            contactID = $(this).val();
+            updateContactFields();
+        });
+        
+        $('a[id$="inputContact_lkwgt"]').click(function(){
+            lookup = true;
+        });
+        
+        $('input[id$="inputContact"]').change(function(){
+             if(lookup) $('input[id$="resetContactInfo"]').click();
+        });
+    });
+    
+    function updateContactFields(){
+        
+        DASRequestController.getContactJSON(contactID, function(contactResult,event){
+                if(event){
+                    var contact = jQuery.parseJSON( contactResult.replace(/&quot\;/g,"\"") )[0];
+                    console.log(contact);
+                    if(contact != undefined ){
+                    
+                        if(contact.Name != undefined && updatedCustomer )   $('input[id$="Attention"]').val(contact.Name);
+                        
+                        // Account Fields
+                        if(contact.Account != undefined){
+                            if(contact.Account.Name != undefined && updatedCustomer )               $('input[id$="shipToCompany"]').val(contact.Account.Name);
+                            if(contact.Account.ShippingStreet != undefined && updatedCustomer )     $('textarea[id$="shipToStreet"]').val(contact.Account.ShippingStreet);
+                            if(contact.Account.ShippingCity != undefined  && updatedCustomer )      $('input[id$="shipToCity"]').val(contact.Account.ShippingCity);
+                            if(contact.Account.ShippingState != undefined && updatedCustomer )      $('input[id$="shipToState"]').val(contact.Account.ShippingState);
+                            if(contact.Account.ShippingPostalCode != undefined && updatedCustomer ) $('input[id$="shipToPostalCode"]').val(contact.Account.ShippingPostalCode);
+                        }
+                    }
+                    if(contact != undefined && contact.Email != undefined)  $('span[id$="ContactEmail"]').text(contact.Email);
+                    
+                }
+                else{
+                    alert('error: ' + event);
+                }
+        });
+    }
+    
+    </script>
+
+    
+    
+    <apex:form >
+    
+        <apex:outputText value="{!ChosenContactID}" id="chosenContactID" style="display:none;visible:true;"/>
+        <apex:pageMessages />
+    
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="2" title="Case Information">
+                <apex:inputField value="{!thisCase.Estimated_Data_Size__c}"/>   <apex:outputField value="{!thisCase.RecordTypeId}"/>
+                <apex:inputField value="{!thisCase.End_Customer__c}" rendered="{!(!isPartner)}"/>           <apex:inputField value="{!thisCase.DAS_Request_By__c}" rendered="{!(!isPartner)}" /> 
+                <apex:pageBlockSectionItem rendered="{!isPartner}">
+                    <apex:outputLabel value="Service ID" for="inputSID"/>
+                    <apex:inputText value="{!inputSID}" id="inputSID"/>
+                </apex:pageBlockSectionItem>
+                <apex:inputField value="{!thisCase.Service_ID__c}" rendered="{!(!isPartner)}"/>
+                <apex:inputField value="{!thisCase.Customer__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" title="Shipping Information">
+                <apex:inputField value="{!thisCase.ContactID}" id="inputContact"/>              <apex:outputField value="{!thisCase.Contact.email}" id="ContactEmail" />
+                                                                                                <apex:pageBlockSectionItem rendered="{!isPartner}" >
+                                                                                                    <apex:outputLabel value="Email" for="PartnerContactEmail"/>
+                                                                                                    <apex:outputText value="" id="PartnerContactEmail" />
+                                                                                                </apex:pageBlockSectionItem>
+                
+                <apex:inputField value="{!thisCase.Attention__c}" id="Attention"/>  <apex:outputText />
+                <apex:inputField value="{!thisCase.Ship_To_Company__c}" id="shipToCompany"/>    <apex:outputText />
+                <apex:inputField value="{!thisCase.Ship_To_Street__c}" id="shipToStreet"/>      <apex:outputText />
+                <apex:inputField value="{!thisCase.Ship_To_City__c}" id="shipToCity"/>          <apex:outputText />
+                <apex:inputField value="{!thisCase.Ship_To_State__c}" id="shipToState"/>        <apex:outputText />
+                <apex:inputField value="{!thisCase.Ship_To_Zip__c}" id="shipToPostalCode"/>     <apex:outputText />
+                <apex:inputField value="{!thisCase.Priority}" rendered="{!(!isPartner)}"/>      <apex:outputText />
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Shipping Method" for="shippingMethod"/>
+                    <apex:selectList value="{!shippingMethod}" multiselect="false" size="1" id="shippingMethod">
+                        <apex:selectOption itemValue="3 Day Shipping" itemLabel="3 Day Shipping"/>
+                        <apex:selectOption itemValue="2 Day Shipping" itemLabel="2 Day Shipping"/>
+                        <apex:selectOption itemValue="Next Day Shipping" itemLabel="Next Day Shipping"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="Fee Notice">
+                <apex:outputField value="{!thisCase.DAS_Request_Fee_Notice__c}"/>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="Submit"/>
+                <apex:commandButton action="{!output}" style="display:none;visible:true;"  id="resetContactInfo"/>
+            </apex:pageBlockButtons>
+            
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

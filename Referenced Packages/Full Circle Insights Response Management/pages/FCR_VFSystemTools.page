@@ -1,0 +1,54 @@
+<apex:page controller="FCRM.FCR_VFSystemTools" title="Advanced System Tools" tabStyle="Response_Intelligence__tab">
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Advanced System Tools">
+    <div style="color:red;font-weight:bold">Warning: Operations on this page are intended for use by Full-Circle CRM technical support.
+    So please do not use any of these commands without instruction.</div><br />
+    <apex:form >
+        <apex:pageblock mode="edit" >
+ 
+            <apex:pageBlockSection columns="2" title="Resets">
+                <apex:commandButton style="width:200px" id="idClearAsync" value="Reset Async System" action="{!ResetAsync}" />
+                <apex:outputText >Resets async system. May be needed in the event that a scheduled or batch operation is aborted due 
+                to an exception.
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idClearDuplicateSettings" value="Test Custom Settings" action="{!TestCustomSettings}" />
+                <apex:outputText >Tests and repairs custom settings corruption including duplicate names.
+                </apex:outputText>
+                <apex:commandButton rendered="{!V3AsyncSystemEnabled}" style="width:200px" id="idExecuteAsyncNow" value="Execute Pending Async" action="{!ExecutePendingAsync}" />
+                <apex:outputText rendered="{!V3AsyncSystemEnabled}" >Executed a pending async operation. There are currently {!AnyPendingCount} async operations pending or scheduled (10,000 indicates >10,000 pending). 
+                This command ignores user context restrictions - always executes in the current context. Pending (scheduled) async operations are subject
+                to immediate execution. Allows QA of scheduled operations without waiting.
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idRequestAsync" value="Request Async" action="{!RequestForceAsync}" />
+                <apex:outputText >Requests async processing. Use after an exception during async operation to start a new async request. 
+                Note - this has little use with the 2015 Async system
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idDoTickTock" value="Execute Tick Timer" action="{!DoTickTock}" />
+                <apex:outputText >Immediately makes a future call to execute a 'tick' - this is a periodic application timer. Used for diagnostic purposes.
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idDeleteSnapshots" value="Delete Debug Snapshots" action="{!DoDeleteSnapshot}" />
+                <apex:outputText >Deletes Snapshot debug entries. Used for diagnostic purposes.
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idDoRollupDataCleanup" value="Cleanup Rollup Data" action="{!DoRollupDataCleanup}" />
+                <apex:outputText >Zeros out influence fields on Campaigns and Campaign Members 
+                </apex:outputText>                
+
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" title="Links">
+                <apex:commandButton style="width:200px" id="idShowDebugs" value="View Debug Objects" action="{!ShowDebugObjects}" />
+                <apex:outputText >View the list of raw debug objects. Warning - do not modify these objects.
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idShowRIDB" value="Response Information Database" action="{!ShowRIObjects}" />
+                <apex:outputText >View the list of objects in the Response Information Database. Warning - do not modify these objects.
+                </apex:outputText>
+                <apex:commandButton style="width:200px" id="idShowAsyncRequests" value="View Async Requests" action="{!ShowARObjects}" />
+                <apex:outputText >View the list of pending asynchronous requests. Warning - do not modify these objects.
+                </apex:outputText>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Return to main" action="{!URLFOR($Page.FCR_VFConfigMain)}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+    </apex:form>
+    </apex:SectionHeader>
+</apex:page>

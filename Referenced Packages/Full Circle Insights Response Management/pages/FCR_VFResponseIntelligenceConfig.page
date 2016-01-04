@@ -1,0 +1,78 @@
+<apex:page controller="FCRM.FCR_VFResponseSummaryController" tabStyle="Response_Intelligence__tab">
+    <apex:stylesheet value="{!$Resource.FCRM__FCRStyleSheet}"/>
+    <link rel="icon" type="image/x-icon" href="{!$Resource.fcr_favicon}" />
+
+    <apex:sectionHeader title="{!$Label.fcrm__FCR_Response_Intel_Configuration}" help="https://www.fullcirclecrm.com/fcrm/app/response-intelligence-config/"/>
+    <apex:outputText rendered="{!AsyncDatabaseStatus=3}">{!$Label.FCR_App_Disabled_2}  
+         &nbsp; <apex:outputLink value="{! URLFOR($Page.FCR_VFConfigMain,null)}">{!$Label.fcrm__FCR_Configuration_Page}</apex:outputLink>.</apex:outputText>
+
+    <apex:form rendered="{!AsyncDatabaseStatus!=3}" > 
+    <apex:pageBlock id="idmainblock" mode="maindetail" >
+        <apex:outputPanel id="idConfirmChanges">
+            <script type="text/javascript">
+                var configvalchanged = false;
+                
+                function confirmchanges()
+                {
+                    if(!configvalchanged || window.confirm('{!$Label.fcrm__FCR_Confirm_Unsaved}'))
+                    {
+                        if(window.parent!=null) window.parent.location = "{!URLFOR('/apex/FCR_VFresponseintelligence')}";
+                        else window.location = "{!URLFOR('/apex/FCR_VFresponseintelligence')}";
+                    }
+                }
+                function enableapplybuttons(isenabled)
+                {
+                    var apbuttons = document.getElementsByName("{!$Component.idBlockButtons.idApplyChanges}");
+                    if(isenabled)
+                    {
+                        apbuttons[0].disabled = false; apbuttons[0].className="btn";
+                        apbuttons[1].disabled = false; apbuttons[1].className="btn";
+                        configvalchanged = true;
+                    }
+                    else
+                    {
+                        apbuttons[0].disabled = true; apbuttons[0].className="btnDisabled";
+                        apbuttons[1].disabled = true; apbuttons[1].className="btnDisabled";
+                        configvalchanged = false;
+                    }
+                }
+            </script>
+        </apex:outputPanel>
+        <apex:pageBlockSection columns="1" collapsible="false" title="{!$Label.fcrm__FCR_Select_Charts}" >
+           <apex:DataTable columns="4" cellpadding="4" value="{!ChartConfigSet[0]}" var="rowinfo">
+               <apex:column style="text-align:center" headerValue="{!$Label.fcrm__FCR_Selected}" ><apex:inputCheckbox value="{!rowinfo.ShowChart}" onclick="enableapplybuttons(true);" /></apex:column>
+               <apex:column style="text-align:center" headerValue="{!$Label.fcrm__FCR_Order}" ><apex:inputText style="width:25px" maxlength="2" value="{!rowinfo.SortOrderString}" onchange="enableapplybuttons(true);" /></apex:column>
+               <apex:column headerValue="{!$Label.fcrm__FCR_Chart_Title}" ><apex:outputtext title="Chart ID # {!rowinfo.ChartID}" value="{!rowinfo.LocalizedChartName}"/></apex:column>
+               <apex:column headerValue="{!$Label.fcrm__FCR_Description}" ><apex:outputtext value="{!rowinfo.LocalizedChartDescription}" /></apex:column>
+           </apex:DataTable>
+        </apex:pageBlockSection>
+
+        <apex:pageBlockSection columns="1" collapsible="false" title="{!$Label.fcrm__FCR_Select_Charts_2}" >
+           <apex:DataTable columns="4" cellpadding="4" value="{!ChartConfigSet[1]}" var="rowinfo">
+               <apex:column style="text-align:center" headerValue="{!$Label.fcrm__FCR_Selected}" ><apex:inputCheckbox value="{!rowinfo.ShowChart}" onchange="enableapplybuttons(true);" /></apex:column>
+               <apex:column style="text-align:center" headerValue="{!$Label.fcrm__FCR_Order}" ><apex:inputText style="width:25px" maxlength="2" value="{!rowinfo.SortOrderString}" onchange="enableapplybuttons();" /></apex:column>
+               <apex:column headerValue="{!$Label.fcrm__FCR_Chart_Title}"><apex:outputtext title="Chart ID # {!rowinfo.ChartID}" value="{!rowinfo.LocalizedchartName}"/></apex:column>
+               <apex:column headerValue="{!$Label.fcrm__FCR_Description}"><apex:outputtext value="{!rowinfo.LocalizedChartDescription}" /></apex:column>
+           </apex:DataTable>         
+        </apex:pageBlockSection>
+
+        <apex:pageBlockSection columns="3" title="{!$Label.fcrm__FCR_Database_Administration}">
+            <apex:commandButton action="{!RebuildResponseData}" value="{!$Label.fcrm__FCR_Rebuild_Response_Data}" rendered="{!AND(CONTAINS($Profile.Name,'System Admin'),AsyncDatabaseStatus=0)}"/>
+            <apex:commandButton action="{!UpdateResponseData}" value="{!$Label.fcrm__FCR_Update_Response_Data}" rendered="{!AsyncDatabaseStatus=0}"/>
+            <apex:outputText rendered="{!AsyncDatabaseStatus=1}" value="Database rebuild is in progress"/>
+
+            <p>&nbsp;</p><p>&nbsp;</p>     
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockButtons id="idBlockButtons" location="both">
+            <apex:commandButton id="idApplyChanges" value="{!$Label.fcrm__FCR_Apply_Changes}" action="{!ApplyConfigChanges}"/> 
+            <apex:commandButton value="{!$Label.fcrm__FCR_Return_to_RI}" oncomplete="confirmchanges()"  /> 
+        </apex:pageBlockButtons>
+    
+    </apex:pageBlock>
+
+    </apex:form>
+    <script type="text/javascript">
+        enableapplybuttons(false);
+    </script>
+</apex:page>

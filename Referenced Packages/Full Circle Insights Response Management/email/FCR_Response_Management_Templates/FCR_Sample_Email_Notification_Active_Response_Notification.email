@@ -1,0 +1,15 @@
+New Activity - Please follow up with
+
+Name: {!Lead.Name}
+
+Company: {!Lead.Company} {!Account.Name}
+
+Phone: {!Lead.Phone}
+
+Email: {!Lead.Email}
+
+Campaign: {!CampaignMember.Campaign}
+
+Link: {!URLFor(Lead.Id)}
+
+Include lead ID only - contact ID will be populated instead if the record is a Contact record.

@@ -1,0 +1,9 @@
+<apex:component access="global">
+<br/><br/><br/><br/>
+<table width="100%" style="background-color: lightgray; padding: 10px;">
+  <tbody><tr>
+    <td width="75%" style="font-size: 6pt;">You are receiving this mail because you are part of a Distribution Engine Salesforce team. Distribution Engine is a Salesforce application for automated round robin assignment of leads &amp; cases.</td>
+    <td align="right"><a href="http://www.nc-squared.com" target="_blank"><img src="http://nc-squared.com/assets/distribution-engine.png" style="width:75px"/></a></td>
+  </tr>
+</tbody></table>
+</apex:component>

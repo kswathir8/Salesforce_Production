@@ -1,0 +1,35 @@
+<apex:component controller="FCRM.FCI_VFInfluenceModelDetailsController">
+    <apex:attribute name="HeaderString" assignTo="{!m_HeaderString}" type="String" description="Header string of table"/>
+    <apex:attribute name="TableData" assignTo="{!m_TableData}" type="String[]" description="List of comma separated row values"/>
+    <apex:attribute name="TableHeaders" assignTo="{!m_TableHeaders}" type="String[]" description="Headers of table's columns"/>
+    <apex:attribute name="AdditionalData" required="false" assignTo="{!m_AdditionalData}" type="String[]" description="Additional Data displayed below table"/>
+    <apex:pageBlock title="{!m_HeaderString}">              
+        <apex:pageBlockTable value="{!modelDetailData}" var="row">
+            <apex:repeat value="{!m_TableHeaders}" var="colName">               
+                <apex:column >
+                    <apex:facet name="header">{!colName}</apex:facet>
+                    <apex:outputPanel rendered="{!AND(CONTAINS(row.colNameToVal[colName], '00v'), OR(lookupCols[colName] = true, lookupColsWithLabel[colName] = null))}">
+                        <apex:outputLink value="{!'/' & row.colNameToVal[colName]}" target="_blank">
+                            <apex:outputText value="{!row.colNameToVal[colName]}"/>
+                        </apex:outputLink>                                          
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(lookupColsWithLabel[colName], CONTAINS(row.colNameToVal[colName], '%%'))}">
+                        <apex:outputLink value="{!'/' & LEFT(row.colNameToVal[colName], (FIND('%%', row.colNameToVal[colName])-1))}" target="_blank">
+                            <apex:outputText value="{!RIGHT(row.colNameToVal[colName], (LEN(row.colNameToVal[colName]) - FIND('%%', row.colNameToVal[colName])-1))}"/>
+                        </apex:outputLink>                                          
+                    </apex:outputPanel>                 
+                    <apex:outputPanel rendered="{!AND(!CONTAINS(row.colNameToVal[colName], '%BOLD%'), OR(AND(lookupCols[colName] = false, lookupColsWithLabel[colName] = false), AND(lookupColsWithLabel[colName], !CONTAINS(row.colNameToVal[colName], '%%'))))}">
+                        {!row.colNameToVal[colName]}
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(CONTAINS(row.colNameToVal[colName], '%BOLD%'), OR(AND(lookupCols[colName] = false, lookupColsWithLabel[colName] = false), AND(lookupColsWithLabel[colName], !CONTAINS(row.colNameToVal[colName], '%%'))))}">
+                        <apex:outputText style="font-weight: bold;" value="{!LEFT(row.colNameToVal[colName], (FIND('%BOLD%', row.colNameToVal[colName])-1))}"/>
+                    </apex:outputPanel>                    
+                </apex:column>
+            </apex:repeat>             
+        </apex:pageBlockTable> 
+        <apex:repeat value="{!m_AdditionalData}" var="dataEntry">
+        	<br/>
+        	<apex:outputText value="{!dataEntry}"/>
+        </apex:repeat>
+    </apex:pageBlock>     
+</apex:component>

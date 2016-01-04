@@ -1,0 +1,116 @@
+<apex:page showHeader="false" sidebar="false">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Axcient Partner Portal</title>
+<link href="/resource/partnercss" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+<center>
+<table valign="top" width="703" border="0" cellspacing="0" cellpadding="0" border-color="white">
+  <tr>
+    <td colspan="4"></td>
+    </tr>
+  <tr>
+    <td colspan="4"><img src="/resource/partnerbanner" width="703" height="120" alt="Axcient Partner Portal - Welcome" /><img src="/resource/partnerpixel" width="703" height="25" alt="Horizontal Spacer" /></td>
+    </tr>
+  <tr valign="top">
+    <td width="12" rowspan="4">&nbsp;</td>
+    <td width="493" rowspan="4"><p><span class="mainheader">Welcome to the new Axcient Partner Program,<b> {!$User.FirstName}.</b></span> </p>
+      <p class="maintext">We are pleased to inform you that <b>{! $User.Account__c }</b>'s current partner status is <b>Partner</b>.</p>
+      <p class="maintext">At Axcient, our goal is to assist you with your efforts to sell, market, support, and manage the Axcient service. Our new partner program provides you with a number of self service features and benefits.</p>
+      <p class="maintext">With the  <b>Partner</b> status you have access to the following features (for specifics on these benefits, please reference the<span class="maintextbold4"> <a style="color:009af4" href="/sfc/#version?selectedDocumentId=06980000000MhG7" target="_blank">Axcient Partner Program Detailed Overview Guide</a></span>):</p>
+      <p class="maintextheader">Sales Features:</p>
+      <ul>
+        <li class="maintext2">Deal Registration</li>
+        <li class="maintext2">Partner Referral Program</li>
+        <li class="maintext2">Dedicated Account Manager</li>
+        </ul>
+      <p class="maintextheader">Marketing Features:</p>
+      <ul>
+        <li class="maintext2">Co-Branded Marketing Materials</li>
+        <li class="maintext2">Demand Generation Tools</li>
+        <li class="maintext2">Customized Partner Portal</li>
+        <li class="maintext2">Thought Leadership Webinars</li>
+        <li class="maintext2">Sales/Marketing Webinars</li>
+        
+        </ul>
+      <p class="maintextheader">Technical Features:</p>
+      <ul>
+        <li class="maintext2">ACE (Axcient Certified Expert) Training</li>
+        <li class="maintext2">30-Day Eval Program</li>
+        <li class="maintext2">Not for Resale Program (NFR)</li>
+        <li class="maintext2">Support Services</li>
+        <li class="maintext2">Install Calls &amp; First-Time Deployment Support</li>
+        </ul>
+      <p class="maintextbold3">LEARN MORE: <span class="maintextbold4"><a style="color:009af4" href="https://www1.gotomeeting.com/register/597612120" target="_blank">Axcient Partner Program Overview Webinar</a></span></p>
+      <p class="maintextbold3">DON'T MISS:<span class="maintext2"> Axcient's <u>Continuous Improvment Webinar</u> titled "Axcient Product and Support Enhancements for Growth and Scalability".</span> <span class="maintextbold4"><a style="color:009af4" href="https://www1.gotomeeting.com/register/950408960" target="_blank">Click here</a></span><span class="maintext2"> to hear the recorded version! </span> </p>
+      
+      <p class="maintextbold3"><span class="maintext2"> View the latest Axcient press release.</span> <span class="maintextbold4"><a style="color:009af4" href="https://na6.salesforce.com/sfc/#version?selectedVersionId=06880000000O6rl" target="_blank">Click here</a></span><span class="maintext2"></span> </p>
+  
+      
+      
+      <p class="maintext2">If you have additional questions, please download our <a style="color:009af4" href="/sfc/#version?selectedDocumentId=06980000000MhGC" target="_blank">quick start quide to partner program here</a> or speak to your Regional Sales Manager or Account Manager.</p>
+      <p class="maintext2">As always, this portal is also available to access your <a style="color:009af4" href="/apex/SupportCenter?sfdc.tabName=01r80000000UEhM" target="_blank">support cases</a> and to available <a style="color:009af4" href="/sfc/#workspaces">sales and marketing resources</a>.</p>
+      <p class="maintextbold3">Thank you for your continued partnership!</p>
+      <p class="maintextbold3">The Axcient Team</p></td>
+    <td width="30" rowspan="4">&nbsp;</td>
+
+    <td width="168"><a href="/sfc/#version?selectedDocumentId=06980000000MhG7" target="_blank"><img src="/resource/partnergetstarted2" width="168" height="149" alt="Get Started with the Axcient Partner Program" /> </a>
+      <img src="/resource/partnerpixel" width="5" height="18" alt="Horizontal Spacer" /></td>
+  </tr>
+  <tr valign="top">
+    <td><a href="/sfc/#workspaces" target="_blank"><img src="/resource/partnersalestool" width="168" height="149" alt="Access Axcient Sales Tools for Success" /></a><img src="/resource/partnerpixel" width="5" height="18" alt="Horizontal Spacer" /></td>
+  </tr>
+  <tr valign="top">
+    <td><a href="/apex/SupportCenter?sfdc.tabName=01r80000000UEhM" target="_blank"><img src="/resource/partnersupportcenter" width="168" height="149" alt="Check Out Your Axcient Support Center" /></a><img src="/resource/partnerpixel" width="5" height="18" alt="Horizontal Spacer" /></td>
+  </tr>
+  <tr valign="top">
+    <td><a href="http://www.axcient.com/co-brand-me" target="_blank"><img src="/resource/partnermarketingmaterial" width="168" height="149" alt="Request Co-Branded Marketing Materials" /></a><img src="/resource/partnerpixel" width="5" height="18" alt="Horizontal Spacer" /></td>
+  </tr>
+  <tr background="/resource/xxBottomBG" >
+    <td colspan="4"><table width="703"><tbody><tr><td colspan="8" height="8">
+    
+    </td></tr><tr><td rowspan="5" width="20">&nbsp;</td></tr><tr><td><span class="Feature02">
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L3vq" target="_blank">Sales Tools</a> <br/><br/>
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L3vl" target="_blank">Marketing Tools</a> <br/><br/>
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L4Ip" target="_blank">Media Center</a> 
+    
+    </span>
+    </td><td width="55">&nbsp;</td>
+    <td>
+    <span class="Feature02">
+    <a href="/05880000000L4Ia" target="_blank">Product Releases</a><br/><br/>
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L3wA" target="_blank">Compliance Documents</a><br/><br/>
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L3w5" target="_blank">Case Studies</a>    
+    </span>
+    </td>
+    <td width="55">&nbsp;</td>
+    <td>
+    <span class="Feature02">
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L3w0" target="_blank">Partner Newsletters</a><br/><br/>
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L4If" target="_blank">Analyst Papers</a><br/><br/>
+    <a href="/sfc/#workspaceView?selectedWorkspaceId=05880000000L4Ik" target="_blank">Industry Articles</a>
+    </span>
+    </td>
+    <td width="55">&nbsp;</td>
+    <td><span class="Feature02">
+    <a href="https://na6.salesforce.com/500/o" target="_blank">Support Cases</a><br/><br/>
+    <a href="" target="_blank" ><font color="white">1</font></a><br/><br/>
+    <a href="" target="_blank" ><font color="white">2</font></a>
+    </span>
+    </td>
+    </tr>
+    </tbody></table></td>
+    </tr>
+</table>
+</center>
+</body>
+</html>
+
+
+
+</apex:page>

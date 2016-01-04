@@ -1,0 +1,103 @@
+<apex:page standardController="Case" extensions="CaseCommentCreateController">
+
+<apex:includeScript value="{!$Resource.JQuery}"/>
+
+<style>
+
+.publicHeader{
+	text-align: center;
+}
+
+#bodyCell h3{
+	color: black;
+}
+
+#PageHeader{
+	font-size: 2em;
+	color: black;
+}
+
+</style>
+
+<script>
+
+var isPublished = {!newCaseComment.isPublished};
+
+	$(document).ready(function(){
+		$('textarea[id$="commentBody"]').attr("cols","80");
+		$('textarea[id$="commentBody"]').attr("rows","8");
+		if(!isPublished)	$('input[id$="sendCustomerNotification"]').attr("disabled",true);
+		
+		$('input[id$="isPublished"]').click(function(){
+				
+				if($(this).attr("checked")){
+					$('input[id$="sendCustomerNotification"]').attr("disabled",false);
+					$('input[id$="sendCustomerNotification"]').attr("checked",true);
+				}
+				else{
+					$('input[id$="sendCustomerNotification"]').attr("disabled",true);
+					$('input[id$="sendCustomerNotification"]').attr("checked",false);
+					
+				}
+		});
+		
+	});
+
+</script>
+
+<h1>Comments</h1><br/><br/>
+<h2 id="PageHeader">Support Case {!Case.CaseNumber}</h2><br/><br/>
+
+<apex:form >
+	<apex:Messages />
+	<apex:pageBlock title="Case Comment Edit">
+		<apex:pageBlockButtons >
+			<apex:commandButton value=" Save " action="{!saveRecords}"/>
+			<apex:commandButton value="Cancel" action="{!cancel}"/>
+			<apex:commandButton value="Add Task" action="{!addTask}" rendered="{!(!addTask)}"/>
+		</apex:pageBlockButtons>
+		<apex:pageBlockSection title="Case Details"  columns="1" collapsible="false">
+			<apex:outputField value="{!Case.subject}"/>
+			<apex:outputField value="{!Case.Description}"/>
+		</apex:pageBlockSection>
+		<apex:pageBlockSection title="Comment Details" columns="1" collapsible="false">
+			<apex:inputField value="{!newCaseComment.isPublished}" id="isPublished"/>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Send Customer Notification" for="sendCustomerNotification"/>
+				<apex:inputCheckbox value="{!sendCustomerNotification}" id="sendCustomerNotification"/>
+			</apex:pageBlockSectionItem>
+			<apex:inputField value="{!newCaseComment.commentBody}" id="commentBody" label="Comment" required="true"/>
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+	<apex:pageBlock title="New Task" rendered="{!addTask}">
+		<apex:pageBlockButtons >
+			<apex:commandButton value="Remove" action="{!removeTask}"/>
+		</apex:pageBlockButtons>
+		<apex:pageBlockSection title="Task Information" columns="2" collapsible="false">
+			<apex:inputField value="{!newReminder.OwnerId}" />
+			<apex:inputField value="{!newReminder.WhatId}" />
+			<apex:inputField value="{!newReminder.WhoId}" />
+		</apex:pageBlockSection>
+		<apex:pageBlockSection title="Additional Information" columns="2" collapsible="false">
+			<apex:inputField value="{!newReminder.Status}" />
+			<apex:inputField value="{!newReminder.Priority}" />
+		</apex:pageBlockSection>
+		<apex:pageBlockSection title="Reminder Information" columns="2" collapsible="false">
+			<apex:inputField value="{!newReminder.ReminderDateTime}"/>
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+	<apex:pageBlock title="Case Comments">
+		<apex:pageBlockTable value="{!otherComments}" var="comment">
+			<apex:column value="{!comment.IsPublished}" headerValue="Public" style="width:10%;text-align:center;" headerClass="publicHeader" />
+			<apex:column headerValue="Comment" >
+				<b>
+					<apex:outputText value="Created By: "/><apex:outputLink value="/{!comment.CreatedByID}">{!comment.CreatedBy.Name}</apex:outputLink><apex:outputText value=" ({!comment.CreatedDate})"/><br/>
+				</b>
+				<apex:outputText value="{!comment.CommentBody}" />
+			</apex:column>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+</apex:form>
+
+
+</apex:page>

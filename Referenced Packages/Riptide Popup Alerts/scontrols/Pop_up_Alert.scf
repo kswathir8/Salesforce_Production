@@ -1,0 +1,63 @@
+<html> 
+  <head>
+    <script type="text/javascript"> 
+      var s = "";
+      function checkAlert() 
+      { 
+        // Look for account message
+        try { 
+          a = "{!JSENCODE(Account.Alert_Message__c)}";
+          if (a.length > 0) { 
+            s += "Account Alert: " + a + "\n"; 
+          } 
+        } 
+        catch(err)  {  } 
+        
+        // Look for contact message
+        try { 
+          c = "{!JSENCODE(Contact.Alert_Message__c)}";
+          if (c.length > 0) { 
+          s += "Contact Alert: " + c + "\n"; 
+          } 
+        } 
+        catch(err)  {  } 
+        
+        // Look for lead message
+        try { 
+          l = "{!JSENCODE(Lead.Alert_Message__c)}";
+          if (l.length > 0) { 
+          s += "Lead Alert: " + l + "\n"; 
+          } 
+        } 
+        catch(err)  {  } 
+        
+        // Look for opportunity message
+        try { 
+          o = "{!JSENCODE(Opportunity.Alert_Message__c)}";
+          if (o.length > 0) { 
+          s += "Opportunity Alert: " + o + "\n"; 
+          } 
+        } 
+        catch(err)  {  } 
+
+        // Look for case message
+        try { 
+          ca = "{!JSENCODE(Case.Alert_Message__c)}";
+          if (ca.length > 0) { 
+          s += "Case Alert: " + ca + "\n"; 
+          } 
+        } 
+        catch(err)  {  } 
+        
+        // Pop-up message if any alerts found
+        if (s.length > 0)
+        { 
+          window.alert(s); 
+        } 
+      } 
+
+    </script> 
+  </head>
+  <body onload="checkAlert()"> 
+  </body> 
+</html>

@@ -1,0 +1,213 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Response UI Campaigns" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Field Synchronization Configuration" help="https://www.fullcirclecrm.com/fcrm/app/sync-fields/">
+    <apex:pageMessages />
+    <apex:form id="idTheForm" >
+        <apex:pageblock id="idSync" mode="edit" >
+            <apex:pageblockSection columns="1">
+            <apex:outputtext >
+                   This Field Synchronization Configuration screen allows you to synchronize custom fields between Leads and Contacts, and their 
+                    associated Campaign Member (Response) records. This is useful to keep track of historical information on the outcomes 
+                    of your Responses.
+                    It also supports synchronization of response data to campaign influence detail records when detailed campaign influence 
+                    is enabled in an organization.
+             </apex:outputtext>
+             <apex:outputtext >
+                    There are three tables below: Lead Field Synchronization, Contact Field Synchronization and Campaign Influence Detail Field Synchronization. 
+                    In the first two tables, the Source Field is the custom field on the Lead or Contact. 
+                    The Response Field is the target field on the Campaign Member that you wish to sync to. 
+                    If you check the box for Sync on Create or Sync on Update, the fields will be synchronized 
+                    when a new Lead or Contact is created or updated. If you check the "Clear When Set to Inactive" box, the field value 
+                    on the source Lead or Contact will be cleared when the Lead or Contact is set to a status that is Inactive.
+                    In the Campaign Influence Detail Field Synchronization table, the response (CampaignMember) field is the source field, and the field
+                    on the Campaign Influence Detail object is the target.
+                   
+            </apex:outputtext>
+            </apex:pageblockSection>        
+            <apex:pageBlockSection id="idLeadSync" columns="1" title="Lead Field Synchronization">
+
+                <apex:datatable width="100%" cellspacing="4px" value="{!LeadSyncFields}" var="syncfield">
+                    <apex:column headerValue="Source Field" value="{!syncfield.SourceField}"/>
+                    <apex:column headerValue="Response Field" value="{!syncfield.ResponseField}"/>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" headerValue="Sync on Create">
+                        <apex:inputCheckbox value="{!syncfield.SyncOnCreate}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" headerValue="Sync on Update">
+                        <apex:inputCheckbox value="{!syncfield.SyncOnUpdate}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" HeaderValue="Clear When Set to Inactive">
+                        <apex:inputCheckbox value="{!syncfield.ClearWhenResolved}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center">
+                        <apex:commandButton value="Remove" action="{!RemoveSyncEntry}" rerender="idLeadSync">
+                            <apex:param name="ser" value="{!syncfield.name}"/>
+                        </apex:commandButton>
+                    </apex:column>
+                    
+
+                </apex:datatable>
+
+                <apex:outputText style="font-weight:bold" value="Select New Fields to Synchronize" />
+                <apex:outputText >
+                    Select a source Lead field and then a target response field on the Campaign Member for synchronization. 
+                    The list of available response fields will match the field type of the source field such as text field to text field 
+                    or date field to date field. Once the new field mapping is created, you can then select the check boxes to define the 
+                    synchronization mapping.
+                </apex:outputText>
+            </apex:pageBlockSection>
+            
+            <apex:actionFunction name="AvailableLeadsUpdated" reRender="idLeadResponseFields"/>
+            <script type="text/javascript">
+                function disableleadresponse()
+                {
+                    var obj = document.getElementById('{!$Component.idTheForm.idSync.idLeadMapping.idLMSec1.idLeadresponseFields}');
+                    obj.style.visibility= 'hidden';
+                }
+                function disablecontactresponse()
+                {
+                    var obj = document.getElementById('{!$Component.idTheForm.idSync.idContactMapping.idCMSec1.idContactresponseFields}');
+                    obj.style.visibility= 'hidden';
+                }
+
+                function disablecidtarget()
+                {
+                    var obj = document.getElementById('{!$Component.idTheForm.idSync.idCIDMapping.idCMSec3.idCIDTargetFields}');
+                    obj.style.visibility= 'hidden';
+                }
+
+            </script>
+            <apex:pageBlockSection id="idLeadMapping" columns="3">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAvailableLeadFields" value="Source" />
+                    <apex:selectList id="idAvailableLeadFields" size="0" value="{!SelectedSyncLeadField}" onchange="disableleadresponse();AvailableLeadsUpdated()">
+                        <apex:SelectOptions value="{!AvailableLeadSyncFields}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="idLMSec1">
+                    <apex:outputLabel for="idLeadResponseFields" value="Response Field" />
+                    <apex:selectList id="idLeadResponseFields" size="0" value="{!SelectedSyncLeadResponseField}">
+                        <apex:SelectOptions value="{!AvailableLeadResponseSyncFields}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:commandButton value="Insert" action="{!InsertLeadSync}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:pagemessage severity="Error" Summary="{!InsertLeadSyncError}" rendered="{!NOT(IsBlank(InsertLeadSyncError))}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="idContactSync" columns="1" title="Contact Field Synchronization">
+                <apex:datatable width="100%" cellspacing="4px" value="{!ContactSyncFields}" var="syncfield">
+                    <apex:column headerValue="Source Field" value="{!syncfield.SourceField}"/>
+                    <apex:column headerValue="Response Field" value="{!syncfield.ResponseField}"/>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" headerValue="Sync on Create">
+                        <apex:inputCheckbox value="{!syncfield.SyncOnCreate}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" headerValue="Sync on Update">
+                        <apex:inputCheckbox value="{!syncfield.SyncOnUpdate}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" headerValue="Update Op-Active">
+                        <apex:inputCheckbox value="{!syncfield.SyncOnOpActiveUpdate}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center" headerclass="SyncHeader" HeaderValue="Clear When Set to Inactive">
+                        <apex:inputCheckbox value="{!syncfield.ClearWhenResolved}"/>
+                    </apex:column>
+                    <apex:column style="text-align:center">
+                        <apex:commandButton value="Remove" action="{!RemoveSyncEntry}" rerender="idContactSync">
+                            <apex:param name="ser" value="{!syncfield.name}"/>
+                        </apex:commandButton>
+                    </apex:column>
+
+                </apex:datatable>
+                <apex:outputText style="font-weight:bold" value="Select New Fields to Synchronize" />
+                <apex:outputText >Select a source Contact field and then a target response field on the Campaign Member for synchronization. 
+                    The list of available response fields will match the field type of the source field such as text field to text field 
+                    or date field to date field. Once the new field mapping is created, you can then select the check boxes to define 
+                    the synchronization mapping.
+                </apex:outputText>
+
+            </apex:pageBlockSection>
+
+            <apex:actionFunction name="AvailableContactsUpdated" reRender="idContactResponseFields"/>
+            <apex:pageBlockSection id="idContactMapping" columns="3">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAvailableContactFields" value="Source" />
+                    <apex:selectList id="idAvailableContactFields" size="0" value="{!SelectedSyncContactField}" onchange="disablecontactresponse(),AvailableContactsUpdated()">
+                        <apex:SelectOptions value="{!AvailableContactSyncFields}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="idCMSec1" >
+                    <apex:outputLabel for="idContactResponseFields" value="Target" />
+                    <apex:selectList id="idContactResponseFields" size="0" value="{!SelectedSyncContactResponseField}">
+                        <apex:SelectOptions value="{!AvailableContactResponseSyncFields}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:commandButton value="Insert" action="{!InsertContactSync}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:pagemessage severity="Error" Summary="{!InsertContactSyncError}" rendered="{!NOT(IsBlank(InsertContactSyncError))}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+
+
+            <apex:pageBlockSection id="idCIDSync" columns="1" title="Campaign Influence Detail Field Synchronization">
+                <apex:datatable width="100%" cellspacing="4px" value="{!InfluenceDetailSyncFields}" var="syncfield">
+                    <apex:column headerValue="Response Field" value="{!syncfield.ResponseField}"/>
+                    <apex:column headerValue="Campaign Influence Detail Field" value="{!syncfield.SourceField}"/>
+                    <apex:column style="text-align:center">
+                        <apex:commandButton value="Remove" action="{!RemoveSyncEntry}" rerender="idCIDSync">
+                            <apex:param name="ser" value="{!syncfield.name}"/>
+                        </apex:commandButton>
+                    </apex:column>
+
+                </apex:datatable>
+                <apex:outputText style="font-weight:bold" value="Select New Fields to Synchronize" />
+                <apex:outputText >Select a source Response field and then a target field on the Campaign Influence Detail object for synchronization. 
+                    The list of available target fields will match the field type of the response field such as text field to text field 
+                    or date field to date field. Synchronization only takes place when the detailed Campign Influence feature is enabled.
+                </apex:outputText>
+
+            </apex:pageBlockSection>
+
+            <apex:actionFunction name="AvailableCIDsUpdated" reRender="idCIDTargetFields"/>
+            <apex:pageBlockSection id="idCIDMapping" columns="3">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAvailableCIDResponseFields" value="Source" />
+                    <apex:selectList id="idAvailableCIDResponseFields" size="0" value="{!SelectedSyncCIDResponseField}" onchange="disablecidtarget(),AvailableCIDsUpdated()">
+                        <apex:SelectOptions value="{!AvailableCIDResponseSyncFields}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="idCMSec3" >
+                    <apex:outputLabel for="idCIDTargetFields" value="Target" />
+                    <apex:selectList id="idCIDTargetFields" size="0" value="{!SelectedSyncCIDSourceField}">
+                        <apex:SelectOptions value="{!AvailableCIDTargetSyncFields}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:commandButton value="Insert" action="{!InsertInfluenceDetailSync}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:pagemessage severity="Error" Summary="{!InsertCIDSyncError}" rendered="{!NOT(IsBlank(InsertCIDSyncError))}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+
+
+            <apex:pageblockSection columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on the currently saved data. Save the page and then return to the page for an updated report.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!SyncFieldsDiagnosticInfo}" />
+            </apex:pageblockSection>
+        
+        
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!SyncFieldSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    </apex:SectionHeader>
+</apex:page>

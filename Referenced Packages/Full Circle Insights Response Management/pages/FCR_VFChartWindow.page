@@ -1,0 +1,102 @@
+<apex:page controller="FCRM.FCR_VFChartWindowController" showHeader="false" sidebar="false" readOnly="true">
+<apex:stylesheet value="{!$Resource.FCRM__FCRStyleSheet}"/>
+<style>
+    html { height:100%; width:100%; }
+    body { background-color:#{!BackColor}; height:100%; }
+</style>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    
+  google.load('visualization', '1');   // Don't need to specify chart libraries!
+  
+</script>
+<apex:form >
+<apex:actionFunction name="SetSize" action="{!SetSize}"  reRender="idGraphTablePanel" >
+    <apex:param name="CWidth" value="" assignTo="{!ClientWidth}"/>
+    <apex:param name="CHeight" value="" assignTo="{!ClientHeight}"/>
+</apex:actionFunction>
+<apex:outputPanel id="idGraphTablePanel" layout="block" style="margin:0px;">                   
+    <table id="idGraphTable" height="{!ClientHeight}" width="{!ClientWidth}" >
+        <tr>
+        <td class="ChartTitle">
+            <apex:outputText value="Loading Data" rendered="{!IsLoading}" />
+            <apex:outputPanel layout="inline" rendered="{! NOT(IsLoading)}">
+                <apex:outputText rendered="{!ISBlank(ChartURL)}" value="{!Description + ' [ ' + ChartError + ' ]'}" />
+                <apex:outputPanel id="idGraphTitle" layout="inline" rendered="{!NOT(ISBlank(ChartURL))}">
+                    <apex:outputText value="{!Title}" title="{!Description}"></apex:outputText>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </td>
+        </tr>
+        <tr><td style="height:6px;" ><hr class="ChartRuler" /></td></tr>
+        <tr>
+        <td id="idmaincell" height="100%" width="100%" valign="middle" style="vertical-align: middle; padding:0px;">            
+            <apex:outputPanel rendered="{!AND(NOT(ISLoading),Not(ISBlank(ChartURL))) }" layout="none">                          
+                <table class="InnerChart" height="100%" width="100%">
+                <tr>
+                <td>
+                    <div class="waitingSearchDiv" id="el_loading" style="height: 100%;width:91%;"> 
+                        <div class="waitingHolder" style="top: 50%; width: 91px;">
+                            <img class="waitingImage" src="/img/loading.gif" title="Loading chart..." />
+                            <span class="waitingDescription">Loading chart...</span>
+                        </div>
+                    </div>
+                    <div id="chartContainer" style='visibility: hidden;'>
+                        <apex:outputPanel id="idGraph" layout="inline" rendered="{!NOT(ISBlank(ChartURL))}">                        
+                            <div id="chart_div" onclick="ShowLarge()" style="cursor:-moz-zoom-in;cursor:-webkit-zoom-in;cursor:zoom-in;"></div>
+                            <script>               
+                            	if({!ExcludePopupLink}) document.getElementById('chart_div').style.cursor = 'auto';             
+                                renderChart({!ChartURL});
+                            </script>
+                        </apex:outputPanel>
+                        <br />
+                        <apex:outputPanel id="idGraphLegend" styleClass="ChartLegend" layout="block">
+                            <apex:outputText id="idLegend" escape="false" value="{!TheLegend}"></apex:outputText>
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="block" styleClass="ChartUnderLegend" rendered="{!NOT(ISBLANK(UnderTheLegend))}">
+                            <apex:outputText escape="false" value="{!UnderTheLegend}"></apex:outputText>
+                        </apex:outputPanel>                 
+                    </div>                
+                </td>
+                </tr>
+                </table>
+            </apex:outputPanel>
+        </td></tr>
+    </table>    
+     
+</apex:outputPanel>
+</apex:form>
+<script type="text/javascript"> 
+    function ShowLarge()
+    {
+        if({!ExcludePopupLink}) return;
+        window.open("{!OriginalURL + '&ex=1'}","chart","width=700,height=680,status=0,toolbar=1,location=0,menubar=0,scrollbars=0");
+    }
+    
+    var wrapper;
+    var renderedOnce = false;
+    function renderChart(chartData)
+    {   
+        if (renderedOnce) return;           
+        wrapper = new google.visualization.ChartWrapper(chartData);  
+        wrapper.draw(); 
+        
+        google.visualization.events.addListener(wrapper, 'ready', onReady);
+    
+        wrapper.draw();
+    
+        function onReady() {
+            document.getElementById('el_loading').style.visibility = 'hidden';
+            document.getElementById('chartContainer').style.visibility = 'visible';
+        }
+
+        renderedOnce = true;
+    }  
+        
+    var clientheight = document.documentElement.clientHeight;
+    document.getElementById('idGraphTable').height = clientheight;
+    var clientwidth = document.documentElement.clientWidth;
+    SetSize(clientwidth, clientheight);    
+    
+</script>
+</apex:page>

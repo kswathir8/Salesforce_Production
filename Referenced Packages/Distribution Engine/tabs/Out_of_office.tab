@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <icon>Distribution_engine/Logo_out_of_office.png</icon>
+    <label>Distribution OoO</label>
+    <mobileReady>false</mobileReady>
+    <motif>Custom253: TV Widescreen</motif>
+    <page>OutOfOffice</page>
+</CustomTab>

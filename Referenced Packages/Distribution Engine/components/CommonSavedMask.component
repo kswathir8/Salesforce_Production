@@ -1,0 +1,45 @@
+<apex:component >
+<script>
+function showSavedMask(){
+	$("#s_mask").show();
+	setTimeout(function() { $("#s_mask").hide(); }, 1500);
+}
+</script>
+<style>
+#s_mask {
+	z-index: 999;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: black;
+	opacity: 0.5;
+	margin: 0;
+	padding: 0;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: alpha(opacity=30);
+	display: none;
+}
+#saved_block{
+	border-radius: 5px; 
+	background-color: white; 
+	padding: 10px; 
+	position: absolute; 
+	left: 50%; 
+	top: 50%;
+}
+#s_mask img{
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+</style>
+<!-- loading mask -->
+<div id="s_mask">
+	<div id="saved_block">
+		<img alt="success" src="{!URLFOR($Resource.DEResources, 'images/greentick32.png')}"/>
+		<span>Saved</span>
+	</div>
+</div>
+</apex:component>

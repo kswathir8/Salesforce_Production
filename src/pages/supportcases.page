@@ -1,0 +1,34 @@
+<apex:page standardController="Case" extensions="caseupdatecont" >
+
+<apex:form >
+
+<apex:includeScript value="/support/console/22.0/integration.js"/>
+     <script type="text/javascript">
+     var pageLoad = window.onload;
+          window.onload = function() {
+                 if (pageLoad) {
+                         pageLoad();
+                 }
+                 defaultTabTitle();
+            function defaultTabTitle() {
+             
+                sforce.console.setTabTitle('Case: {!case.CaseNumber}');
+          }
+          
+          }
+  </script>
+
+<apex:pageBlock mode="maindetail" id="casepage"  >
+<apex:commandButton action="{!updatecases}" value="Get SLA Ranking" rendered="{!$ObjectType.Case.deletable}" /> 
+
+<apex:detail inlineEdit="true" showChatter="true" >
+
+</apex:detail>
+
+</apex:pageblock>
+
+
+
+</apex:form>
+
+</apex:page>

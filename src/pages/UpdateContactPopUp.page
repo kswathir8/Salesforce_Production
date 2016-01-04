@@ -1,0 +1,91 @@
+<apex:page standardController="Opportunity" extensions="UpdatePrimaryContact" showHeader="false" sidebar="false">
+<apex:includescript value="{!$Resource.JQuery}"/>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script>
+
+$(document).ready(function (){
+	
+	// Close window?
+	if({!finished}) window.close(); 
+	
+	// Get list of contacts
+	if('{!ContactJSON}' != '') contacts = {!ContactJSON};
+
+	 if('{!Opportunity.Primary_Contact__c}' != '' && contacts != []){
+       	var primaryID = '{!Opportunity.Primary_Contact__c}';
+       	$('select[id$="contactList"]').children('option').each(function (){
+        		if($(this).attr('value') == primaryID) $(this).attr('selected',true);
+        		else $(this).attr('selected',false);
+        });
+     }
+
+	 // Change contacts
+	$('select[id$="contactList"]').change(function (){
+		var contactID = $(this).attr('value');
+		
+		if(contactID != ''){
+			var contact = contacts[contactID];
+			console.log(contact);
+			$('input[id$="firstName"]').attr('value',contact.FirstName);
+			$('input[id$="lastName"]').attr('value',contact.LastName);
+			$('input[id$="Phone"]').attr('value',contact.Phone);
+			$('input[id$="email"]').attr('value',contact.Email);
+			$('input[id$="Fax"]').attr('value',contact.Fax);
+		}
+		else{
+			$('input[id$="firstName"]').attr('value','');
+			$('input[id$="lastName"]').attr('value','');
+			$('input[id$="Phone"]').attr('value','');
+			$('input[id$="email"]').attr('value','');
+			$('input[id$="Fax"]').attr('value','');
+		}
+	});
+
+});
+
+</script>
+	 <apex:pageMessages />
+    
+<apex:form >
+	<apex:pageBlock title="Primary Contact">
+		<apex:pageBlockSection columns="1">
+			 <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Contacts" for="contactList"/>
+                <apex:selectList value="{!contactInput}" size="1"  id="contactList" >
+                	 <apex:SelectOptions value="{!AccountContactsList}"/>                    
+                 </apex:selectList>
+            </apex:pageBlockSectionItem>
+		
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="First Name: " for="firstName"/>
+				<apex:inputText value="{!firstName}" id="firstName"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Last Name: " for="lastName"/>
+				<apex:inputText value="{!LastName}" id="lastName"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Email: " for="email"/>
+				<apex:inputText value="{!email}" id="email"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Phone: " for="Phone"/>
+				<apex:inputText value="{!phone}" id="Phone"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Fax: " for="Fax"/>
+				<apex:inputText value="{!fax}" id="Fax"/>
+			</apex:pageBlockSectionItem>
+			<apex:panelgrid >
+				<apex:panelgroup >
+					<apex:commandButton value="Cancel" onclick="window.close();"/>
+					<apex:commandButton value="Save" action="{!updateContact}"/>
+				</apex:panelgroup>
+			</apex:panelgrid>
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+	<apex:outputField value="{!Opportunity.AccountId}" rendered="false"/>
+	<apex:outputField value="{!Opportunity.Primary_Contact__c}" rendered="false"/>
+	<apex:outputField value="{!Opportunity.closeDate}" rendered="false"/>
+</apex:form>
+</apex:page>

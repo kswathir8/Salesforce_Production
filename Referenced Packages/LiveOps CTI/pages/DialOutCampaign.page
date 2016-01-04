@@ -1,0 +1,42 @@
+<apex:page controller="LiveOpsTransfer.CDialOutCampaign">
+    <apex:form >
+        <p><apex:OutputLabel rendered="{!m_boolShowError}" style="font-family:Arial;font-size:16pt;color:red;font-weight:bold;">Campaign List Empty</apex:OutputLabel></p>
+        <apex:actionFunction name="SearchAction" action="{!search}" reRender="page"/><p></p>
+        <apex:InputText id="txtbox" value="{!m_strCampaignName}" onkeyup="methodcall();" onkeypress="return handleEnter(this, event)"/>&nbsp;&nbsp;
+        <apex:commandButton value="{!$Label.liveopstransfer__Search}" action="{!search}" reRender="table"/>&nbsp;&nbsp;
+        <apex:commandButton value="{!$Label.liveopstransfer__Showall}" action="{!showAll}" reRender="page"/>&nbsp;&nbsp;
+        <apex:commandButton value="{!$Label.liveopstransfer__Back}" onclick="javascript:window.history.go(-1)" reRender="table"/>
+        <p></p>
+        <apex:PageBlock title="Select DialOut Campaign" id="page">
+            <apex:pageBlockTable value="{!m_lstDialOutCampaignsList}" var="DialOutCampaigns" cellpadding="5" id="table" rows="{!m_intPageSize}" rendered="{!m_boolShowTable}">
+                <apex:column >
+                    <apex:facet name="header">Campaign Id</apex:facet>
+                    <apex:outputText value="{!DialOutCampaigns.id}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">Campaign Name</apex:facet>
+                    <apex:commandLink value="{!DialOutCampaigns.name}" onclick="javascript:sendCTIMessage('/DIALOUTCAMPAIGNS?ID={!DialOutCampaigns.id}&NAME={!DialOutCampaigns.name}')" reRender="table"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:commandLink value="{!$Label.liveopstransfer__Showmore}" action="{!pageSizeIncrement}" rendered="{!m_boolEnabled}" reRender="page"/>
+        </apex:PageBlock>
+    </apex:form>
+    <script type="text/javascript">
+        function stopRKey(evt) { 
+            var evt = (evt) ? evt : ((event) ? event : null); 
+            var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+            if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+            } 
+            document.onkeypress = stopRKey;
+            document.onload = setfocus;
+            document.getElementById('page').onload = setfocus;
+        function methodcall()
+        {
+            SearchAction();
+        }
+        function setfocus()
+        {
+            document.getElementById('txtbox').focus();
+        }
+    </script>
+</apex:page>

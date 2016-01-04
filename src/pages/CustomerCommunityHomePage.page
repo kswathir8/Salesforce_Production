@@ -1,0 +1,9 @@
+<apex:page >
+    <table  valign="top" width="955" border="0" cellspacing="0" cellpadding="0" border-color="white" >
+        <div>
+            <td width="1100" rowspan="4"><p><span ><H4>Welcome to the Axcient Customer Portal,<b> {!$User.FirstName} {!$User.LastName}.</b></H4></span> </p>
+                 At Axcient our goal is to provide you with the easiest-to-use data protection solution in the market. This customer portal contains all the resources you need to setup, configure, and manage your Axcient solution including product documentation, training materials, and best practices guides. You can also create and track support tickets and give us feedback.
+             </td>
+         </div>
+    </table>
+</apex:page>

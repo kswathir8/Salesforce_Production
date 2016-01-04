@@ -1,0 +1,128 @@
+<apex:component controller="n2de.InlineLogsController">
+
+	<!-- Recommend putting the inline page in its own section, 1 column, detail page only, and setting a height of 255px for the inline page  -->
+	<c:CommonHeader />
+	<c:CommonMask />
+	<apex:attribute name="recordName" description="Object name" type="String" required="true" assignTo="{!ObjectName}"/>
+	<apex:attribute name="recordId" description="" type="String" required="true" assignTo="{!ObjectId}"/>
+
+	<style>
+		.de_logs {
+			overflow: auto;
+			height: 180px;
+		}
+		.de_rectest {
+			overflow: auto;
+			height: 180px;
+		}
+		.btn_container {
+			padding-bottom: 4px;
+			text-align: center;
+		}
+		.border_panel {
+			border: 1px solid #D6D6D6;
+			border-radius: 5px;
+			padding: 5px;
+		}
+	</style>
+	
+	<apex:form >
+	<apex:pageBlock title="Distribution Engine Assignment History" id="log_block">
+		<apex:outputPanel id="de_inline">
+			<apex:outputPanel id="de_btn_panel" rendered="{!IsManager}">
+				<div class="btn_container">
+					<apex:commandLink value="Logs" action="{!changeViewType}" reRender="de_inline" onclick="showMask()" oncomplete="hideMask()">
+						<apex:param name="ViewType" value="logs" assignTo="{!ViewType}"/>
+					</apex:commandLink>
+					&nbsp;|&nbsp;
+					<apex:commandLink value="Distribution test" action="{!changeViewType}" reRender="de_inline" onclick="showMask()" oncomplete="hideMask()">
+						<apex:param name="ViewType" value="test" assignTo="{!ViewType}"/>
+					</apex:commandLink>
+				</div>
+			</apex:outputPanel>
+			<apex:outputPanel styleClass="de_rectest" id="de_test_block" layout="block" rendered="{!ViewType != 'logs'}">
+				<div class="border_panel">
+					<apex:outputText value="Test this {!ObjectName} against distributor filters: "/>
+					<apex:selectList value="{!SelectedTeam}" size="1">
+						<apex:selectOptions value="{!TeamList}"/>
+						<apex:actionSupport event="onchange" reRender="dist_list" onsubmit="showMask()" oncomplete="hideMask()"/>
+					</apex:selectList>&nbsp;&nbsp;
+					<apex:selectList value="{!SelectedDistributor}" size="1" id="dist_list" disabled="{!ISBLANK(SelectedTeam)}">
+						<apex:selectOptions value="{!DistributorList}"/>
+						<apex:actionSupport event="onchange" action="{!testRecord}" onsubmit="showMask()" oncomplete="hideMask()" reRender="filter_table"/>
+					</apex:selectList>
+					</div>
+				<br/>
+				<apex:pageBlockTable value="{!DistributorResult.filterResults}" var="filterRes" id="filter_table" 
+											styleClass="de_filter_table" columnsWidth="10%, 40%, 30%, 10%">
+					<apex:column >
+		        		<apex:facet name="header">Type</apex:facet>
+						<apex:outputText value="{!filterRes.filterType}"/>
+					</apex:column>
+					<apex:column >
+		        		<apex:facet name="header">Filter</apex:facet>
+						<apex:outputText value="{!filterRes.filterSoql}"/>
+					</apex:column>
+					<apex:column >
+		        		<apex:facet name="header">Actual value</apex:facet>
+						<apex:outputText value="{!filterRes.actualValue}"/>
+					</apex:column>
+					<apex:column >
+		        		<apex:facet name="header">Matches filter</apex:facet>
+						<apex:image rendered="{!filterRes.matches}" url="{!URLFOR($Resource.n2de__DEResources, 'images/green_tick.png')}" title="matches filter" width="14"/>
+						<apex:image rendered="{!NOT(filterRes.matches)}" url="{!URLFOR($Resource.n2de__DEResources, 'images/red_cross.png')}" title="does not match filter" width="14" />
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:outputPanel>
+			<apex:outputPanel styleClass="de_logs" id="de_logs_block" layout="block" rendered="{!ViewType == 'logs'}">
+				<apex:outputPanel rendered="{!AssignmentLogs.size > 0}">
+					<apex:pageBlockTable value="{!AssignmentLogs}" var="log" id="log_table" headerClass="headerRow" columnsWidth="10%, 11%, 12%, 5%, 24%, 19%, 19%">
+						<apex:column >
+							<apex:facet name="header">Date</apex:facet>
+							<apex:outputText value="{!log.eventDate}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Team member</apex:facet>
+							<apex:outputLink target="_blank" value="/{!log.teamMemberId}">{!log.username}</apex:outputLink>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header"></apex:facet>
+							<apex:outputText value="{!log.eventName}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Status</apex:facet>
+							<apex:outputPanel rendered="{!log.isError}">
+								<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/error.png')}" width="17" height="17" title="Error: {!log.errorMessage}"/>
+							</apex:outputPanel>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Detail</apex:facet>
+							<apex:outputText value="{!log.eventDetail}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Team</apex:facet>
+							<apex:outputLink value="/{!log.teamId}" target="_blank">{!log.teamName}</apex:outputLink>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Distributor</apex:facet>
+							<apex:outputLink value="/{!log.distributorId}" target="_blank">{!log.distributorName}</apex:outputLink>
+						</apex:column>
+					</apex:pageBlockTable>
+				</apex:outputPanel>
+				<apex:outputPanel rendered="{!AssignmentLogs.size == 0 && NOT(HasBeenDistributed)}">
+					<div style="text-align: center;">
+						<br/>
+						<apex:outputText value="This {!objectName} has never been assigned by Distributed Engine."/>
+					</div>
+				</apex:outputPanel>
+				<apex:outputPanel rendered="{!AssignmentLogs.size == 0 && HasBeenDistributed}">
+					<div style="text-align: center;">
+						<br/>
+						<apex:outputText value="No recent distribution logs for this {!objectName}."/>
+					</div>
+				</apex:outputPanel>
+			</apex:outputPanel>
+		</apex:outputPanel>
+	</apex:pageBlock>
+	</apex:form>
+</apex:component>

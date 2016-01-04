@@ -1,0 +1,290 @@
+<apex:page controller="n2de.WidgetController" showHeader="false" sidebar="false" action="{!init}">
+<c:CommonHeader />
+<c:CommonMask />
+<c:CommonHelp help_page="widget" />
+<style>
+.de_help_icon{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+}
+.de_help_icon img{
+   width: 18px;
+}
+</style>
+<apex:includeScript value="/support/console/30.0/integration.js"/>
+    <style>
+    .de-button{ 
+        width: 50px;
+    }
+    img{
+        margin: 5px;
+    }
+    .img-label{
+        position: relative;
+        top: -10px;
+        margin: 5px;
+    }
+    img.status{
+        width: 20px;
+        padding: 0;
+        margin: 0;
+    }
+    #status-bar{
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        margin-top: 15px;
+        margin: 5px;
+        position: absolute;
+        bottom: 0px;
+        width: 95%;
+    }
+    select{
+        margin:5px;
+        margin-top: 0;
+    }
+    #action_content table{
+        width: 90%;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        padding: 0;
+        //margin-top: 10px;
+    }
+    #action_content td{
+        padding: 0;
+        margin: 0;
+    }
+    #status_panel{
+        margin-top: 0;
+        margin-bottom: 5px;
+        overflow: auto;
+        height: 80px;
+    }
+    .pull_button{
+        width: 50px;
+    }
+    #no_pull{
+        width: 90%;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        padding: 0;
+        text-align: center;
+        background-color: lightgray;
+    }
+    #status_panel center{
+        padding: 2px;
+    }
+    #widget_logo{
+    	width: 120px;
+		position: relative;
+		left: -5px;   
+    }
+    #action_content{
+        height: 290px;
+        overflow-y: auto;
+    }
+    </style>
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'iphone-style-checkboxes/scripts/iphone-style-checkboxes.js')}"></script>
+    <link type="text/css" rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'iphone-style-checkboxes/style.css')}"/>
+    <script type="text/javascript">
+    	var consoleButtonUrl = 'https://nc2--c.eu1.content.force.com/servlet/servlet.ImageServer?id=015D0000003l8cm&oid=00DD0000000reiT';
+    	var isUsingLoginMode = {!isLoginMode};
+        var isLoggedIn = {!isLoggedIn};
+        var logoutReasonRequired = {!logOutReasonRequired};
+        var iphoneSlider;
+        $(document).ready(function() {
+	     	if(sforce.console.isInConsole()){
+        		sforce.console.setCustomConsoleComponentButtonText('');
+	        	setConsoleWidgetColor(isLoggedIn);
+			}	           
+            if(isUsingLoginMode == true){
+                setBackground(isLoggedIn);
+            }
+            
+            //Initialise the slider
+          	initSlider();
+          	if(isUsingLoginMode && logoutReasonRequired == true){
+          		setAlertOnClick();
+          		setSliderDisabledIfNoReason(isLoggedIn);
+          	}
+          	
+          	$(".log_out_list").change(function(){
+          		setSliderDisabledIfNoReason(isLoggedIn);
+          	});
+        });
+        function setBackground(isLoggedInParam){
+            if(isLoggedInParam){
+            	$('.log_out_list').show();
+                $("body").css("background-color","white");
+                $("#status_panel").show();
+                $("#pull_panel").show();
+            }else{
+            	$('.log_out_list').hide();
+                $("body").css("background-color","#c0c0c0");
+                $("#status_panel").hide();
+                $("#pull_panel").hide();
+            }
+        }
+        function pullRecord(){
+            var distributorId = $(".pullPicklist").val();
+            if(distributorId == ''){
+                alert('Please select a distributor to pull from.');
+                return;
+            }
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.WidgetController.pullRecord}',distributorId, 
+                function(result, event){  
+                    if (event.status) {
+                        var pulledRecord = result;
+                        if(pulledRecord == undefined){
+                            alert('There is nothing currently available from the queue for you, please try again later or contact your administrator.');
+                        } else {
+                            var recordId = result.recordId;
+                            var recordName = result.recordName;
+                            var objectName = result.objectName;
+                            alert('The following ' + objectName + ' has been assigned to you - ' + recordName + '. Taking you to the record now');
+                            var redirectUrl = '/' + recordId;
+                            //Redirect to pulled record. Special javascript library for SF1
+                            if((typeof sforce != 'undefined') && (typeof sforce.one != 'undefined') && (sforce != null)){
+                            	sforce.one.navigateToSObject(recordId);
+                            }else if (sforce.console.isInConsole()) {
+                            	sforce.console.generateConsoleUrl([redirectUrl], function(urlresult) {
+                            		sforce.console.openConsoleUrl(null, urlresult.consoleUrl, true);
+                            	});
+                            } else {
+                            	window.top.location = redirectUrl;
+                            }
+                        }
+                    } else{
+                        alert('Sorry, an error has occurred:\n\n' + event.message + '\n\nPlease contact your administrator.');  
+                    }
+                },
+            {escape:true});
+        }
+
+        function toggleLogin(isLoggedInParam, reason){
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.WidgetController.toggleLoginWithReason}', isLoggedInParam, reason,
+                function(result, event){
+                	hideMask();
+                    if (event.status) {
+                    	//reset the reason
+                    	if(logoutReasonRequired == true){
+                    		$('.log_out_list').val('');
+                    	}
+                        isLoggedIn = result;
+                        setConsoleWidgetColor(isLoggedIn);
+                        setBackground(isLoggedIn);
+                        setSliderDisabledIfNoReason();
+                    } else{
+                    	if(event.message.indexOf('Logged in?')){
+                    		alert('You are not logged into Salesforce. Please refresh your browser');
+                    	}else{
+                        	alert('Sorry, an error has occurred:\n\n' + event.message + '\n\nPlease contact your administrator.');
+                        }
+                    }
+                },
+            {escape:true});
+        }
+        
+        function setConsoleWidgetColor(isLoggedIn){
+        	if(sforce.console.isInConsole()){
+	            if(isLoggedIn == true){
+	            	$('.log_out_list').show();
+	            	sforce.console.setCustomConsoleComponentButtonStyle('background:none;');
+	            	sforce.console.setCustomConsoleComponentButtonIconUrl(consoleButtonUrl);
+	            }else{
+	            	$('.log_out_list').hide();
+	            	sforce.console.setCustomConsoleComponentButtonStyle('background:gray;');
+	            	sforce.console.setCustomConsoleComponentButtonIconUrl(consoleButtonUrl);
+	            }
+	    	}else{
+	    	}
+        }
+        function initSlider(){
+        	iphoneSlider = ($('.de_agent_logged_in:checkbox')).iphoneStyle({
+	        	onChange: function(elem, value) {
+	              	showMask();
+	              	var reason = $('.log_out_list').val() ? $('.log_out_list').val() : '';
+		        	toggleLogin(value, reason);
+	          	}
+          	});
+        }
+        
+        function setAlertOnClick(){
+        	$(".iPhoneCheckContainer").click(function(){
+          		var reason = $('.log_out_list').val();
+          		if(isLoggedIn == true && reason != undefined && reason.length == 0) {
+        			alert('You must provide a reason for logging out.');
+        			return;
+        		}
+          	});
+        }
+        
+        function setSliderDisabledIfNoReason(){
+        	var reason = $('.log_out_list').val();
+       		if (!isLoggedIn || reason != '') {
+       			$('.de_agent_logged_in:checkbox').removeAttr("disabled");
+       			initSlider();
+       			$('.iPhoneCheckContainer').removeClass('iPhoneCheckDisabled');
+       		}else{
+       			$('.de_agent_logged_in:checkbox').attr("disabled", "true");
+       			initSlider();
+       			$('.iPhoneCheckContainer').addClass('iPhoneCheckDisabled');
+       		}
+        }
+    </script>
+    <apex:form >
+    <apex:pageMessages />
+    <div id="action_content">
+        <center>
+            
+            <a href="http://nc-squared.com" target="new"><img src="{!URLFOR($Resource.DEResources, 'images/DE_Logo.png')}" id="widget_logo"/></a>
+            
+            <br/>
+            <apex:outputPanel rendered="{!isLoginMode}" styleClass="toggleWrapper">
+	            <apex:actionFunction name="doUpdate" action="{!doUpdate}" />
+	            <apex:inputCheckbox value="{!isLoggedIn}" onchange="doUpdate()" styleClass="de_agent_logged_in"/>  
+            	<apex:selectList value="{!logOutReason}" size="1" style="width:150px;margin-top:5px;margin-bottom:10px;" styleClass="log_out_list" rendered="{!logOutReasonRequired}">
+               		<apex:selectOptions value="{!logOutReasonList}"/>
+            	</apex:selectList>
+            </apex:outputPanel>
+			<br/>
+            <div id="status_panel">
+            <apex:outputPanel rendered="{!teams.size > 0}">
+            <table>
+            <apex:repeat value="{!teams}" var="t">
+            <tr>
+            <td>{!t.name}</td>
+            <td align="right">
+                <apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/tick32.png')}" styleClass="status" rendered="{!t.isMemberActive}"/>
+                <apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/cross32.png')}" styleClass="status" rendered="{!NOT(t.isMemberActive)}"/>
+                </td>
+            </tr>
+            </apex:repeat>
+            </table>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!teams.size == 0}">
+                <table><tr><td><center>You are not a member of any distribution teams</center></td></tr></table>    
+            </apex:outputPanel>
+            
+            </div>
+            <div id="pull_panel">
+                <apex:outputPanel rendered="{!anyPullDistributorsActive}">
+                    <apex:selectList value="{!DefaultDistributorId}" size="1" style="width:150px;" styleClass="pullPicklist">
+                        <apex:selectOptions value="{!PullDistributorsAvailable}"/>
+                    </apex:selectList>
+                    <input type="button" value="Pull" onclick="pullRecord()" class="btn pull_button"/>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!teams.size > 0 && NOT(anyPullDistributorsActive)}">
+                    <p id="no_pull">No pull distributors are currently active</p>
+                </apex:outputPanel>
+            </div>
+            
+            <div id="status-bar">
+                <a href="/apex/{!NamespacePrefix}DistributionLogList?view=mylogs&status=inalert" target="_top"><img src="{!URLFOR($Resource.DEResources, 'images/alert32_3.png')}" width="25" title="Alerts - items that have not been actioned on time"/><span class="img-label">{!alertCount}</span></a>
+                <a href="/apex/{!NamespacePrefix}DistributionLogList?view=mylogs&status=new" target="_top"><img src="{!URLFOR($Resource.DEResources, 'images/new32_2.png')}" width="25" title="New - items assigned to you that have not been actioned"/><span class="img-label">{!newCount}</span></a>
+            </div>
+        </center>
+    </div>
+    </apex:form>
+</apex:page>

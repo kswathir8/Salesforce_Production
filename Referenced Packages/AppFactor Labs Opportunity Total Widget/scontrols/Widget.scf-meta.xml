@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scontrol xmlns="http://soap.sforce.com/2006/04/metadata">
+    <contentSource>HTML</contentSource>
+    <encodingKey>UTF-8</encodingKey>
+    <fileContent>R0lGODlhWAAbAMQUAPuvgfdgA/7y6v7k1fh6Lf3fzPzIqPhrFdXV1eHh4fhtGPzKq/h5Kv3Vvfumcv3TuvdeAGZmZszMzP///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABQALAAAAABYABsAAAX/IDWNZGmeaKqubKuKiSTPdG3feK7vfI1MIolrSCyqJJCkcskUBo3QqAvJrCqdE6F0yyVRrVWstkuGfsFLcXldPKOTarac5X7H5/jTF0ASMMJAWSkRhBErhiWEI4gkihOOW2d8IwIETYFjiYiQJpyanZuMUm6TE5VpmCeei4WPrY2FnK2OsayLtiZ1padwqaCqoa6/nrOGtMbIyHpWu5YQd7CsycXDosLU18nCuVYBAyQNvU+/tsTWiuauytvF1iN1AQskAwfigsDlwenp2bjtKG4CGJhXz14mTZBq4fIn6pg0RgndZVkikCCqcXkyvlNSccQABZcwaszzxUGBkw9AMoa8N5Lkm5UHW7KpgwaazJkvL7K8iTOnQZ5zaIKxCbSLUCtYYvRYyrSp0xs/RBSdaiIEADs=</fileContent>
+    <fileName>Widget</fileName>
+    <name>Widget</name>
+    <supportsCaching>true</supportsCaching>
+</Scontrol>

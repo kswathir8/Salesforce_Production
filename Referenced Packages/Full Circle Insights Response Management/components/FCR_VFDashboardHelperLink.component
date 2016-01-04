@@ -1,0 +1,7 @@
+<apex:component controller="FCRM.FCR_VFDashboardHelperController">
+    <apex:attribute name="apiname" type="String" assignTo="{!ApiName27}" description="API name of the component"/>
+    <apex:attribute name="datatype" type="String" assignTo="{!DataType27}" description="data type of the component" />
+    <apex:outputLink value="{!RedirectURLByAPIName}" target="_Top">
+        <apex:componentBody />
+    </apex:outputLink>
+</apex:component>

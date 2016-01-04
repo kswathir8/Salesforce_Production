@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>Tout_Actions_Taken__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Actions taken by the recipient of an email (Sign Up, Enter Credit Card, Hits a button, Visits a particular page, etc).</description>
+        <externalId>false</externalId>
+        <label>Tout Actions Taken</label>
+        <required>false</required>
+        <type>TextArea</type>
+    </fields>
+    <fields>
+        <fullName>Tout_Clicked__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates whether the recipient of the email has clicked on links inside the email.</description>
+        <externalId>false</externalId>
+        <label>Tout Clicked</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Tout_Details__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A link to more details around the Touted email.</description>
+        <externalId>false</externalId>
+        <label>Tout Details</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Tout_Events_Tracked__c</fullName>
+        <deprecated>false</deprecated>
+        <description># of Tout Engagement Events tracked around this email.</description>
+        <externalId>false</externalId>
+        <label>Tout Events Tracked</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Tout_Last_Event_At__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The last time someone viewed, clicked or engaged in any other way with this email.</description>
+        <externalId>false</externalId>
+        <label>Tout Last Event At</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Tout_Presentation_Viewed__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates whether a presentation included in this email was viewed.</description>
+        <externalId>false</externalId>
+        <label>Tout Presentation Viewed</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Tout_Replied_At__c</fullName>
+        <deprecated>false</deprecated>
+        <description>THe timestamp of when someone last replied to this email.</description>
+        <externalId>false</externalId>
+        <label>Tout Replied At</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Tout_Replied__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates whether Tout detected a response to this email.</description>
+        <externalId>false</externalId>
+        <label>Tout Replied</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Tout_Sent_By__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Tout Sent By</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Tout_Template_Details__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A link to details around the Tout template.</description>
+        <externalId>false</externalId>
+        <label>Tout Template Details</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Tout_Template__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The name of the Tout template used in this email.</description>
+        <externalId>false</externalId>
+        <label>Tout Template</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Tout_Viewed__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates whether the recipient of the email viewed it.</description>
+        <externalId>false</externalId>
+        <label>Tout Viewed</label>
+        <type>Checkbox</type>
+    </fields>
+    <webLinks>
+        <fullName>Email_with_Tout</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Email with Tout</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+        <url>var u = &quot;https://www.toutapp.com/pitches/new?name={!Contact.Name}&amp;email={!Contact.Email}&amp;salesforce_contact_id={!Contact.Id}}&amp;force_bookmarklet=true&amp;style=salesforce&quot;; var w = window; w.open(u,&apos;Tout&apos;,&apos;scrollbars=1,status=1,width=762,height=&apos; + ( w.screen.height &lt; 970 ? w.screen.height : 970))</url>
+    </webLinks>
+</CustomObject>

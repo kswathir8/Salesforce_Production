@@ -1,0 +1,991 @@
+<apex:component controller="n2de.ConsoleQueueController">
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/magnific_popup.js')}"></script>
+    <script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+    <script src="{!URLFOR($Resource.DEResources, 'scripts/jExpand.js')}" type="text/javascript"></script>
+    <link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/magnific_popup.css')}"/> 
+    <link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-nc2.css')}" type="text/css" media="all"/>
+    <style>
+    	#error_container{
+    		margin-left: auto;
+    		margin-right: auto;
+    		width: 300px;
+    		margin-top: 10px;
+    	}
+        span, th {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #queue_count_table{
+    		border-spacing: 0px;
+    	}
+    	#queue_count_table td{
+    		padding-bottom: 4px;
+    		padding-top: 2px;
+    	}
+    	#queue_count_table th{
+		    color: #808080;
+		    font-weight: bold;
+		    font-size: 14pt;
+		    width: 170px;
+		}
+		#queue_count_table .queue_count{
+		    text-align: center;
+		    font-weight: bold;
+		    color: #808080;
+		}
+		#queue_count_table th.narrow_col{
+		    width: 80px;
+		}
+		#queue_count_table .count_detail{
+		    color: #808080;
+		}
+		#queue_count_table .wide_col {
+			width: 390px;
+		}
+		#queue_count_table img{
+		    width: 15px;
+		}
+    	#pgbutton_panel {
+    		position:relative;
+    		float:right;
+    		padding-right: 25px;
+    	}
+        .white-popup {
+          position: relative;
+          background: #FFF;
+          padding: 20px;
+          width: auto;
+          width: 820px;
+          max-height: 780px;
+          margin: 20px auto;
+          border-radius: 5px;
+          overflow: auto;
+        }
+        .queue-tabs { 
+		    padding: 0px; 
+		    background: none; 
+		    border-width: 0px; 
+		}
+		.queue-tabs a{ 
+			outline: 0;
+		}  
+		.queue-tabs li{
+		    background-color: #F8F8F8 !important;
+		    background-image: none !important;
+		    background: transparent !important;
+		    top: -1px !important;
+		}
+		.queue-tabs .ui-tabs-nav { 
+		    background: transparent; 
+		    border-width: 0px 0px 0px 0px; 
+		    -moz-border-radius: 0px; 
+		    -webkit-border-radius: 0px; 
+		    border-radius: 0px; 
+		    padding-right: 15px;
+		    padding-left: 15px;
+		    margin-bottom: -3px;
+		} 
+		.queue-tabs .ui-tabs-panel { 
+			border-top: 3px solid #56aa1c;
+		    border-width: 3px 1px 1px 1px; 
+		    border-top-right-radius: 4px;
+		    border-top-left-radius: 4px;
+		    background-color: #F8F8F8;
+		}
+		.queue-tabs .ui-tabs-anchor {
+			border-bottom: none;
+			padding-bottom: 8px !important;
+			background: transparent;
+		}
+		.queue-tabs .ui-tabs-active {
+		    background-color: #F8F8F8 !important;
+		    border-bottom: 2px solid #F8F8F8 !important;
+		}
+        #object_table_header {
+            width: 548px;
+        }
+        .object_list_panel {
+            max-height: 240px;
+            overflow: auto;
+        }
+        .open-popup-link {
+            color: #808080 !important;
+        }
+        .filter_result_table {
+            table-layout: fixed;
+            width: 530px;
+        }
+        #filter_table {
+            overflow: auto;
+            max-height: 245px;
+        }
+        .med-icon {
+            width: 20px;
+        }
+        .small-icon {
+        	width: 15px;
+        }
+        .tiny-icon {
+        	width: 12px;
+        }
+        .log-table-container {
+        	width: 100%;
+        	max-height: 450px;
+        	overflow: auto;
+        }
+        .log-table {
+        	width: 100%;
+        	border-spacing: 0px;
+        }
+        .log-table th {
+        	padding-bottom: 5px;
+        }
+        .log-table td {
+        	height: 30px;
+        	border-top: 1px solid #c9c9c9;
+        }
+        .disabled {
+        	background-color: #E8E8E8;
+        }
+        .split-cols {
+        	display: inline-block;
+        	width: 48%;
+        }
+		.header-legend {
+			border-right: none;
+			border-left: none;
+			border-bottom: none;
+			padding-bottom: 0; 
+			padding-left: 20px;
+			border-top: 1px solid gray;
+			margin-left: 0;
+		}
+		.header-legend legend{
+			color: #222;
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 1.1em;
+		}
+        .criteria_col {
+            width: 290px;
+            word-wrap: break-word;
+        }
+        .value_col {
+            width: 180px;
+            word-wrap: break-word;
+        }
+        .match_col {
+            width: 40px;
+        }
+        .cdr:hover {
+        	background-color: #E8E8E8;
+        }
+        a:hover, .expandable-tbl tr.odd td:hover {
+        	cursor: pointer;
+        }
+        .popup_help_icon{
+			position: absolute;
+			right: 15px;
+			top: 50px;
+		}
+		.popup_help_icon img{
+		   width: 28px;
+		}
+		.team-tbl {
+			max-height: 350px;
+			overflow:auto;
+			max-width: 756x;
+		}
+		.expandable-tbl {
+			width: 100%;
+			border-collapse: collapse;
+		}
+		.expandable-tbl th, .expandable-tbl td {
+			padding: 5px;
+		}
+		.expandable-tbl td {
+			border-top: 1px solid #c9c9c9;
+			border-bottom: 1px solid #c9c9c9;
+		}
+		.expandable-child {
+			padding-left: 50px;
+			padding-top: 20px;
+			padding-bottom: 20px;
+			background-color: #eeeeee;
+		}
+		.expandable-child td {
+			border: none;
+		}
+		.expandable-child td:hover {
+			cursor: text !important;
+		}
+		#test_tool_header {
+			font-size: 14pt;
+			position: relative;
+			top: -15px;
+			left: -15px;
+		}
+		#test_tool_header img {
+			margin-right: 10px;
+		    width: 40px;
+		    top: 10px;
+		    position: relative;
+		    margin-left: 20px;
+		}
+    </style>
+
+<script type="text/javascript">
+	var matchIcon = '{!URLFOR($Resource.DEResources, 'images/tick32.png')}';;
+    var noMatchIcon = '{!URLFOR($Resource.DEResources, 'images/cross32-red.png')}';
+    var arrowRight = '{!URLFOR($Resource.DEResources, 'images/arrow_right.png')}';
+    var arrowWithTail = '{!URLFOR($Resource.DEResources, 'images/full_arrow.png')}';
+    var grey_head = '{!URLFOR($Resource.DEResources, 'images/grey_user.png')}';
+    var green_head = '{!URLFOR($Resource.DEResources, 'images/green_user.png')}';
+    var lookupOwner = '{!URLFOR($Resource.DEResources, 'images/maglass_32.png')}';
+    var lookupMatch = '{!URLFOR($Resource.DEResources, 'images/green_tick.png')}';
+    var noLookupMatch = '{!URLFOR($Resource.DEResources, 'images/red_cross.png')}';
+	
+	var teamIconUrl = '{!URLFOR($Resource.DEResources, 'images/teams32.png')}';
+	var distributorIconUrl = '{!URLFOR($Resource.DEResources, 'images/distributor32.png')}';
+	var queueIconUrl = '{!URLFOR($Resource.DEResources, 'images/queue32_3.png')}';
+	var avQueueIconUrl = '{!URLFOR($Resource.DEResources, 'images/queue32.png')}';
+	var warningIconUrl = '{!URLFOR($Resource.DEResources, 'images/circle-red.png')}';
+	var memberIconUrl = '{!URLFOR($Resource.DEResources, 'images/teammember32.png')}';
+	var tickIconUrl = '{!URLFOR($Resource.DEResources, 'images/circle-green.png')}';
+	var spannerIcon = '{!URLFOR($Resource.DEResources, 'images/test_tool_4.png')}';
+	
+	//================================================Remote action methods===============================================
+	
+	function loadQueueCountsPanel(orderGreaterThan){
+        $("#queuecounts").html('<img alt="loading" src="/img/loading.gif"/>');
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.getQueueCountsRemote}', orderGreaterThan,
+            function(result, event){
+                hideMask();
+                if (event.type === 'exception'){
+                	var errorHtml = '<div style="width: 100%"><div style="width: 32px; margin-left: auto; margin-right: auto;"><img alt="ERROR" src="' + warningIconUrl + '" title="ERROR"></div>' +
+                					'<div id="error_container"><span>Sorry! There\'s been a problem. <a href="http://help.nc-squared.com/home" target="_blank">Help</a><br/>' +
+                					'<b>Error:</b> ' + event.message + '</span></div></div>';
+                	$("#queuecounts").html(errorHtml);
+                }else{
+                    buildQueueCountsPanelHtml(result);
+                    createPopUps();
+                    $('.tabs').tabs();
+                }
+        });
+    }
+    
+    function getAvailableRecords(distId) {
+    	$('#prev_' + distId).html('<img alt="loading" src="/img/loading.gif"/>');
+   		Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.getAvailableRecords}', distId,
+            function(result, event){
+                hideMask();
+                if (event.type === 'exception'){
+                    alert(event.message);
+                }else{
+                    var html = showAvailableRecords(result);
+                    $('#prev_' + distId).html(html);
+                }
+        });
+    }
+    
+    function getRecentRecords(distId, duration) {
+    	$('#rec_' + distId).html('<img alt="loading" src="/img/loading.gif"/>');
+    	if (!duration) {
+    		duration = '';
+    	}
+   		Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.getRecentDistributions}', distId, duration,
+            function(result, event){
+                if (event.type === 'exception'){
+                    alert(event.message);
+                }else{
+                	var html = showRecentDistributions(distId, result);
+                	$('#rec_' + distId).html(html);
+                }
+        });
+    }
+	
+	function testRecord(objectName, distributorId) {
+		var objectId = $('#record_input').val();
+    	var resultsSelector = '#test_results';
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.testRecordRemote}', 
+            objectName, objectId, distributorId,
+            function(result, event){
+                if (event.type === 'exception'){
+                    var html = '<br/><span>An error occurred. Please ensure you entered a valid id for this object.</span><br/>' +
+                                '<span>Exception: ' + event.message + '</span><br/><br/>' +
+                                '<a href="http://help.nc-squared.com/home" target="_blank">Help</a>';
+                    $('#test_results').html(html);
+                }else{
+                    var html = showTestResults(objectName, result);
+                    $(resultsSelector).html(html);
+                }
+        });
+    }
+	
+	function getTeamMembersAvailability(distributorId) {
+		$('#' + distributorId + '_tm_av').html('<img alt="loading" src="/img/loading.gif"/>');
+		var resultsSelector = '#' + distributorId + '_tm_av';
+		Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.getTeamMemberAvailabilityRemote}', distributorId,
+            function(result, event){
+                if (event.type === 'exception'){
+                    var html = '<br/><span>An error occurred. Please ensure you entered a valid id for this object.</span><br/>' +
+                                '<span>Exception: ' + event.message + '</span><br/><br/>' +
+                                '<a href="http://help.nc-squared.com/home" target="_blank">Help</a>';
+                    $(resultsSelector).html(html);
+                }else{
+                	var recordId = $('#tags_record_input').val();
+                	if (recordId) {
+                		getTeamMembersAvailabilityDynamicTags(result, distributorId, recordId);
+                	} else {
+						setTeamMemberTableHtml(distributorId, result);
+					}
+					
+                }
+        });
+	}
+	
+	function getTeamMembersAvailabilityDynamicTags(distMembersVO, distributorId, recordId) {
+		if (recordId && recordId != '') {
+			$('#error_span').html('');
+			$('#' + distributorId + '_tm_av').html('<img alt="loading" src="/img/loading.gif"/>');
+			var resultsSelector = '#' + distributorId + '_tm_av';
+			
+			var userIds = [];
+			for (var i = 0; i < distMembersVO.teamMembers.length; i++) {
+				var tm = distMembersVO.teamMembers[i];
+				userIds.push(tm.userId);
+			}
+	
+			Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.getTeamMemberTagAvailability}', distributorId, 
+				userIds, recordId, function(result, event){
+	                if (event.type === 'exception'){
+	                    var html = '<br/><span>An error occurred. Please ensure you entered a valid id for this object.</span><br/>' +
+	                                '<span>Exception: ' + event.message + '</span><br/><br/>' +
+	                                '<a href="http://help.nc-squared.com/home" target="_blank">Help</a>';
+	                    $(resultsSelector).html(html);
+	                }else{
+	                	var teamMembers = result.userTags;
+						for (var j = 0; j < distMembersVO.teamMembers.length; j ++) {
+							var tm = distMembersVO.teamMembers[j];
+							var userTags = teamMembers[tm.userId];
+							tm.userTagVos = userTags;
+						}
+						setTeamMemberTableHtml(distributorId, distMembersVO, result);
+					}
+	        });
+        } else {
+        	$('#error_span').html('Enter a record id.<br/>');
+        }
+	}
+	
+	function setTeamMemberTableHtml(distributorId, distMembersVO, lookupVO) {
+		var resultsSelector = '#' + distributorId + '_tm_av';
+
+		if (distMembersVO.memberFilterType == 'Tags') {
+			for (var i = 0; i < distMembersVO.teamMembers.length; i++) {
+				var tagsMatch = true;
+				var tm = distMembersVO.teamMembers[i];
+				for (var j = 0; j < tm.userTagVos.length; j++) {
+					var userTag = tm.userTagVos[j];
+					if (!userTag.userMatches) {
+						tagsMatch = false;
+						break;
+					}
+				}
+				tm.matchesDistributor = tagsMatch;
+			}
+		}
+		
+		var html = showTeamMemberAvailability(distributorId, distMembersVO, lookupVO);
+		$(resultsSelector).html(html);
+		if (distMembersVO.memberFilterType == 'Tags') {
+			$('#' + distributorId + '_tm').jExpand();
+		}
+		$('.odd').click(function() {
+			var arrowNo = $(this).attr('_row');
+			var rotate_angle = 90;
+			var currentRotation = $('#arrow_' + arrowNo).attr('rotation');
+			if (currentRotation && currentRotation == 90) {
+				rotate_angle = 0;
+			}
+			$('#arrow_' + arrowNo).attr('rotation', rotate_angle);
+			$('#arrow_' + arrowNo).css({'-webkit-transform' : 'rotate('+ rotate_angle +'deg)',
+				'-moz-transform' : 'rotate('+ rotate_angle +'deg)',
+				'-ms-transform' : 'rotate('+ rotate_angle +'deg)',
+				'transform' : 'rotate('+ rotate_angle +'deg)'});
+		});
+	}
+
+	//====================================================================================================================================
+	//==========================================Console set up============================================================================
+
+	var firstExecOrderArray = [];
+	var pageNumber = 0;
+    var lastExecOrder = null;
+    
+    function loadQueueCountsTab() {    
+    	pageNumber = 0;
+    	firstExecOrderArray = [];
+    	loadQueueCountsPanel(null);
+    }
+    
+    function loadQueueCountsPanelPreviousPage() {
+    	pageNumber--;
+    	var startOfPrevPage = firstExecOrderArray[pageNumber]
+    	var execGreaterThan = startOfPrevPage ? startOfPrevPage - 1 : 0;
+    	loadQueueCountsPanel(execGreaterThan);
+    }
+    
+    function loadQueueCountsPanelNextPage() {
+    	pageNumber++;
+    	loadQueueCountsPanel(lastExecOrder);
+    }
+
+    function createPopUps() {
+        $('.open-popup-link').magnificPopup({
+            type:'inline',
+            midClick: true
+        });
+    }
+
+    function buildQueueCountsPanelHtml(teamWrapper){
+        var tooManyRecordsWarning = 'There is a high volume of objects waiting in the queue. This may affect Distribution Engine performance. Please see help topic \'Tuning Distribution Engine\' for more details.';
+        var distFailedWarning = 'There is an error with this team or distributor. See team and distributor detail pages for more information.';
+        
+        var html = '';
+        var previewPopup = '';
+		var testPopup = '';
+        html += '<hr/><br/><table id="queue_count_table"><tr>' +
+                '<th class="wide_col">Team</th>' +
+                '<th>Object</th>' +
+                '<th class="wide_col">Distributor</th>' +
+                '<th>Queue</th>' + 
+                '<th class="queue_count" title="All objects owned by the queue">Total Count</th>' +
+                '<th class="queue_count" title="Objects in the queue that match the distributor">Available Count</th>' +
+                '<th class="queue_count">Status</th>' +
+				'<th class="queue_count narrow_col">Test</th>' +
+                '</tr>';
+                
+		var queueCountsList = teamWrapper.teamVos;
+        for(var i=0; i < queueCountsList.length; i++){
+            var team = queueCountsList[i];
+            if (i == 0) {
+            	firstExecOrderArray.push(team.team.{!NamespacePrefix}Execution_Order__c);
+            }
+            if (i == queueCountsList.length - 1) {
+            	lastExecOrder = team.team.{!NamespacePrefix}Execution_Order__c;
+            }
+            for (var d=0; d < team.distQueueCounts.length; d++) {
+                html += '<tr class="cdr">';
+                if (d == 0) { 
+                    html += '<td class="count_detail wide_col"><a href="/apex/TeamSummary?id=' + team.team.Id + '" class="count_detail">' + team.team.Name + '</a></td>' +
+                          	'<td class="count_detail">' + team.objectLabel + '</td>';
+                } else {
+                    html += '<td class="count_detail wide_col"/>' +
+                    		'<td class="count_detail"/>';
+                }         
+                var dist = team.distQueueCounts[d];
+                html += '<td class="count_detail wide_col"><a href="/apex/{!NamespacePrefix}DistributorDetailView?id=' + dist.distributor.Id + '" class="count_detail">' + dist.distributor.Name + '</a></td>' +
+                        '<td class="count_detail">' + dist.queueName + '</td>' +
+                        '<td class="queue_count">' + dist.totalCount + '</td>' +
+                        '<td class="queue_count">';
+                        
+                html += '<a title="Open Distribution Preview" onclick="initialisePreviewPopUp(\'' + dist.distributor.Id + '\')" href="#preview-popup-' + dist.distributor.Id + '" class="open-popup-link" id="link-' + dist.distributor.Id + '">';     
+                if (dist.availableCount >= 0) {
+               		html += dist.availableCount;
+                } else {
+                	html += '0';
+                }
+                html += '</a></td>';
+                if (dist.warning || dist.availableCount < 0) {
+                	var errorTitle = dist.availableCount < 0 ? distFailedWarning : tooManyRecordsWarning;
+                    html += '<td class="queue_count" title="' + errorTitle + '"><img src="' + warningIconUrl + '"/></td>';
+                } else {
+                    html += '<td class="queue_count"><img src="' + tickIconUrl + '"/></td>';
+                }
+				html += '<td class="queue_count narrow_col">' +
+						'<a title="Open Distributor Test Tool" onclick="getTeamMembersAvailability(\'' + dist.distributor.Id + '\')" href="#test-popup-' + dist.distributor.Id + '" class="open-popup-link" id="link-' + dist.distributor.Id + '"><img src="' + spannerIcon + '"></td>'; 
+                html += '</tr>';
+                previewPopup += buildAvailableObjectsPopUp(team, dist);
+				testPopup += buildTestPopUp(team, dist);
+            }
+        }
+        html += '</table>';
+        html += '<br/><hr/><div id="pgbutton_panel">';
+        if (pageNumber > 0) {
+        	html += '<a onclick="loadQueueCountsPanelPreviousPage()"><b>&lt;Previous page</b></a>';
+        }
+        if (pageNumber > 0 && teamWrapper.hasMoreTeams) {
+        	html += ' | ';
+        }
+        if (teamWrapper.hasMoreTeams) {
+        	html += '<a onclick="loadQueueCountsPanelNextPage()"><b>Next page&gt;</b></a>';
+        }
+        
+        html += '</div>';
+        if (pageNumber > 0 || teamWrapper.hasMoreTeams) {
+        	html += '<br/><br/><hr/>';
+        }
+        html += previewPopup;
+		html += testPopup;
+        $("#queuecounts").html(html);
+    }
+	
+	function buildAvailableObjectsPopUp(team, distVO) {
+        var html = '';
+        html += '<div id="preview-popup-' + distVO.distributor.Id + '" class="white-popup mfp-hide">' +
+               '<div class="tabs queue-tabs"><ul>' +
+                '<li id="preview_tab"><a onclick="getAvailableRecords(\'' + distVO.distributor.Id + '\')"  href="#dist_preview">Preview records</a></li>' +
+                '<li id="recent_tab"><a onclick="getRecentRecords(\'' + distVO.distributor.Id + '\')"  href="#dist_recent">Recent distributions</a></li>' +
+                '</ul>';
+        html += buildPreviewTab(team, distVO);
+        html += buildRecentTab(team, distVO);
+        html += '</div>';
+        return html;
+    }
+    
+    function initialisePreviewPopUp(distId) {
+    	var activeTab = $('#preview-popup-' + distId + ' li.ui-tabs-active').attr('id');
+    	if (activeTab == 'preview_tab') {
+    		getAvailableRecords(distId);
+  		} else {
+  			var dur = $('#logs_time_' + distId).val();
+  			getRecentRecords(distId, dur);
+  		}
+    }
+	
+	function buildTestPopUp(team, distVO) {
+		var html = '';
+        html += '<div id="test-popup-' + distVO.distributor.Id + '" class="white-popup mfp-hide">' +
+				'<h1 id="test_tool_header"><img src="' + spannerIcon + '">Distributor Test Tool</h1>' + 
+                '<div class="tabs queue-tabs"><ul>' +
+                '<li><a href="#test_record">Filters</a></li>' +
+                '<li><a onclick="getTeamMembersAvailability(\'' + distVO.distributor.Id + '\')" href="#team_members">Team members</a></li>' +
+                '</ul>';
+        html += buildTestTab(team, distVO); 
+		html += buildTeamMembersTab(team, distVO);
+        html += '</div></div>';
+        return html;
+	}
+	
+	//===================================================================================================================================
+	//================================================Preview records tab===============================================================
+
+    function buildPreviewTab(team, distVO) {
+        var html = '';
+        html += '<div id="dist_preview">' + 
+                '<div id="dist_details">' + getPopupHeaderHtml(team, distVO, 'preview');
+                
+        html += '<span><b>Active status field: ' + team.activeStatusFieldLabel + '</b></span><br/>' + 
+                '<span><b>Active status values: </b>' + team.team.{!NamespacePrefix}Object_active_status_values_long__c + '</span>' + 
+                '<br/><br/></div>';
+        html += '<div id="prev_' + distVO.distributor.Id + '"/>';
+        html += '</div>';
+        return html;
+    }
+    
+    function showAvailableRecords(availableVO) {
+        var tuningHelpUrl = 'http://help.nc-squared.com/optimising-distribution-engine-performance';
+        
+    	var html = '';
+    	if (availableVO.isWarning) {
+            html += '<table style="border-spacing: 0"><tr><td rowspan="2">' +
+                    '<img src="' +  warningIconUrl + '" style="width: 25px"/>&nbsp&nbsp;</td><td>' + 
+                    '<span>There is a high volume of ' + availableVO.objectLabelPlural.toLowerCase() + ' waiting in the queue. This may affect Distribution Engine performance.</span></td></tr>' + 
+                    '<tr><td><span>Please see help topic <a href="' + tuningHelpUrl + '" target="_blank">Tuning Distribution Engine</a> for more details.</span>' +
+                    '</td></tr></table><br/>';
+        }
+         
+        if (!availableVO.availableRecords) {
+        	html += '<table><tr><td>' +
+                    '<img src="' +  warningIconUrl + '"/>&nbsp&nbsp;</td><td>' + 
+                    '<span>There is an error with this team or distributor. Go to <a href="/apex/TeamDetailView?id=' + availableVO.team.Id + '">' + availableVO.team.Name + '</a> and <a href="/apex/{!NamespacePrefix}DistributorDetailView?id=' + availableVO.distributor.Id + '">' + availableVO.distributor.Name + '</a> detail pages for more information.</span><br/>' +
+                    '</td></tr></table>';
+        } else {
+	    	if (availableVO.availableRecords.length > 0) {
+	            var noRecords = availableVO.availableRecords.length;
+	            //We only check max 5000 available records to prevent soql limit exceptions
+	            var totalRecords = availableVO.totalAvailableRecords < 5000 ? availableVO.totalAvailableRecords : '5000+';
+	            html += '<div><span>Showing ' + noRecords + ' of <b>' + totalRecords + '</b> ' + availableVO.objectLabelPlural.toLowerCase() + ' matching this distributor:</span></div><br/>'; 
+	            html += '<div class="log-table-container">' +
+	            		'<table class="log-table"><tr>' +
+	                    '<th class="object_name">' + availableVO.nameFieldLabel + '</th>' +
+	                    '<th class="status_value">' + availableVO.activeStatusFieldLabel + '</th>' +
+	                    '<th class="date_value">Last modified date</th>' +
+	                    '<th class="date_value">Created date</th>' +
+	                    '</tr>';
+	                    
+	            for (var i = 0; i < noRecords; i++) {
+	                var obj = availableVO.availableRecords[i];
+	                html += '<tr><td class="object_name"><a href="/' + obj.objectId + '" target="_blank">' + obj.name + '</a></td>' + 
+	                        '<td class="status_value">' + obj.activeStatus + '</td>' +
+	                        '<td class="date_value">' + obj.lastModifiedDate + '</td>' +
+	                        '<td class="date_value">' + obj.createdDate + '</td>' +
+	                        '</tr>';
+	            }
+	            html += '</table></div>';
+	        } else {
+	            html += '<span>There are no ' + availableVO.objectLabelPlural.toLowerCase() + ' in the queue that match this distributor.</span>';
+        	}
+        }
+        return html;
+    }
+    
+    //===================================================================================================================================
+	//================================================Recent records tab===============================================================
+
+    function buildRecentTab(team, distVO) {
+        var html = '';
+        html += '<div id="dist_recent">' + 
+                '<div id="dist_details">' + getPopupHeaderHtml(team, distVO, 'preview') + 
+                '<span>Show distributions for: <select onchange="getRecentRecords(\'' + distVO.distributor.Id + '\', $(this).val())" id="logs_time_' + distVO.distributor.Id + '">' +
+       			'<option value="">--Select--</option>' +
+       			'<option value="last run">Last run</option>' +
+       			'<option value="today">Today</option>' +
+       			'<option value="yesterday">Yesterday</option>' +
+       			'<option value="last week">Last 7 days</option>' +
+       			'</select></span></div><br/>';
+
+       	html += '<div id="rec_' + distVO.distributor.Id + '"/>' +
+       			'</div>';
+        return html;
+    }
+    
+    function showRecentDistributions(distId, logs) {
+		var sticky = '{!URLFOR($Resource.DEResources, 'images/stickypin_32.png')}';
+	    var inError = '{!URLFOR($Resource.DEResources, 'images/error.png')}';
+	    var inAlert = '{!URLFOR($Resource.DEResources, 'images/alert32_2.png')}';
+	    var reassigned = '{!URLFOR($Resource.DEResources, 'images/re-assign32_2.png')}';
+    
+    	var html = '<div class="log-table-container">';
+    	if (logs.length > 0) {
+    		html += '<table class="log-table" id ="recent_' + distId + '"><tr>' +
+    				'<th>Name</th>' + 
+    				'<th>Date</th>' +
+    				'<th>Type</th>' +
+    				'<th>Status</th>' +
+    				'<th>Assigned to</th></tr>';
+    		
+    		for (var i = 0; i < logs.length; i++) {
+    			var log = logs[i];
+    			html += '<tr><td><a target="_blank" href="/' + log.objectId + '">' + log.objectName + '</a></td>' +  
+    					'<td>' + log.assignmentDate + '</td>';
+				if (log.algorithm == 'Sticky') {
+					html += '<td><img title="Sticky assignment" class="med-icon" src="' + sticky + '"/></td>';
+				} else if (log.algorithm == 'Lookup owner') {
+					html += '<td><img title="Lookup owner" class="med-icon" src="' + lookupOwner + '"/></td>';
+				} else {
+					html += '<td></td>';
+				}
+				
+				if (log.inError) {
+					var errorMessage = 'Distribution failed: ' + log.errorMessage; 
+					html += '<td><img title="' + errorMessage + '" class="med-icon" src="' + inError + '"/></td>';
+				} else if (log.inAlert) {
+					html += '<td><img title="' + log.alertMessage + '" class="med-icon" src="' + inAlert + '"/></td>';
+				} else if (log.isReassigned) {
+					html += '<td><img title="Reassigned" class="med-icon" src="' + reassigned + '"/></td>';
+				} else {
+					html += '<td></td>';
+				}
+				
+				var un =  log.username ? '<a href="/' + log.teamMemberId + '" target="_blank">' + log.username + '</a>' : '<span style="color: #787878;" title="Team member has been deleted"><i>deleted</i></span>';
+				html += '<td>' + un + '</td></tr>';	
+    		}
+    		
+    		html += '</table>';
+    	} else {
+    		html += '<span>There are no distributions for this period.</span>';
+    	}
+    	html += '</div>';
+    	return html;
+    }
+
+	//===================================================================================================================================
+	//=====================================================Test record tab===============================================================
+    
+    function buildTestTab(team, distVO) {        
+        var html = '';
+        html += '<div id="test_record">' + getPopupHeaderHtml(team, distVO, 'test');
+        if (distVO.distributor.{!NamespacePrefix}Is_advanced_filter__c) {
+            html += '<span>Record testing is not available for distributors using Advanced Filter Mode.</span>';
+        } else {
+            html += '<span><b>' + team.objectLabel + ' ID </b></span>' +
+            		'<input type="text" id="record_input" maxlength="18" length="18" title="Enter ' + team.objectLabel.toLowerCase() + ' ID to test Team Active Status & Distributor Filters">&nbsp;' +
+                    '<input class="go-btn" type="submit" value="Go!" onclick="testRecord(\'' + team.team.{!NamespacePrefix}Object_name__c + '\', \'' + distVO.distributor.Id + '\')">' +
+                    '<div id="test_results"></div>';
+        }
+        html += '</div>';
+        return html;
+    }
+    
+    function showTestResults(objectName, resultVO) {
+        var html = '';
+        html += '<br/><br/><div id="record_name"><b>' + objectName + ': ' + resultVO.recordName + '</b></div>' +
+                '<br/><hr>';
+        
+        var activeStatusFilter;     
+        var filterMatchTable = '<div><b>Distributor filters: </b></div><div id="filter_table">' + 
+                '<table class="filter_result_table"><tr>' +
+                '<th class="criteria_col"></th>' +
+                '<th class="value_col">Actual value</th>' +
+                '<th class="match_col">Match</th>' +
+                '</tr>';        
+        for (var i = 0; i < resultVO.filterResults.length; i++) {
+            var filter = resultVO.filterResults[i];
+            if (filter.filterType == 'Active status') {
+                activeStatusFilter = filter;
+            } else {
+                var actualValue = filter.actualValue ? filter.actualValue : 'null';
+                filterMatchTable += '<tr>' +
+                        '<td class="criteria_col">' + filter.filterSoql + '</td>' +
+                        '<td class="value_col">' + actualValue + '</td>';
+                if (filter.matches) {
+                    filterMatchTable += '<td class="match_col"><img title="true" class="med-icon" src="' + matchIcon + '"/></td>';
+                } else {
+                    filterMatchTable += '<td class="match_col"><img title="false" class="med-icon" src="' + noMatchIcon + '"/></td>';
+                }   
+                filterMatchTable += '</tr>';
+            }
+        }
+        filterMatchTable += '</table></div>';
+        
+        if (activeStatusFilter) {
+            html += '<div><b>Team active status: </b></div>' +
+                    '<table class="filter_result_table"><tr>' +
+                    '<th class="criteria_col"></th>' +
+                    '<th class="value_col">Actual value</th>' +
+                    '<th class="match_col">Match</th>' +
+                    '</tr>' +
+                    '<tr><td class="criteria_col">' + activeStatusFilter.filterSoql + '</td>' +
+                    '<td class="value_col">' + activeStatusFilter.actualValue + '</td>';
+            if (activeStatusFilter.matches) {
+                html += '<td class="match_col"><img title="true" class="med-icon" src="' + matchIcon + '"/></td>';
+            } else {
+                html += '<td class="match_col"><img title="false" class="med-icon" src="' + noMatchIcon + '"/></td>';
+            }
+            html += '</tr></table>';
+        }
+        html += '<hr>';
+        html += filterMatchTable;
+        return html;
+    }
+	
+	//===================================================================================================================================
+	//================================================Team members tab==================================================================
+	
+	function buildTeamMembersTab(team, distVO) {        
+        var html = '';
+        html += '<div id="team_members">' + getPopupHeaderHtml(team, distVO, 'team') +
+				'<div id="dynamic_record" style="display: none;">' +
+				'<span><b>' + team.objectLabel + ' ID </b></span>' + 
+				'<input type="text" id="tags_record_input" maxlength="18" length="18" title="Enter ' + team.objectLabel.toLowerCase() + ' ID to test Team Members with Dynamic Tags or Lookup owner">&nbsp;' +
+                '<input class="go-btn" id="' + distVO.distributor.Id + '_go" type="submit" value="Go!"></div><span id="error_span" style="color: red;"/><br/>';
+		html += '<div id="' + distVO.distributor.Id + '_tm_av" class="team-member-detail"></div>';
+        html += '</div>';
+        return html;
+    }
+	
+	function showTeamMemberAvailability(id, distMembersVO, lookupVO) {
+		$('#' + id + '_go').off().click(function() {
+			getTeamMembersAvailabilityDynamicTags(distMembersVO, id, $('#tags_record_input').val());
+		});
+		
+		var html = '';
+		html += '<div id="member-detail">';
+		if (distMembersVO.hasDynamicTags || distMembersVO.isLookup) {
+			$('#dynamic_record').show();
+		} else {
+			$('#dynamic_record').hide();
+		}
+		if (lookupVO && lookupVO.recordName) {
+			html += '<span style="font-size: 1.2em;"><b>' + distMembersVO.objectName + ': </b>' + lookupVO.recordName + '</span><br/><br/>';
+		}
+
+		if (distMembersVO.isLookup) {
+			html += '<fieldset class="header-legend"><legend>Lookup owner</legend></fieldset>';
+		
+			html += '<div style="padding-left: 10px;">' +
+					'<span><img src="' + lookupOwner + '" class="tiny-icon"/>&nbsp;' + distMembersVO.objectName + '.' + distMembersVO.lookupMatchField + ' <i>lookup to</i> ' + 
+					distMembersVO.lookupObjectName + '.' + distMembersVO.lookupObjectMatchField;
+			if (distMembersVO.lookupFilterSoql != '') {
+				html += ' <i>where</i> (' + distMembersVO.lookupFilterSoql +')';
+			} 
+					
+			html += '</span><br/>';
+			if (lookupVO && lookupVO.isLookup) {
+				if (lookupVO.lookedUpRecordName) {
+					html += '<br/><span><img class="tiny-icon" src="' + arrowWithTail + '"/>&nbsp;Found matching ' + distMembersVO.lookupObjectName + ' <b><a href="/' + lookupVO.lookedUpRecordId + '" target="_blank">' + lookupVO.lookedUpRecordName + '</a></b> for ' + distMembersVO.objectName + '.' + distMembersVO.lookupMatchField + ' <b>' + lookupVO.matchedValue + '</b></span><br/>';
+				}  else if (!lookupVO.lookedUpRecordName) {
+					html += '<br/><span style="color: red;"><img class="tiny-icon" src="' + arrowWithTail + '"/>&nbsp;<b>No ' + distMembersVO.lookupObjectName + ' found for lookup value: ' + lookupVO.matchedValue + '</b></span>';
+				}
+				
+				if (lookupVO.lookupUserId && lookupVO.lookupUserName) {
+					html += '<span><img class="tiny-icon" src="' + lookupMatch + '"/>&nbsp;<b>Matched team member: <a style="color: #56aa1c" target="_blank" href="/' + lookupVO.lookupUserId + '">'  + lookupVO.lookupUserName + '</a></b>' +
+							'</span>';
+				} else if (lookupVO.lookedUpRecordName && !lookupVO.lookupUserName) {
+					html += '<span style="color: red;"><img class="tiny-icon" src="' + noLookupMatch + '"/>&nbsp;<b>No matching team member found for Lookup Owner.</b></span>';
+				}
+			}
+			html += '</div><br/><br/>';
+		}
+		
+		if (distMembersVO.memberFilterType != 'None') {
+			html +=	'<span style="padding-left: 10px;"><b>Member filter:</b> ' + distMembersVO.memberFilterType + '</span></div><br/>';
+		}
+		html += buildTeamMemberTable(id, distMembersVO, lookupVO);
+		
+		return html;
+	}
+	
+	function buildTeamMemberTable(id, distMembersVO, lookupVO) {
+		var html = '';
+		html += '<div class="team-tbl"><table class="expandable-tbl" id="' + id + '_tm">' +
+				'<th></th>' +
+				'<th>Team member</th>' +
+				'<th>Available</th>';
+		if (distMembersVO.hasCap) {
+			html += '<th title="' + distMembersVO.capType + '">Distributor assignments</th>';
+		}
+		if (distMembersVO.hasTeamLevelCap) {
+			html += '<th title="' + distMembersVO.teamLevelCapType + '">Team-wide assignments</th>';
+		}
+		if (!distMembersVO.isLookup || (distMembersVO.isLookup && !distMembersVO.isRoundRobinDisabled)) {
+			html +=	'<th>Matches member filters</th>';
+		}
+					
+		for (var i = 0; i < distMembersVO.teamMembers.length; i++) {
+			var tm = distMembersVO.teamMembers[i];
+			var showRow = true;
+			if (distMembersVO.isRoundRobinDisabled) {
+				if (lookupVO && lookupVO.isLookup) {
+					if (lookupVO.lookupUserId && lookupVO.lookupUserName && lookupVO.lookupUserId == tm.userId) {
+						showRow = true;
+					} else {
+						showRow = false;
+					}
+				} else {
+					showRow = false;
+				}
+			}
+			if (showRow) {
+				var className = tm.isDisabled ? 'tbl-row disabled' : 'tbl-row';
+				var rowTitle = tm.isDisabled ? 'Team member disabled' : '';
+				html += '<tr _row="' + i + '" class="' + className + '" title="' + rowTitle + '">';
+				if (distMembersVO.memberFilterType == 'Tags') {
+					html += '<td><img id="arrow_' + i + '"class="med-icon" src="' + arrowRight + '"/></td>';
+				} else {
+					html += '<td><span class="med-icon"/></td>';
+				}
+				html += '<td>' + tm.username + '</td>';
+				if (tm.isOnline) {
+					html += '<td><img title="available" id="arrow_' + i + '"class="med-icon" src="' + green_head + '"/></td>';
+				} else {
+					html += '<td><img title="Logged out/Outside working hours/Out of office/Inactive" id="arrow_' + i + '"class="med-icon" src="' + grey_head + '"/></td>';	
+				}
+				if (distMembersVO.hasCap) {
+					if (tm.capAssignment >= 0) {
+						if (tm.capAssignment >= distMembersVO.cap) {
+							html += '<td style="color: red"><b>' + tm.capAssignment + ' / ' + distMembersVO.cap + '</b></td>';
+						} else {
+							html += '<td>' + tm.capAssignment + ' / ' + distMembersVO.cap + '</td>';
+						}
+					} else {
+						html += '<td>0 / ' + distMembersVO.cap + '</td>';
+					}
+				}
+				if (distMembersVO.hasTeamLevelCap) {
+					var teamLevelCapString = tm.teamLevelCap != null ? ' / ' + tm.teamLevelCap : '';
+					var tip = tm.teamLevelCapName + ' cap';
+					if (tm.teamLevelAssignments >= 0) {
+						if (tm.teamLevelAssignments >= tm.teamLevelCap) {
+							html += '<td style="color: red" title="' + tip + '"><b>' + tm.teamLevelAssignments + teamLevelCapString + '</b></td>';
+						} else {
+							html += '<td title="' + tip + '">' + tm.teamLevelAssignments + teamLevelCapString + '</td>';
+						}
+					} else {
+						html += '<td title="' + tip + '">0' + teamLevelCapString + '</td>';
+					}
+				}
+				if (!distMembersVO.isLookup || (distMembersVO.isLookup && !distMembersVO.isRoundRobinDisabled)) {
+					if (tm.matchesDistributor) {
+						html += '<td><img title="Team member matches distributor" class="med-icon" src="' + matchIcon + '"/></td>';
+					} else {
+						html += '<td><img title="Team member not available for this distributor" class="med-icon" src="' + noMatchIcon + '"/></td>';
+					}
+				}
+				html += '</tr>';
+				
+				//expandable
+				if (distMembersVO.memberFilterType == 'Tags') {
+					var colSpan = 4;
+					if ((distMembersVO.hasCap && !distMembersVO.hasTeamLevelCap) || (!distMembersVO.hasCap && distMembersVO.hasTeamLevelCap)) {
+						colSpan = 5;
+					} else if (distMembersVO.hasCap && distMembersVO.hasTeamLevelCap) {
+						colSpan = 6;
+					}
+					html += '<tr><td colspan="' + colSpan + '">';
+					
+					if (distMembersVO.hasDynamicTags && tm.userTagVos.length == 0) {
+						html += '<span>Please enter a record ID to test dynamic tags.</span>';
+					} else {
+						html += '<table class="expandable-tbl expandable-child">';
+						for (var j = 0; j < tm.userTagVos.length; j++) {
+							var u = tm.userTagVos[j];
+							html += '<tr><td style="width: 10px;"></td><td>' + u.tagType + '</td>' +
+								'<td>' + u.tagCategory + ' ' + u.tagOperator + ' ' + u.tagValues;
+							if (u.tagType == 'Dynamic') {
+								html += ': <b>' + u.recordValue + '</b>';
+							}
+							html += '</td>';
+							
+							if (u.userTags && u.userTags.length > 0) {
+								html += '<td>' + u.userTags + '</td>';
+							} else {
+								html += '<td>none</td>';
+							}	
+							if (u.userMatches) {
+								html += '<td><img title="true" class="small-icon" src="' + matchIcon + '"/></td>';
+							} else {
+								html += '<td><img title="false" class="small-icon" src="' + noMatchIcon + '"/></td>';
+							}
+							html += '<tr/>';
+						}
+						html += '</table>';
+					}
+					html +=	'</td></tr>';
+				}
+			}
+		}
+		html += '</table></div>';
+		return html;
+	}
+	
+	
+	//===================================================================================================================================
+	//================================================Helpers============================================================================
+	
+    function getPopupHeaderHtml(team, distVO, tabName) {
+        var queueIcon = '{!URLFOR($Resource.DEResources, 'images/queue32.png')}';
+        var teamIcon = '{!URLFOR($Resource.DEResources, 'images/teams32.png')}';
+    	var html = '';
+    	html += '<table><tr><td>';
+    	
+    	if (tabName == 'team') {
+        	html += '<img src="' +  teamIcon + '"/>&nbsp&nbsp;</td><td>';
+        } else {
+        	html += '<img src="' +  queueIcon + '"/>&nbsp&nbsp;</td><td>';
+        }
+        html += '<span><b>Team: </b>' + team.team.Name + '</span><br/>' +
+                '<span><b>Distributor: </b>' + distVO.distributor.Name + '</span><br/>';
+        var queueUser = distVO.isUser ? 'user' : 'queue';    
+        if (distVO.distributor.{!NamespacePrefix}Distributor_type__c != 'Trigger') {
+        	html += '<span><b>Distributing from ' + queueUser + ': </b>' + distVO.queueName + '</span>';
+        }
+        html += '</td><td><span>' +
+                '<a href="http://help.nc-squared.com/#distributor-test-tool" class="popup_help_icon" target="new">' +
+                '<img src="{!URLFOR($Resource.DEResources, 'images/help40_3.png')}" /></a>' +
+                '</span></td>' +
+                '</tr></table><br/>';      
+		return html;	
+    }
+    </script>
+</apex:component>

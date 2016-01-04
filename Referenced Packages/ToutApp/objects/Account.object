@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <webLinks>
+        <fullName>Email_with_Tout</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Email with Tout</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/9.0/connection.js&quot;)} 
+
+var queryResult = sforce.connection.queryAll(&quot;Select Id, Name, Email from Contact where AccountId = &apos;{!Account.Id}&apos;&quot;);
+var records = queryResult.getArray(&quot;records&quot;);
+
+var contactId = 0;
+var contactName = &quot;&quot;;
+var contactEmail = &quot;&quot;;
+var cc = [];
+
+for (var i=0; i&lt;records.length; i++) {
+  var record = records[i];
+  if(i == 0)
+  {
+    contactId = record.Id;
+    contactName = record.Name;
+    contactEmail = record.Email;
+  }
+  else
+  {
+    cc.push(record.Email);
+  }
+}
+var u = &quot;https://toutapp.com/pitches/new?name=&quot; + contactName + &quot;&amp;email=&quot; + contactEmail + &quot;&amp;force_bookmarklet=true&amp;style=salesforce&amp;salesforce_contact_id=&quot; + contactId + &quot;&amp;salesforce_account_id={!Account.Id}&amp;cc=&quot; + cc.join(&quot;,&quot;); 
+
+var w = window; 
+
+w.open(u,&apos;Tout&apos;,&apos;scrollbars=1,status=1,width=762,height=&apos; + ( w.screen.height &lt; 970 ? w.screen.height : 970));</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Push_to_Tout</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Push to Tout</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/9.0/connection.js&quot;)} 
+// create the form. Set it up to POST the transaction
+f = document.createElement(&quot;form&quot;);
+f.action=&quot;https://toutapp.com/salesforce_bridge&quot;;
+f.method = &quot;post&quot;;
+f.target = &quot;_blank&quot;;
+
+// add the session id as a parameter
+i = document.createElement(&quot;input&quot;);
+i.id = &quot;session&quot;;
+i.name = &quot;session&quot;;
+i.type = &quot;hidden&quot;;
+i.value = &quot;{!API.Session_ID}&quot;;
+f.appendChild(i);
+
+// add the server location as a parameter
+i = document.createElement(&quot;input&quot;);
+i.id = &quot;server&quot;;
+i.name = &quot;server&quot;;
+i.type = &quot;hidden&quot;;
+i.value = &quot;{!API.Partner_Server_URL_90}&quot;;
+f.appendChild(i);
+
+// Get the Object IDs that were checked
+accountArray = {!GETRECORDIDS($ObjectType.Account)};
+queryResult = sforce.connection.query(&quot;select Id from Contact where AccountId in (&apos;&quot; + accountArray.join(&quot;&apos;,&apos;&quot;) + &quot;&apos;)&quot;);
+it = new sforce.QueryResultIterator(queryResult);
+idArray = []
+while (it.hasNext()) {
+  contact = it.next();
+  idArray.push(contact.Id);
+}
+
+// add the idArray as a parameter
+i = document.createElement(&quot;input&quot;);
+i.id = &quot;ids&quot;;
+i.name = &quot;ids&quot;;
+i.type = &quot;hidden&quot;;
+i.value = idArray;
+f.appendChild(i);
+
+// add the object type
+i = document.createElement(&quot;input&quot;);
+i.id = &quot;object_type&quot;;
+i.name = &quot;object_type&quot;;
+i.type = &quot;hidden&quot;;
+i.value = &quot;Contact&quot;;
+f.appendChild(i);
+
+// add the form to the document.
+document.body.appendChild(f);
+
+// submit the form
+f.submit();</url>
+    </webLinks>
+</CustomObject>

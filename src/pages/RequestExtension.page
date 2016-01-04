@@ -1,0 +1,21 @@
+<apex:page controller="RequestExtensionController" title="Deal Registration Request Extension" showHeader="false" sidebar="false" standardStylesheets="false">
+    <apex:composition template="PartnerTemplate">
+        <apex:define name="page-title">Axcient Partner Request Extension</apex:define>
+        <apex:define name="main-content">
+		    <apex:form >
+		        <apex:pageMessages />
+		        <apex:outputPanel id="beforePanel">
+		            <apex:pageBlock mode="edit">
+		                <apex:pageBlockButtons location="bottom">
+		                    <apex:commandButton title="Submit" value="Request Extension" action="{!requestExtension}"/>
+		                </apex:pageBlockButtons>
+		                <apex:pageBlockSection title="Request Extension" columns="1">
+			                <apex:inputField label="Requested Extension Length in Days" value="{!der.Requested_Extension_Length__c}"/>
+			                <apex:inputField value="{!der.Reason_for_extension_request__c}"/>
+		                </apex:pageBlockSection>
+		            </apex:pageBlock>
+		        </apex:outputPanel>
+		    </apex:form>
+        </apex:define>
+    </apex:composition>
+</apex:page>

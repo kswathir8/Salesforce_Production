@@ -1,0 +1,206 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="General Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM General Configuration" help="https://www.fullcirclecrm.com/fcrm/app/general-configuration/">
+    <apex:form >
+        <apex:pageblock mode="edit" >
+            <apex:pagemessages />
+            <apex:pageBlockSection columns="2">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idEnableApp" value="Application Enabled" />
+                    <apex:inputcheckbox id="idEnableApp"  value="{!GeneralEnableApplication}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Check this box to enable Full Circle CRM Response Management.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idPassiveMode" value="Global Passive Mode" />
+                    <apex:inputcheckbox id="idPassiveMode"  value="{!GeneralPassiveMode}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    When you check Global Passive Mode, no user is required to associate a Campaign with a Lead 
+                    or a Contact when, for example, creating a new record or updating the status of a Lead or Contact record.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idEnableDebugging" value="Enable Debug Logging" />
+                    <apex:inputcheckbox id="idEnableDebugging"  value="{!GeneralEnableDebugging}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    This option enables debug logging. You should only enable this when instructed to do so by Full Circle CRM Support personnel.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idTaxonoy" value="Taxonomy Definitions" />
+                    <apex:selectList value="{!TaxonomyName}" size="1">
+                        <apex:selectOptions value="{!TaxonomyList}" />
+                    </apex:selectList>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Taxonomy files are static resource files that define terminology and localization information 
+                    for the Response Intelligence tab.
+                </apex:outputText>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="idopcreate" columns="2" title="Opportunity Creation">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idOpportunityGating" value="Restrict Opportunity Creation" />
+                    <apex:inputcheckbox id="idOpportunityGating"  value="{!GeneralOpportunityGating}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    When you check Restrict Opportunity Creation, active mode users must create Opportunities from Lead conversion 
+                    or from the Contact related list. If a user attempts to create an Opportunity from another location, the system 
+                    will display an error. If you check Global Passive Mode, this option has no effect.
+                </apex:outputText>            
+                <apex:inputcheckbox label="Use Gating Alerts" id="idUseGating"  value="{!GeneralUseGatingAlerts}"/>
+                <apex:outputText >
+                    When you check "Use Gating Alerts" and the user is in active mode, the system will generate a 
+                    popup alert if the user attempts an operation that requires an active response. 
+                    When unchecked, the user will see an error page.
+                </apex:outputText>
+                <apex:inputcheckbox label="Do Not Create Opportunity on Lead Conversion" id="idNoOpConvert"  value="{!GeneralNoOpOnConvert}"/>
+                <apex:outputText >
+                    When this setting is selected the 'Do not create a new opportunity upon conversion" 
+                    checkbox on the lead conversion page is defaulted to checked.
+                </apex:outputText>
+                <apex:inputcheckbox label="Opportunity Naming Convention" id="idOpNamingConvention"  value="{!GeneralOpNamingConvention}"/>
+                <apex:outputText >
+                    When an opportunity is created from a contact record, the opportunity name 
+                    field will be pre-populated with the Account name followed by a dash.
+                </apex:outputText>
+           
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="idopcreate2" columns="1" >
+                <apex:inputtext maxlength="255" size="100" label="Opportunity Creation Query String" id="idOpQueryString"  value="{!GeneralOpQueryString}"/>
+                <apex:pageblockSectionItem >
+                <apex:outputText value="" />
+                <apex:outputText >
+                    Query string of additional parameters for inclusion when creating opportunities from a contact page when using gating. The format is fieldcode1=Contact_API_name1&amp;fieldcode2=Contact_API_name2 etc. 
+                    The contact field value for the specified contact API name is substituted into the string and used to populate default values on the new opportunity page. Character limit is 255.
+                </apex:outputText>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:actionFunction name="locationupdated" reRender="idLocationOption"  />
+            <apex:pageBlockSection id="idoverrides" columns="1" title="Passive Profile & User Overrides">
+                <apex:outputText >When the Global Passive Mode checkbox above is unchecked, all Salesforce users are set to 
+                active mode and will be required to respond to the Campaign Response Prompt on Lead and Contact records. 
+                You can use this section to set specific profiles and users to passive mode by overriding the default 
+                active mode setting.  <br /><br />
+                After adding a profile or user, select the Force Passive checkbox and save the configuration changes. 
+                If unchecked, the profile or user will remain active. If a user or profile you are looking for doesn't 
+                appear on the list, type in the first few characters and execute a search.
+                </apex:outputText>
+                <apex:outputtext style="font-weight:bold" value="The following user/profile passive overrides are currently defined:" />
+                <apex:dataTable value="{!PassiveOverrideList}" var="ovr" cellpadding="5px">
+                    <apex:column headerValue="Location" value="{!ovr.Name}"/>
+                    <apex:column headerValue="Force Passive" styleclass="CenterHeader">
+                        <apex:inputCheckbox value="{!ovr.Overrides.FCRM__Passive_Mode__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:commandButton action="{!RemovePassiveOverride}" value="Remove override" reRender="idoverrides">
+                            <apex:param name="passivetoremove" value="{!ovr.setupid}"/>
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:dataTable>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText style="font-weight:bold;margin-left:10px;margin-right:5px" value="Select Profile or User" />
+                    <apex:pageBlockSectionItem >
+                        <apex:selectList style="width:160px" value="{!ForcePassiveLocation.OverrideLocation}" size="0" onchange="locationupdated()" >
+                            <apex:selectOption itemValue="user" itemLabel="User" />
+                            <apex:selectOption itemValue="profile" itemLabel="Profile" />
+                        </apex:selectList>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputPanel id="idLocationOption">
+                                <apex:inputField required="false" rendered="{!IF(ForcePassiveLocation.OverrideLocation='user',true, false)}" value="{!ForcePassiveLocation.CM.FCRM__FCR_Opportunity_Created_by__c}"/>
+                                <apex:inputField required="false" rendered="{!IF(ForcePassiveLocation.OverrideLocation='profile',true, false)}" value="{!ForcePassiveLocation.U.ProfileID}"/>
+                                <script type="text/javascript">    
+                                    swapicontitle('Opportunity Created','User Lookup');
+                                </script>    
+                            </apex:outputPanel>
+                            <apex:commandButton action="{!AddOverrideLocation}" value="Add Override"/> 
+                        </apex:pageBlockSectionItem>                                                                                               
+                    </apex:pageBlockSectionItem>            
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText style="color:red" rendered="{! NOT(ISBLANK(overrideerror))}" value="{!overrideerror}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:actionFunction name="asynclocationupdated" reRender="idAsyncLocationOption"  />
+            <apex:pageBlockSection id="idasyncoverrides" columns="1" title="Asynchronous Profiles & Users">
+                <apex:outputText >The profiles and users defined here will be used for asynchronous processing for operations that are not
+                user specific, and if necessary, to complete user specific tasks that were not completed in a timely manner. These profiles
+                and users will be granted permission to perform Response Management operations as required. This setting only applies to the 2015 
+                and later async systems.
+                  <br /><br />
+                After adding a profile or user, select the Allow Asynchronous Operations checkbox and save the configuration changes. 
+                If unchecked, the profile or user will not be granted permission to perform asynchronous operations. 
+                If a user or profile you are looking for doesn't appear on the list, type in the first few characters and execute a search.
+                </apex:outputText>
+                <apex:outputtext style="font-weight:bold" value="The following user/profile asynchronous overrides are currently defined:" />
+                <apex:dataTable value="{!NewAsyncOverrideList}" var="ovr" cellpadding="5px">
+                    <apex:column headerValue="Location" value="{!ovr.Name}"/>
+                    <apex:column headerValue="Allow Async" styleclass="CenterHeader">
+                        <apex:inputCheckbox value="{!ovr.DelegatedAsyncs.FCRM__Delegated_Async_Allowed__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:commandButton action="{!RemoveAsyncLocation}" value="Remove user/profile" reRender="idasyncoverrides">
+                            <apex:param name="AsyncToRemove" value="{!ovr.setupid}"/>
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:dataTable>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText style="font-weight:bold;margin-left:10px;margin-right:5px" value="Select Profile or User" />
+                    <apex:pageBlockSectionItem >
+                        <apex:selectList style="width:160px" value="{!NewAsyncLocation.OverrideLocation}" size="0" onchange="asynclocationupdated()" >
+                            <apex:selectOption itemValue="user" itemLabel="User" />
+                            <apex:selectOption itemValue="profile" itemLabel="Profile" />
+                        </apex:selectList>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputPanel id="idAsyncLocationOption">
+                                <apex:inputField required="false" rendered="{!IF(NewAsyncLocation.OverrideLocation='user',true, false)}" value="{!NewAsyncLocation.CM.FCRM__FCR_Opportunity_Created_by__c}"/>
+                                <apex:inputField required="false" rendered="{!IF(NewAsyncLocation.OverrideLocation='profile',true, false)}" value="{!NewAsyncLocation.U.ProfileID}"/>
+                                <script type="text/javascript">    
+                                    swapicontitle('Opportunity Created','User Lookup');
+                                </script>    
+                            </apex:outputPanel>
+                            <apex:commandButton action="{!AddAsyncLocation}" value="Add Async User or Profile"/> 
+                        </apex:pageBlockSectionItem>                                                                                               
+                    </apex:pageBlockSectionItem>            
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText style="color:red" rendered="{! NOT(ISBLANK(overrideerror))}" value="{!overrideerror}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+                        
+            <apex:pageBlockSection columns="1" title="Passive RecordTypes" rendered="{!ShowLeadContactRecordTypeConfig}">
+                <apex:pageblockSectionItem >
+                    <c:FCR_VFDualListSelect AvailableIDs="{!AvailablePassiveRTID}" AvailableStrings="{!AvailablePassiveRTString}"
+                        SelectedIDs="{!SelectedPassiveRTID}" SelectedStrings="{!SelectedPassiveRTString}" AllowReorder="false" MaxSelect="12" />
+                <apex:outputText >You can configure individual lead or contact record types so that passive mode is always enforced on records of these types. 
+                    You may specify up to 12 record types. Remember to save when done.
+                </apex:outputText>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="Non-Response RecordTypes" rendered="{!ShowLeadContactRecordTypeConfig}">
+                <apex:pageblockSectionItem >
+                    <c:FCR_VFDualListSelect AvailableIDs="{!AvailableNonResponseRTID}" AvailableStrings="{!AvailableNonResponseRTString}"
+                        SelectedIDs="{!SelectedNonResponseRTID}" SelectedStrings="{!SelectedNonResponseRTString}" AllowReorder="false" MaxSelect="12" />
+                    <apex:outputText >You can configure individual Lead or Contact record types for incoming responses 
+                        (Campaign Members) so that these Leads or Contacts are not considered responses by the response management 
+                        system. For example, a job applicant record type could be configured as a non-response record type.
+                    </apex:outputText>
+                </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageblockSection columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on the currently saved data. Save the page and then return to the page for an updated report.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!GeneralConfigDiagnosticInfo}" />
+            </apex:pageblockSection>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!GeneralSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    </apex:SectionHeader>
+</apex:page>

@@ -1,0 +1,12 @@
+<apex:page controller="CreateUserController" tabStyle="Contact" standardStylesheets="true" action="{!doCreateUser}">
+  <apex:form >
+        <apex:pageBlock title="Create User">
+            <apex:pageMessage rendered="{!flag}" summary="{!userCreateStatus}" severity="error" strength="3" />
+            <apex:pageMessage rendered="{!NOT(flag)}" summary="{!userCreateStatus}" severity="confirm" strength="3" />
+            <br/>
+            <div>
+                <apex:commandButton value="OK" action="{!cancel}"/> 
+            </div>
+        </apex:pageBlock>
+  </apex:form>  
+</apex:page>

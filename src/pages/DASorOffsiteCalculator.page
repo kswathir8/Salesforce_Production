@@ -1,0 +1,97 @@
+<apex:page sideBar="false" showHeader="false">
+
+<apex:includeScript value="{!$Resource.JQuery}"/>
+<script>
+
+    $(document).ready(function(){
+        calculateDASAndOffsite(); 
+        
+        $("input").change(function(){
+            calculateDASAndOffsite(); 
+        });
+        
+    });
+
+    
+    function calculateDASAndOffsite(){
+    
+        console.log("fired");
+    
+        var uploadSpeed = parseFloat($("#uploadSpeed").val());
+        var offsiteSize = parseFloat($("#offsiteSize").val());
+        var maxDays = parseFloat($("#acceptableDays").val());
+        
+        console.log(uploadSpeed,offsiteSize,maxDays);
+        
+        var numDays = ( (offsiteSize*1024*8) / uploadSpeed) / 86400;
+        
+        $("#numDays").text(Math.round(numDays));
+        
+        if( numDays > maxDays) $("#needsDAS").text("YES");
+        else $("#needsDAS").text("NO");
+    }
+
+</script>
+
+<style>
+
+.header{
+    background-image: url("http://www.axcient.com/themes/axcient/images/header-clouds.png");
+    background-size: 6000px 40px;
+    background-repeat:no-repeat;
+    height: 40px;
+    border-radius: 10px 10px 0 0;
+    padding-top: 20px;
+}
+
+.header h1{
+    font-size: 20px;
+    color: black;
+    margin: auto 50px;
+}
+
+.container{
+    width: 600px;
+    margin: 10px auto;
+    background-color: #edf8fe;
+}
+
+.containerBody{
+    padding: 10px;
+}
+
+#bodyCell div{
+    clear: both;
+    margin: 0;
+}
+
+#bodyCell div p{
+    float: left;
+    margin-bottom: 15px;
+}
+
+#bodyCell div input[type=text]{
+    float: right;
+    margin: 10px;
+}
+
+#bodyCell div span{
+    float: right;
+    margin: .8em;
+}
+
+</style>
+
+<div class="container">
+    <div class="header">
+        <h1>DAS or Offsite Calculator</h1>
+    </div>
+    <div class="containerBody">
+        <div><p>Enter the upload Speed of the internet connection (Mbps)*</p><input type="text" id="uploadSpeed" value="1.00" size="8"/></div>
+        <div><p>Enter the amount of data to be sent off site (GB)</p><input type="text" id="offsiteSize" value="100" size="8"/></div>
+        <div><p>The number of days for the offsite backup would be:</p><span id="numDays"></span></div>
+        <div><p>Should you request a DAS?</p><span id="needsDAS"></span></div>
+        <div><p>The maximum acceptable number of days for an offsite backup:</p><input type="text" id="acceptableDays" value="5" size="8"/></div>
+    </div>
+</div>
+</apex:page>

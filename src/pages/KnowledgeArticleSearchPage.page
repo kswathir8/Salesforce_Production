@@ -1,0 +1,116 @@
+<apex:page controller="KnowledgeArticleSearchController" sidebar="false" title="Knowledge Search" showHeader="true">
+<style>
+ td{
+  vertical-align : top;   
+  text-align: left;
+ }
+ body .bPageBlock, body #bodyCell .bResource .secondaryPalette, body .secondaryPalette.bPageBlock,
+ .bpageblock{
+     border-top:4px solid #53B2D1 !important;  
+ }
+</style>
+<apex:form >
+         <apex:panelGrid columns="2" >
+          <apex:panelGroup >
+           <apex:pageBlock >
+            <apex:outputText value="Filter Your Results" />
+             <apex:pageBlockSection columns="1">
+             <apex:dataTable value="{!dataCategoryGroupInfo}" var="dataCategory" id="dataCategory">
+             <apex:column width="100%">
+              <apex:outputLabel for="categoryType_{!dataCategory.name}">{!dataCategory.name}</apex:outputLabel> 
+               <br />
+               <select id="categoryType_{!dataCategory.name}" name="categoryType_{!dataCategory.name}" onchange = "refreshSearchResult()" >
+                <option value="NoFilter">No Filter</option>
+                <option value="All">All</option>
+                <knowledge:categoryList categoryVar="category" categoryGroup="{!dataCategory.name}" rootCategory="All" level="-1">
+                <option value="{!category.name}">
+                 <apex:outputText escape="false" value="{!LPAD(' ',6*category.depth,'&nbsp;')}" />
+                 {!category.label}
+                </option>
+                </knowledge:categoryList>
+               </select>
+              </apex:column>
+             </apex:dataTable>
+             </apex:pageBlockSection>
+            </apex:pageBlock>
+           
+            <apex:pageBlock >
+                    <table width="99%"> 
+                        <h3> Documentation Links</h3><br/><br/>
+                         <td>
+                             <tr>• <a href="http://documents.axcient.com/forkc/wn.pdf" target="_blank">What's New</a></tr>
+                         </td><br/>
+                         <td>
+                            <tr>• <a href= "http://documents.axcient.com/forkc/qsg.pdf" target="_blank">Quick Start Guide</a></tr>
+                         </td><br/>
+                         <td>
+                             <tr>• <a href= "http://documents.axcient.com/forkc/umc.pdf" target="_blank">UMC User Guide</a></tr>
+                         </td><br/>
+                         <td>
+                             <tr>• <a href= "http://documents.axcient.com/forkc/bpg.pdf" target="_blank">Best Practice Guide</a></tr>
+                         </td><br/>
+                         <td>
+                             <tr>• <a href= "http://documents.axcient.com/forkc/mm.pdf" target="_blank">Error Messages Manual</a></tr>
+                         </td><br/>
+                         <td>
+                             <tr>• <a href= "http://documents.axcient.com/forkc/rmc.pdf" target="_blank">RMC User Guide</a></tr>
+                         </td><br/>
+                    </table>
+            </apex:pageBlock>
+            
+              <apex:pageBlock title="Contact Support">
+                    <table width="99%"> 
+                        <center><h2>Need Assistance?</h2></center><br/>
+                         <td>
+                             <tr><p style="Color:#53B2D1;"><b>Phone Support- 800-715-2339</b></p></tr>
+                         </td><br/>
+                         <td>
+                             <tr><p style="Color:#53B2D1;"><b>Online Support- <a href="/500/e?ent=Case&nooverride=1&RecordType=01280000000BWYa&retURL=%2F500%2Fo"> Log a Case </a></b></p></tr>
+                         </td><br/>
+                         <td>
+                            <tr><p style="Color:#53B2D1;"><b>Email Support- support@axcient.com</b></p></tr>
+                         </td><br/>
+                    </table>
+            </apex:pageBlock>
+         </apex:panelGroup>
+         
+         <apex:panelGroup >
+          <apex:pageBlock title="Search" >
+           <apex:inputText value="{!searchstring}" id="theSearchstring" maxlength="100" size="110"  onkeypress="if (event.keyCode == 13) {refreshSearchResult();return false;} "/> &nbsp;
+           <apex:commandButton value="Go" id="submitButton" style="width:30" reRender="theSearchResults" />
+          </apex:pageBlock>  
+          <apex:messages />
+          <apex:panelGroup id="theSearchResults" >
+          <apex:pageBlock title="Search Results" > 
+           <apex:panelGrid width="100%">
+            <table width="99%">
+             <tr>
+              <th width="33%">Title</th>
+              <th width="33%">Article Type</th>
+              <th width="33%">Summary</th>
+             </tr>
+            </table>
+           <knowledge:articleList articleVar="article"  categories="{!categoryKeyword}" Keyword="{!searchstring}" pageNumber="{!currentPageNumber}" hasMoreVar="false" pageSize="10">
+            <table  width="99%">
+             <tr>
+              <td width="33%">
+               <apex:outputLink target="_blank" value="{!URLFOR($Action.KnowledgeArticle.View, article.id,['popup' = 'true'])}">{!article.title}</apex:outputLink>
+              </td>
+              <td width="33%"><apex:outputText >{!article.articleTypeLabel}</apex:outputText></td>
+              <td width="33%"><apex:outputText >{!article.abstract}</apex:outputText></td>
+             </tr>
+            </table>
+           </knowledge:articleList>
+          </apex:panelGrid> 
+         </apex:pageBlock>
+         <apex:panelGrid columns="2">
+          <apex:commandLink action="{!previous}" value="Previous" style="{!IF(prevRequired = true,'display:block','display:none')}" reRender="theSearchResults"/> 
+          <apex:commandLink action="{!next}" value="Next"  style="{!IF(nextRequired = true,'display:block','display:none')}" reRender="theSearchResults"/>  
+         </apex:panelGrid>
+         </apex:panelGroup>
+         </apex:panelGroup>
+         </apex:panelGrid>
+         <apex:actionFunction action="{!refreshSearchResult}" name="refreshSearchResult" rerender="theSearchResults" >
+         </apex:actionFunction>
+ </apex:form>
+</apex:page>

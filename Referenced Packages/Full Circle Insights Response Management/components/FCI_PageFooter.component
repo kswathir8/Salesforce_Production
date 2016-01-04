@@ -1,0 +1,7 @@
+<apex:component >
+    <div style="text-align: center; margin-top: 20px;">
+    	<a href="http://fullcirclecrm.com/" target="_blank">
+    		<img src="{!$Resource.FCRM__FCCRM_Logo}"/>
+    	</a>
+    </div>
+</apex:component>

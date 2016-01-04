@@ -1,0 +1,119 @@
+<apex:page sidebar="false" controller="n2de.TeamController" tabstyle="n2de__Team__c">
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}" type="text/javascript"></script>
+<apex:form >
+<script>
+var teamId = '{!JSENCODE(teamWrap.id)}';
+function moveUp(){
+	var select = document.getElementById ("distributor_picklist");
+	var selectedIndex = select.selectedIndex;
+	if(selectedIndex > 0){
+		var option = select.options[selectedIndex];
+		var optionUp = select.options[selectedIndex - 1];
+		select.remove(selectedIndex);
+		select.add(option, optionUp);
+	}
+}
+function moveDown(){
+	var select = document.getElementById ("distributor_picklist");
+	var selectedIndex = select.selectedIndex;
+	if(selectedIndex < select.length){
+		var option = select.options[selectedIndex];
+		var optionDown = select.options[selectedIndex + 2];
+		select.remove(selectedIndex);
+		select.add(option, optionDown);
+	}
+}
+function moveTop(){
+	var select = document.getElementById ("distributor_picklist");
+	var selectedIndex = select.selectedIndex;
+	var option = select.options[selectedIndex];
+	var optionTop = select.options[0];
+	select.remove(selectedIndex);
+	select.add(option, optionTop);
+}
+function moveBottom(){
+	var select = document.getElementById ("distributor_picklist");
+	var selectedIndex = select.selectedIndex;
+	var option = select.options[selectedIndex];
+	var optionBottom = select.options[select.length];
+	select.remove(selectedIndex);
+	select.add(option, optionBottom);
+}
+function save(){
+	showMask();
+	var distributorIdArray = new Array();
+	$("#distributor_picklist option").each(function(){
+		var distributorId = $(this).val();
+		distributorIdArray.push(distributorId);
+	});
+	Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamController.saveOrder}', distributorIdArray, teamId, 
+		function(result, event){
+			if (event.type === 'exception'){
+				alert(event.message);
+			}else{
+				document.location.href = '/apex/TeamSummary?id=' + teamId;
+			}
+	});
+}
+</script>
+<style>
+.text{
+	padding: 1px;
+	text-align: center;
+}
+table.layout{
+	margin-left: 200px;
+}
+#distributor_picklist{
+	width: 200px;
+}
+</style>	
+<c:CommonMask />
+	<apex:sectionHeader title="Team Distributor Order" subtitle="{!teamWrap.Name}"/>
+	
+	<apex:pageBlock title="Distributor Order of Execution">
+		
+		<apex:pageBlockButtons >
+			<input type="button" class="btn" onclick="save();" value="Save"/>
+			<apex:commandButton action="{!cancelDistributionOrder}" value="Cancel" immediate="true"/>
+		</apex:pageBlockButtons>
+		
+		<table class="layout">
+		<tr>
+		<td>
+		<select id="distributor_picklist" size="20">
+			<apex:repeat value="{!distributorList}" var="d">
+				<option value="{!d.id}">{!d.name}</option>
+			</apex:repeat>
+		</select>
+		</td>
+		<td class="zen-phs buttonCell">
+			<div class="text">Top</div>
+			<div class="text">
+				<a onclick="moveTop()">
+				<img src="/s.gif" alt="Top" class="doubleArrowUp" title="Top" />
+				</a>
+				</div>
+				<div class="text">Up</div><div class="zen-mbs text">
+					<a onclick="moveUp()">
+						<img src="/s.gif" alt="Up" class="upArrowIcon" title="Up"/>
+					</a>
+				</div>
+				<div class="text">
+					<a onclick="moveDown()">
+						<img src="/s.gif" alt="Down" class="downArrowIcon" title="Down"/>
+					</a>
+				</div>
+				<div class="text">Down</div>
+					<div class="text">
+						<a onclick="moveBottom()">
+							<img src="/s.gif" alt="Bottom" class="doubleArrowDwn" title="Bottom"/>
+						</a>
+					</div>
+				<div class="text">Bottom</div>
+			</td>
+		</tr>
+		</table>
+	</apex:pageBlock>
+</apex:form>	
+</apex:page>

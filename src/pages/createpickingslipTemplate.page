@@ -1,0 +1,111 @@
+<apex:page standardController="Sales_Order__c" extensions="CreatePickingSlipController" renderAs="pdf" sidebar="false" showHeader="false" >
+ 
+        <table align="center" style="width:100%;margin-left:0px" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+            <td style="width:70%;">
+            <table style="width:70%;" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td>
+                        <apex:image url="{!URLFOR($Resource.AxcientLogo)}" width="200" height="50"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >{!add.Address__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >{!add.City__c}, {!add.State__c} {!add.Zip_Postal_Code__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >P: {!add.Phone__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >F: {!add.Fax__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >{!add.Email__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                
+            </table>
+            </td>
+            <td>
+                <table style="width:100%;" cellspacing="0" cellpadding="0" border="0">
+                <tr >
+                    <td style="width:60%;border-radius:35px;">
+                        <apex:outputLabel style="font-size:25px;color:white;font-weight:bold;background-color:#000;border-radius:35px;" >Pick Slip</apex:outputLabel>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel style="font-weight:bold;">Order #:&nbsp;</apex:outputLabel>
+                        <apex:outputText value="{!salesOrder.Name}"/><br/>                      
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel style="font-weight:bold;" >Order Date:&nbsp;</apex:outputLabel>
+                        <apex:outputText value="{0,date,MMM dd yyyy}"><apex:param value="{!salesOrder.Date__c}"/></apex:outputText>
+                    </td>
+                </tr>
+                 
+            </table>
+            </td>
+        </tr>
+    </table>
+        
+        <br />
+        <table style="width:100%;font-size:10px;border-collapse: separate;" border="1" cellpadding="0" cellspacing="0">
+            <tr >
+                <th style="background-color:#E9E5E5" >Sales Order No</th>
+                <th style="background-color:#E9E5E5">Account</th>
+                <th style="background-color:#E9E5E5">Opportunity</th>
+                <th style="background-color:#E9E5E5">Document No</th>
+                <th style="background-color:#E9E5E5">Date</th>
+                <th style="background-color:#E9E5E5">Ship Date</th>
+                <th style="background-color:#E9E5E5;width:40px">Item# / Model# / SKU#</th>
+                <th style="background-color:#E9E5E5">Description</th>
+                <th style="background-color:#E9E5E5">Quantity</th>
+                <th style="background-color:#E9E5E5">Warehouse Location</th>
+                <th style="background-color:#E9E5E5">Picked</th>
+                <th style="background-color:#E9E5E5">Comment</th>
+            </tr>
+            <apex:repeat value="{!soItems}" var="soItem" id="theRepeat">
+               <tr>
+                   <td style="vertical-align:top;height:30px"> <apex:outputText value="{!salesOrder.Name}" id="SalesOrderNo"/></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{!salesOrder.Account__r.Name}" id="Account"/></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{!opp.name}" id="Opportunity"/></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{!salesOrder.Document_Number__c}" id="DocumentNo"/></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{0,date,MMM dd yyyy}" id="Date"><apex:param value="{!salesOrder.Date__c}"/></apex:outputText></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{0,date,MMM dd yyyy}" id="ShipDate"><apex:param value="{!salesOrder.Ship_Date__c}"/></apex:outputText></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{!soItem.Item__c}" id="ProductId"/></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{!soItem.Description__c}" id="Description"/></td>
+                   <td style="vertical-align:top;"> <apex:outputText value="{0,number,#,###}" id="Quantity"><apex:param value="{!soItem.Quantity__c}"/></apex:outputText></td>
+                   <td style="vertical-align:top;"> <apex:outputLabel ></apex:outputLabel></td>
+                   <td style="vertical-align:top;"> <apex:outputText ></apex:outputText></td>
+                   <td style="vertical-align:top;"> <apex:outputText ></apex:outputText></td>
+               </tr>
+            </apex:repeat>
+        </table>
+        <br /><br />
+        <apex:outputLabel style="color:#00688B;font-style:italic" >**Axcient reserves the right to charge for EVAL/DEMO/DAS units that are not returned within 30 days of contract end date.**</apex:outputLabel>
+        
+</apex:page>

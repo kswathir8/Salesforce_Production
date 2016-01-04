@@ -1,0 +1,3 @@
+<apex:page standardController="Lead">
+<apex:iframe src="https://toutapp.com/pitches/history?salesforce_id={!Lead.Id}&email={!Lead.Email}" scrolling="true" id="theIframe"/>
+</apex:page>

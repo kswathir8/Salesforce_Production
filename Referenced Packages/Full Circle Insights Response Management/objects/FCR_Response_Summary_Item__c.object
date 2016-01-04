@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>Object to hold aggregate data for a given date and type of data</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <externalSharingModel>ReadWrite</externalSharingModel>
+    <fields>
+        <fullName>Admin_Full_Update_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>ID of batch used to perform a full update</description>
+        <externalId>false</externalId>
+        <label>Full Update ID</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CampaignFilter__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Lookup to Campaign for entries that are filtered by campaign only.</description>
+        <externalId>false</externalId>
+        <label>CampaignFilter</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipLabel>Response Summary Items</relationshipLabel>
+        <relationshipName>Response_Summary_Items</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>CascadeParent__c</fullName>
+        <deprecated>false</deprecated>
+        <description>ID of the parent campaign if this is an entry for a cascaded campaign.</description>
+        <externalId>false</externalId>
+        <label>Cascade Parent</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ClosedOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue influence for this entry model 1</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>ClosedOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue influence for this entry model 2</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>ClosedOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue influence for this entry model 3</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>DeletePending__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set when Responses are deleted on this day to flag that (all response info records for) this date needs to be updated. We only set this on Aggregate type though - but it impacts all records for the date.</description>
+        <externalId>false</externalId>
+        <label>DeletePending</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>ItemCount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>ItemCount</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ItemType__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>ItemType</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Aggregate</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Campaign</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Campaign Type</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Marketing Region</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>LostOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue influence for this entry model 1</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>LostOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue influence for this entry model 2</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>LostOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue influence for this entry model 3</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>NetNewLeadCount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>NetNewLeadCount</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OpenOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue influence for this entry model 1</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>OpenOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue influence for this entry model 2</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>OpenOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue influence for this entry model 3</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>QRAndNetNew__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Meets QR and is a Net New Lead</description>
+        <externalId>false</externalId>
+        <label>QRAndNetNew</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>QRCount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>MQR or Target count - aggregates FCR_QR__C on CampaignMember</description>
+        <externalId>false</externalId>
+        <label>QRCount</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Record_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Record Date</label>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Record_Month__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Formula to determine the start date of the month containing this record</description>
+        <externalId>false</externalId>
+        <formula>Date( YEAR(Record_Date__c ), MONTH(Record_Date__c),1)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Record Month</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Record_Week__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The week (approximate) of the current record in the current month.</description>
+        <externalId>false</externalId>
+        <formula>DATE(YEAR(Record_Date__c),Month(Record_Date__c), MAX(FLOOR(Day(Record_Date__c)/7)+1,4))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Record Week</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Response_Status_Counts__c</fullName>
+        <deprecated>false</deprecated>
+        <description>| separated list of response status counts</description>
+        <externalId>false</externalId>
+        <label>Response Status Counts</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Response_Status_Names__c</fullName>
+        <deprecated>false</deprecated>
+        <description>| separated list of response status names</description>
+        <externalId>false</externalId>
+        <label>Response Status Names</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Response_Status_Other__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Count of response statuses that don&apos;t fit in list</description>
+        <externalId>false</externalId>
+        <label>ResponseStatusOther</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>SARCount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>SARCount</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>SARDays__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>SARDays</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>SQRCount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>SQRCount</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>SQRDays__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Average days to SQR</description>
+        <externalId>false</externalId>
+        <label>SQRDays</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>SQRWonCount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>SQRWonCount</label>
+        <precision>8</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Source__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Source of this entry</description>
+        <externalId>false</externalId>
+        <label>Source</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Marketing</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sales</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <label>Response Summary Item</label>
+    <listViews>
+        <fullName>Aggregate</fullName>
+        <columns>Record_Date__c</columns>
+        <columns>ItemCount__c</columns>
+        <columns>ItemType__c</columns>
+        <columns>Source__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>ItemType__c</field>
+            <operation>equals</operation>
+            <value>Aggregate</value>
+        </filters>
+        <label>Aggregate</label>
+    </listViews>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>Record_Date__c</columns>
+        <columns>ItemCount__c</columns>
+        <columns>ItemType__c</columns>
+        <columns>Source__c</columns>
+        <columns>CascadeParent__c</columns>
+        <columns>Admin_Full_Update_ID__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <nameField>
+        <label>Response Summary Item Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Response Summary Items</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

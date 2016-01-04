@@ -1,0 +1,240 @@
+<apex:component controller="n2de.ConsoleDistributionController">
+    <style>
+        #record_count .team_count{
+            text-align: center;
+            font-weight: bold;
+        }
+        #record_count .team_count a{
+            color: #808080;
+            font-weight: bold;
+        }
+        #record_count .team_name a{
+            color: #808080;
+        }
+        #record_count th:first-child{
+            text-align: left !important;
+        }
+        #record_count th{
+            color: #808080;
+            font-weight: bold;
+            font-size: 14pt;
+            text-align: center;
+        }
+        #record_count img{
+            width: 20px;
+            top: 5px;
+            position: relative;
+        }
+        th.count{
+            width: 15%;
+        }
+    </style>
+    <script type="text/javascript">
+        var activityRowCount = 5;
+        var retryCountSchedulerStatus = 0;
+        var retryCountActivity = 0;
+        var retryCountTeamCounts = 0;
+        function loadDistributionPanels() {
+            loadStatusPanel();
+            loadActivityPanel(activityRowCount);
+            loadCountsPanel();
+            $("#activity_rows_to_display a").click(function(){
+                $("#activity").html('<img alt="loading" src="/img/loading.gif"/>');
+                $("#activity_rows_to_display").html('');
+                var rowCount = 10000; //$(this).text();
+                loadActivityPanel(rowCount);
+            });
+        }
+        
+        function loadStatusPanel(){
+            $('#scheduler_status').html('<img alt="loading" src="/img/loading.gif"/>');
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleDistributionController.getSchedulerStatusRemote}',
+                function(result, event){
+                    hideMask();
+                    if (event.type === 'exception'){
+                        if(retryCountSchedulerStatus == 0){
+                            retryCountSchedulerStatus++;
+                            loadStatusPanel();
+                        }else{
+                            alert(event.message);
+                        }
+                    }else{
+                        buildStatusPanel(result);
+                    }
+            });
+        }
+    
+        function loadActivityPanel(rowCount){
+            $("#activity").html('<img alt="loading" src="/img/loading.gif"/>');
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleDistributionController.getSchedulerActivityRemote}', rowCount,
+                function(result, event){
+                    hideMask();
+                    if (event.type === 'exception'){
+                        if(retryCountActivity == 0){
+                            retryCountActivity++;
+                            loadActivityPanel();
+                        }else{
+                            alert(event.message);
+                        }
+                    }else{
+                        buildActivityPanelHtml(result);
+                    }
+            });
+        }
+    
+        function loadCountsPanel(){
+            $("#counts").html('<img alt="loading" src="/img/loading.gif"/>');
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleDistributionController.getTodaysTeamCountsRemote}', 
+                function(result, event){
+                    hideMask();
+                    if (event.type === 'exception'){
+                        if(retryCountTeamCounts == 0){
+                            retryCountTeamCounts++;
+                            loadCountsPanel();
+                        }else{
+                            alert(event.message);
+                        }
+                    }else{
+                        buildCountsPanelHtml(result);
+                    }
+            });
+        }
+        
+        function buildStatusPanel(statusVo){
+            var html = '<table>';
+            if (!statusVo.schedulerOn || statusVo.JobFailed) {
+                $('.status_panel').addClass('schedule_error');
+            }
+            if (statusVo.schedulerOn && !statusVo.JobFailed) {
+                $('.status_panel').removeClass('schedule_error');
+                var freqString = '';
+                if (statusVo.Frequency >= 1 && statusVo.Frequency <= 30) {
+                    freqString = statusVo.Frequency;
+                    freqString += statusVo.Frequency == 1 ? ' minute' : ' minutes';
+                } else if (statusVo.Frequency >= 60 && statusVo.Frequency <= 1440) {
+                    freqString = statusVo.Frequency / 60;
+                    freqString += statusVo.Frequency == 60 ? ' hour' : ' hours';
+                } else if (statusVo.Frequency == 10080) {
+                    freqString = '1 week';
+                }
+                
+                html += '<tr><td>Running every ' + freqString + '</td></tr>';
+                html += '<tr><td style="font-size: 10pt;"><br/><br/><br/>';
+                html += 'Started at ' + statusVo.StartedTime + ' by <a href="/' + statusVo.StartedByUser.Id + '">' + statusVo.StartedByUser.Name + '</a>';
+                html += ' using ' + statusVo.processingMethod + ' processing.<br/>';
+                if (statusVo.schedulerDelay > 15) {
+                    html += '<span>Currently experiencing a delay of ' + statusVo.schedulerDelay + ' minutes. <a href="http://help.nc-squared.com/faq-distribution-engine-delayed" target="_blank">Why?</a></span><br/><br/>';
+                }
+                html += '</td></tr>';
+                html += '<tr><td style="font-size: 10pt;">Current time: <span id="current_time">' + statusVo.currentTime + '</span> ' + statusVo.timezoneDescription + '</td></tr>';
+            } else if (!statusVo.schedulerOn && !statusVo.JobFailed) {
+                html += '<tr><td>Scheduler is turned off</td></tr>';
+            } else if (statusVo.JobFailed) {
+                html += '<tr><td>Scheduler has aborted. Please restart from Settings tab.</td></tr>';
+                html += '<tr><td style="font-size: 10pt;"><br/><br/><br/>';
+                html += '<h2 style="color: orange">Why has this happened?</h2><br/>';
+                html += 'This could be because someone has manually deleted the scheduled job or because the Salesforce platform is currently experiencing difficulties.</td></tr>';
+            }
+            html += '</table>';
+            $("#scheduler_status").html(html);
+        }
+        
+        function buildActivityPanelHtml(activityLogList){
+            var schedulerIconUrl = '{!URLFOR($Resource.DEResources, 'images/scheduler40.png')}';
+            var errorIconUrl = '{!URLFOR($Resource.DEResources, 'images/error.png')}';
+            var healthCheckUrl = 'https://cdn0.iconfinder.com/data/icons/healthcare-and-medicine-kit/512/aid_ambulance_care_cross_kit-128.png';
+            var schedulerUrl = '{!URLFOR($Resource.DEResources, 'images/scheduler40.png')}';
+            var html = '';
+            html += '<table class="scheduler_history"><tr><th>Date / time</th><th>Duration (seconds)</th><th>Assignments</th><th>Details</th></tr>';
+            for(var i=0; i<activityLogList.length; i++){
+                var log = activityLogList[i];
+                html += '<tr>';
+                html += '<td>' + log.StartTime + '</td>';
+                html += '<td>' + log.Duration + '</td>';
+                html += '<td>';
+                if(log.logType != 'Health Checker'){
+                     html += log.recordCount;
+                }
+                html += '</td>';
+                html += '<td>';
+                if(log.logType == 'Health Checker'){
+                    var tooltipMsg = 'Distribution Engine Health Checker - ';
+                    if(log.errorMsg != undefined){
+                        tooltipMsg += ' Issue found: ' + log.errorMsg;
+                    }else{
+                        tooltipMsg += ' No issues reported';
+                    }
+                    html += '<img src="' + healthCheckUrl + '" title="' + tooltipMsg + '" style="width: 15px; margin-left: 5px;top: 2px;position: relative;"/>';
+                }
+                else if(log.errorMsg != undefined){
+                    html += '<img src="' + errorIconUrl + '" style="width: 15px" title="' + log.errorMsg + '"/>';
+                }
+                html += '</td>';
+                html += '</tr>';
+            }
+            html += '</table>';
+            $("#activity").html(html);
+            if(activityRowCount == 5){
+                $("#activity_rows_to_display").show();
+            }
+        }
+        
+        function buildCountsPanelHtml(teamCountsList){
+            var teamIconUrl = '{!URLFOR($Resource.DEResources, 'images/teams32.png')}';
+            var distributionsIconUrl = '{!URLFOR($Resource.DEResources, 'images/pusharrow32.png')}';
+            var alertIconUrl = '{!URLFOR($Resource.DEResources, 'images/alert32_2.png')}';
+            var reassignIconUrl = '{!URLFOR($Resource.DEResources, 'images/re-assign32_2.png')}';
+            var errorIconUrl = '{!URLFOR($Resource.DEResources, 'images/error32.png')}';
+            var memberIconUrl = '{!URLFOR($Resource.DEResources, 'images/teammember32.png')}';
+            
+            var html = '';
+            html += '<table id="record_count"><tr>' +
+                    '<th><img src="' + teamIconUrl + '" title="Todays total distributions"/>&nbsp;&nbsp;Team</th>' +
+                    '<th class="count"><img src="' + distributionsIconUrl + '"title="Todays total distributions"/>&nbsp;&nbsp;Distributions</th>' +
+                    '<th class="count"><img src="' + alertIconUrl + '" title="Alert Count" />&nbsp;&nbsp;Alerts</th>' + 
+                    '<th class="count"><img src="' + reassignIconUrl + '" title="Reassignment Count"/>&nbsp;&nbsp;Reassignments</th>' +
+                    '<th class="count"><img src="' + errorIconUrl + '" title="Error Count"/>&nbsp;&nbsp;Errors</th>' +
+                    '<th class="count"><img src="' + memberIconUrl + '" title="Available team members"/>&nbsp;&nbsp;Available</th>' +
+                    '</tr>';
+                    
+            for(var i=0; i<teamCountsList.length; i++){
+                var team = teamCountsList[i];
+                html += '<tr>';
+                html += '<td class="team_name"><a href="/apex/TeamSummary?id=' + team.teamId + '">' + team.teamName + '</a></td>';
+                html += '<td class="team_count">';
+                if(team.loggingDisabled == true){
+                    html += ' - ';
+                }else{
+                    html += '<a href="/apex/{!NamespacePrefix}DistributionLogList?teamId=' + team.teamId + '">' + team.totalCount + '</a>';
+                }
+                html += '</td>';
+                html += '<td class="team_count">';
+                if(team.loggingDisabled == true){
+                    html += ' - ';
+                }else{
+                    html += '<a href="/apex/{!NamespacePrefix}DistributionLogList?status=inAlert&teamId=' + team.teamId + '" >' + team.recordCount + '</a>';
+                }
+                html += '</td>';
+                html += '<td class="team_count">';
+                if(team.loggingDisabled == true){
+                    html += ' - ';
+                }else{
+                    html += '<a href="/apex/{!NamespacePrefix}DistributionLogList?status=reassigned&teamId=' + team.teamId + '" >' + team.reassignCount + '</a>';
+                }
+                html += '</td>';
+                html += '<td class="team_count">';
+                if(team.loggingDisabled == true){
+                    html += ' - ';
+                }else{
+                    html += '<a href="/apex/{!NamespacePrefix}DistributionLogList?status=inErrort&teamId=' + team.teamId + '" >' + team.errorCount + '</a>';
+                }
+                html += '</td>';
+                html += '<td class="team_count">' + team.activeMemberCount + ' / ' + team.allMemberCount + '</td>';
+                html += '</tr>';
+            }
+            html += '</table>';
+            $("#counts").html(html);
+        }
+    </script>
+
+</apex:component>

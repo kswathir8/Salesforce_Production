@@ -1,0 +1,21 @@
+<apex:page standardController="Case" extensions="CaseCommentCreateController">
+<apex:form >
+	<apex:pageBlock title="Case Comments">
+		<apex:pageBlockButtons location="top">
+			<apex:commandButton value="New" onclick="window.open('/apex/CreateCaseComment?id={!Case.id}')"/>
+		</apex:pageBlockButtons>
+		<apex:pageBlockTable value="{!otherComments}" var="comment">
+			<apex:column headerValue="Action">
+				<apex:outputLink value="/{!comment.id}/e?parent_id={!Case.id}&retURL=%2F{!Case.id}" target="_blank">Edit</apex:outputLink>
+			</apex:column>
+			<apex:column value="{!comment.IsPublished}" headerValue="Public" style="width:10%;text-align:center;" headerClass="publicHeader" />
+			<apex:column headerValue="Comment" >
+				<b>
+					<apex:outputText value="Created By: "/><apex:outputLink value="/{!comment.CreatedByID}">{!comment.CreatedBy.Name}</apex:outputLink><apex:outputText value=" ({!comment.CreatedDate})"/><br/>
+				</b>
+				<apex:outputText value="{!comment.CommentBody}" />
+			</apex:column>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+</apex:form>
+</apex:page>

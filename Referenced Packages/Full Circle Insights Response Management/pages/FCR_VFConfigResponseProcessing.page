@@ -1,0 +1,255 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Response Processing Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Response Processing Configuration" help="https://www.fullcirclecrm.com/fcrm/app/response-processing/">
+    <apex:form id="recproc">
+        <apex:actionFunction name="UpdateOpStageSection" reRender="idOpSection"/>
+        <apex:pageblock mode="edit" >
+            <apex:pageBlockSection columns="2">
+
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idAutoCascade" value="Auto Cascade Levels" />
+                    <apex:pageBlockSectionItem >
+                        <apex:inputText maxlength="2" size="2" id="idAutoCascade"  value="{!RPAutoCascadeLevels}"/>
+                        <apex:pageMessage rendered="{!RPAutoCascadeError}" severity="Error" summary="Must be an integer number" />
+                    </apex:pageBlockSectionItem>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Enter a number of sub-campaigns that will automatically be added to a campaign when campaign cascading 
+                    is enabled on an individual campaign. Campaign cascading is enabled by checking the 
+                    "Repeat Responses Allowed" field on a Salesforce  campaign. When this option is set to zero, you must 
+                    enable cascade levels for each campaign by manually creating one or more sub-campaigns as described in the
+                    Full Circle CRM Response Management documentation.
+                </apex:outputText>
+
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idNetNewLead" value="Net New Lead Timeout" />
+                    <apex:pageBlockSectionItem >
+                        <apex:inputText maxlength="6" size="6" id="idNetNewLead"  value="{!RPNetNewLeadTimeout}"/>
+                        <apex:pageMessage rendered="{!RPNetNewLeadError}" severity="Error" summary="Must be an integer number" />
+                    </apex:pageBlockSectionItem>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Enter a numeric value to specify the time (in minutes) between creation of a lead and creation of a response 
+                    in which the response is credited with creating the new lead.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idPassingOpportunities" value="Passing Opportunities" />
+                    <apex:inputcheckbox value="{!RPPassingOpportunities}" onChange="UpdateOpStageSection()" />
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Check this box if qualified responses are passed to account reps as opportunities. 
+                    Leave unchecked if leads or contacts are passed to account reps when qualified. 
+                    A qualified response is a response that has achieved the threshold score. 
+                    Checking this box impacts the definition of a qualified response on reports, graphs, and dashboards.
+                </apex:outputText>
+               <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idResponseRecovery" value="Response Recovery Campaign" />
+                    <apex:inputField id="idResponseRecovery"  value="{!Dummycm.FCRM__FCR_Precedence_Campaign__c}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    A response recovery campaign is used to hold responses that would otherwise be lost during merge and conversion operations.
+                </apex:outputText>                
+                        
+                                    
+            </apex:pageBlockSection>
+            <apex:outputPanel id="idOpSection">
+                <apex:pageBlockSection rendered="{!RPPassingOpportunities}" columns="2" title="Opportunity Stage Mappings">
+                    <apex:pageBlockSectionItem >
+                        <apex:dataTable value="{!RPOpStageSettings}" var="theentry">
+                            <apex:column headerValue="Stage">
+                                <apex:outputText value="{!theentry.StageName}" />
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="header">
+                                    <table class="OpStageOptionClass" width="100%"><tr>
+                                    <td>None</td>
+                                    <td>MQR/QT</td>                                    
+                                    <td>SAR</td>                                    
+                                    <td>SQR</td>
+                                    </tr></table>                                    
+                                </apex:facet>
+                                <apex:selectRadio styleClass="OpStageOptionClass" value="{!theentry.thestringvalue}">
+                                    <apex:selectOptions value="{!OpStageOptions}" />
+                                </apex:selectRadio>
+                            </apex:column>
+
+                        
+                        
+                        </apex:dataTable>                
+                    </apex:pageBlockSectionItem>
+                    <apex:outputText >
+                        This matrix allows you to map your custom Opportunity Stage(s) to the Full Circle funnel stages.<br /><br />
+                        When Full Circle CRM displays a funnel in the Response Intelligence tab, the following funnel stages 
+                        are displayed by default: All Responses, MQR/QT, SAR, SQR, and Closed.
+                        Since each company defines these Opportunity stages a little differently, this matrix allows you to 
+                        map your company’s sales stages to the Full Circle default funnel stages.<br /><br />
+                        See the Key Concept "Funnel Stages" for more information.
+                    </apex:outputText>                    
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+
+            <apex:pageBlockSection columns="2" title="Contact Response Rules">
+                <apex:inputCheckbox label="Response Prompts" value="{!RPAdditionalActiveOnRP}" />
+                <apex:outputText >Allow an additional active response to be created on a contact 
+                via the response prompty UI, even if it already has one or more active responses associated to opportunities.
+                </apex:outputText>
+                
+                <apex:inputCheckbox label="Standard Campaign Association" value="{!RPAdditionalActiveOnStandard}" />
+                <apex:outputText >Allow an additional active response to be created on a contact 
+                via standard association, even if it already has one or more active responses associated to opportunities.
+                </apex:outputText>
+            </apex:pageBlockSection>
+
+           <apex:pageBlockSection columns="2" title="Repeat Response Timeouts">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idRepeatResponse" value="Default Timeout" />
+                    <apex:pageBlockSectionItem >
+                        <apex:inputText maxlength="6" size="6" id="idRepeatResponse"  value="{!RPRepeatResponseTimeout}"/>
+                        <apex:pageMessage rendered="{!RPRepeatResponseError}" severity="Error" summary="Must be an integer number" />
+                    </apex:pageBlockSectionItem>
+               </apex:pageblockSectionItem>
+               <apex:outputText >
+                    By entering a number as the Default Timeout, you are setting the minimum time in minutes between responses to 
+                    the same campaign by the same individual. 
+                    If you set Default Timeout to 0, Full Circle CRM will process all responses. 
+                    If you set Default Timeout to 5, Full Circle CRM will not process additional responses to a campaign from the 
+                    same person if they are less than 5 minutes apart.<br /> 
+                    Default Timeout can be overridden by the campaign field, Campaign Segment Timeouts.
+                </apex:outputText>
+           </apex:pageBlockSection>
+           <apex:pageBlockSection columns="2" title="Campaign Segment Timeouts">
+                <apex:pageBlockSectionItem >
+                   <apex:dataTable cellspacing="4" value="{!RPTimeoutSegments}" var="ts">
+                        <apex:column headerValue="Segment Name" value="{!ts.name}"/>
+                        <apex:column headerValue="Segment Time">
+                            <apex:inputText value="{!ts.value}"/>
+                        </apex:column>
+                    </apex:dataTable>
+                </apex:pageBlockSectionItem>
+              
+                <apex:outputText >
+                    You may wish to set different repeat response timeout periods for individual campaigns or campaign types.
+                    For example, you may wish to set a timeout period for a software download to 1 week or set a timeout period 
+                    for a white paper to 5 minutes.<br />
+                    The list of timeout segments on this page is dynamically generated from a picklist associated with 
+                    the field Repeat Response Timeout Segments. Edit this picklist to create your timeout segmentation (if any).<br />
+                    Then in the table here, set the Segment Time in minutes associated with each Timeout Segment.
+                </apex:outputText>
+                <apex:pagemessage severity="Error" Summary="All timeouts must be integer values" rendered="{!RPSegmentNumberFormatError}" />
+
+            
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" title="Active Response Timeframe and Overrides" rendered="{!RPIsPassiveOrg}">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idPassiveStatusTimeout" value="Active Response Timeframe" />
+                    <apex:pageBlockSectionItem >
+                        <apex:inputText maxlength="6" size="6" id="idPassiveStatusTimeout"  value="{!RPPassiveOrgStatusTimeout}"/>
+                        <apex:pageMessage rendered="{!RPPassiveOrgTimeoutError}" severity="Error" summary="Must be an integer number" />
+                    </apex:pageBlockSectionItem>
+               </apex:pageblockSectionItem>
+               <apex:outputText >
+                   This timeframe specifies a period of time, in minutes, that starts from the creation of a new lead or contact. If a response arrives during this 
+                   period, the status on the lead or contact will be ignored and the response will be evaluated as if the lead or contact was in 
+                   an inactive status. A value of zero disables this override.
+                    <br /> 
+                    Response timeframes do not apply to Repeat Response users. This feature is only available on organizations that have Global Passive Mode enabled.
+                </apex:outputText>            
+            
+            </apex:pageBlockSection>
+            <apex:actionFunction name="locationupdated" reRender="idLocationOption"  />
+            <apex:pageBlockSection columns="1" id="idtimeoutoverrides" rendered="{!RPIsPassiveOrg}">
+                <apex:outputText >You can disable active response timeframes for individual profiles or users.<br /><br />
+                After adding a profile or user, select the Disable timeframe checkbox and save the configuration changes. 
+                If unchecked, active response timeframes will remain active for the profile or user. If a user or profile you are looking for doesn't 
+                appear on the list, type in the first few characters and execute a search.
+                </apex:outputText>
+                <apex:outputtext style="font-weight:bold" value="The following timeframe overrides are currently defined:" />
+                <apex:dataTable value="{!TimeoutOverrideList}" var="ovr" cellpadding="5px">
+                    <apex:column headerValue="Location" value="{!ovr.Name}"/>
+                    <apex:column headerValue="Disable timeframe" styleclass="CenterHeader">
+                        <apex:inputCheckbox value="{!ovr.Timeouts.FCRM__Disable_Status_Timeout__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:commandButton action="{!RemoveTimeoutOverride}" value="Remove override" reRender="idtimeoutoverrides">
+                            <apex:param name="timeouttoremove" value="{!ovr.setupid}"/>
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:dataTable>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText style="font-weight:bold;margin-left:10px;margin-right:5px" value="Select Profile or User" />
+                    <apex:pageBlockSectionItem >
+                        <apex:selectList style="width:160px" value="{!StatusTimeouts.OverrideLocation}" size="0" onchange="locationupdated()" >
+                            <apex:selectOption itemValue="user" itemLabel="User" />
+                            <apex:selectOption itemValue="profile" itemLabel="Profile" />
+                        </apex:selectList>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputPanel id="idLocationOption">
+                                <apex:inputField required="false" rendered="{!IF(StatusTimeouts.OverrideLocation='user',true, false)}" value="{!StatusTimeouts.CM.FCRM__FCR_Opportunity_Created_by__c}"/>
+                                <apex:inputField required="false" rendered="{!IF(StatusTimeouts.OverrideLocation='profile',true, false)}" value="{!StatusTimeouts.U.ProfileID}"/>
+                                <script type="text/javascript">    
+                                    swapicontitle('Opportunity Created','User Lookup');
+                                </script>    
+                            </apex:outputPanel>
+                            <apex:commandButton action="{!AddTimeoutOverrideLocation}" value="Add Override"/> 
+                        </apex:pageBlockSectionItem>                                                                                               
+                    </apex:pageBlockSectionItem>            
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText style="color:red" rendered="{! NOT(ISBLANK(overrideerror))}" value="{!overrideerror}" />
+                </apex:pageBlockSectionItem>
+            
+            </apex:pageBlockSection>
+
+
+
+            <apex:pageBlockSection columns="2" title="Repeat Response Users" id="idResponseUsers" >
+                <apex:pageBlockSectionItem >
+                    <apex:dataTable cellpadding="4" value="{!RPMAUserList}" var="usr">
+                        <apex:column headerValue="User" value="{!usr.name}"/>
+                        <apex:column >
+                            <apex:commandButton value="Remove" action="{!RPRemoveUser}" reRender="idResponseUsers">
+                                <apex:param name="RPUserToRemove" value="{!usr.id}"/>
+                            </apex:commandButton>
+                        </apex:column>
+                    </apex:dataTable>
+                    <apex:outputText rendered="{!UserListEmpty}" value="No users specified" />
+                </apex:pageBlockSectionItem>    
+                <apex:outputText >You can specify users that will trigger repeat response processing. 
+                    For most customers, Full Circle CRM recommends using this setting just for the Salesforce user accounts used by 
+                    marketing automation tools. When a marketing automation system sends a batch of records, 
+                    Full Circle CRM counts a duplicate record or an updated record from the same individual to the same 
+                    campaign as a repeat response.
+                </apex:outputText>
+
+               <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idDummycm" value="Select user" />
+                    <apex:pageblockSectionItem >
+                        <apex:inputField id="idDummycm"  value="{!Dummycm.FCRM__FCR_Opportunity_Created_by__c}"/>
+                            <apex:pageBlockSectionItem >
+                                <apex:commandButton action="{!RPAddUser}" value="Add User" reRender="idResponseUsers"/>
+                                <apex:pageMessage severity="Error" rendered="{!NOT(IsBlank(RPAddUserError))}">{!RPAddUserError}</apex:pageMessage>
+                            </apex:pageBlockSectionItem>
+    
+                        </apex:pageblockSectionItem>
+                   </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+
+            <apex:pageblockSection columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on the currently saved data. Save the page and then return to the page for an updated report.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!ResponseProcessingDiagnosticInfo}" />
+            </apex:pageblockSection>
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!ResponseProcessingSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+    </apex:form>
+    </apex:SectionHeader>
+        <script type="text/javascript">    
+        swapicontitle('Opportunity Created','Select User');
+        swapicontitle('Precedence Campaign Lookup (New Window)','Select Campaign');
+    </script>
+</apex:page>

@@ -1,0 +1,44 @@
+<apex:page standardController="Opportunity" extensions="FCRM.FCR_VFLeadContactGatingController"  action="{!DoRedirect}">
+    <style type="text/css">
+        body .bPageBlock .detailList tr th { 
+            border-color: transparent; 
+            }
+        body .bPageBlock .detailList tr td { 
+            border-color: transparent; 
+            }
+    </style>  <c:FCR_VFResponseInfo record="{!CurrentContact}" showUI="false" />
+    <script type="text/javascript">
+       var noalert;
+       if({!ActiveResponseCount}>1 && {!ApplicationEnabled})
+       {
+           noalert = true;
+           setTimeout('window.location.reload()',500);
+       }
+   </script>
+   <apex:pageBlock rendered="{! UseGatingAlerts }">
+       <script type="text/javascript">
+           var returl = '{! JSEncode(ReturnURLString) }';
+           if(returl!='' && !noalert) 
+           {
+               window.alert('{!OpportunityGatingErrorMessage}');
+               if(window.parent!=null) window.parent.location = returl; else window.location = returl;
+           }
+       </script>
+   </apex:pageBlock>
+   <apex:form rendered="{! NOT(UseGatingAlerts) }" >
+   <script type="text/javascript">
+       function responsePromptSelected()
+       {
+           window.location.reload();    // Force reload the page to get a true redirection
+       }
+   </script>
+   
+    <apex:pageBlock >
+       <apex:outputText >{!OpportunityGatingErrorMessage}</apex:outputText><br />
+       <c:FCR_VFGlobalResponsePrompt rendered="{!IncludePromptOnNewOpportunityPage}" 
+        id="idThePrompt" recordId="{!CurrentContact.id}" showRecent="false" showActive="false" buttonText="Create Opportunity"
+        onProcessCompleteFunction="responsePromptSelected" />
+        <apex:commandButton value="{!$Label.fcrm__FCR_Gating_Return_to_Previous}" action="{!getReturnUrl}" />
+    </apex:pageBlock>
+   </apex:form> 
+</apex:page>

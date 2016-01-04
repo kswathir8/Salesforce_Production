@@ -1,0 +1,90 @@
+<apex:page standardController="Lead" extensions="FindDuplicatesController">
+
+<style>
+
+#bodyCell h1{
+	font-size: 2em;
+	margin: 3em;
+}
+
+</style>
+
+	
+	<apex:form >
+		<h1>{!Lead.Name} - Search for Duplicates</h1><br/><br/>
+		<apex:pageMessages />
+		<apex:pageBlock mode="maindetail" >
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!search}" value="Search"/>
+				<apex:commandButton action="{!cancel}" value="Cancel"/>	
+			</apex:pageBlockButtons>	
+			<apex:pageBlockSection columns="2">
+				<apex:pageBlockSectionItem >	
+					<apex:outputLabel value="Name" for="fullName"/>
+					<apex:inputText value="{!fullName}" id="fullName"/>
+				</apex:pageBlockSectionItem>
+				<apex:inputCheckbox value="{!useFullName}"/>
+				<apex:pageBlockSectionItem >		
+					<apex:outputLabel value="Last Name" for="lastName"/>
+					<apex:inputText value="{!lastName}" id="lastName"/>
+				</apex:pageBlockSectionItem>	
+				<apex:inputCheckbox value="{!useLastName}"/>
+				<apex:pageBlockSectionItem >		
+					<apex:outputLabel value="Company" for="Company"/>
+					<apex:inputText value="{!Company}" id="Company"/>
+				</apex:pageBlockSectionItem>
+				<apex:inputCheckbox value="{!useCompany}"/>
+				<apex:pageBlockSectionItem >	
+					<apex:outputLabel value="Email" for="Email"/>
+					<apex:inputText value="{!Email}" id="Email"/>
+				</apex:pageBlockSectionItem>
+				<apex:inputCheckbox value="{!useEmail}"/>
+				<apex:pageBlockSectionItem >			
+					<apex:outputLabel value="Email Domain" for="EmailDomain"/>
+					<apex:inputText value="{!EmailDomain}" id="EmailDomain"/>
+				</apex:pageBlockSectionItem>
+				<apex:inputCheckbox value="{!useEmailDomain}"/>
+				<apex:pageBlockSectionItem >		
+					<apex:outputLabel value="Phone" for="Phone"/>
+					<apex:inputText value="{!Phone}" id="Phone"/>
+				</apex:pageBlockSectionItem>
+				<apex:inputCheckbox value="{!usePhone}"/>
+			</apex:pageBlockSection>
+		</apex:pageBlock>	
+	
+		<apex:pageBlock title="Matching Leads">
+			<apex:pageBlockTable value="{!matchingLeads}" var="record">
+				<apex:column headerValue="Name">
+					<apex:outputLink value="/{!record.id}" target="_blank">{!record.Name}</apex:outputLink>
+				</apex:column>
+				<apex:repeat value="{!LeadFields}" var="f">
+					<apex:column value="{!record[f.fieldPath]}"/>
+				</apex:repeat>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+		<apex:pageBlock title="Matching Accounts">
+			<apex:pageBlockTable value="{!matchingAccounts}" var="Acct">
+				<apex:column headerValue="Name">
+					<apex:outputLink value="/{!Acct.id}" target="_blank">{!Acct.Name}</apex:outputLink>
+				</apex:column>
+				<apex:repeat value="{!AccountFields}" var="f">
+					<apex:column value="{!Acct[f.fieldPath]}"/>
+				</apex:repeat>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+		<apex:pageBlock title="Matching Contacts">
+			<apex:pageBlockTable value="{!matchingContacts}" var="cntct">
+				<apex:column headerValue="Name">
+					<apex:outputLink value="/{!cntct.id}" target="_blank">{!cntct.Name}</apex:outputLink>
+				</apex:column>
+				<apex:repeat value="{!ContactFields}" var="f">
+					<apex:column value="{!cntct[f.fieldPath]}"/>
+				</apex:repeat>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+		<apex:outputField value="{!Lead.Company}" rendered="false"/>
+		<apex:outputField value="{!Lead.Email}" rendered="false"/>
+		<apex:outputField value="{!Lead.Phone}" rendered="false"/>
+		<apex:outputField value="{!Lead.Name}" rendered="false"/>
+	</apex:form>
+</apex:page>

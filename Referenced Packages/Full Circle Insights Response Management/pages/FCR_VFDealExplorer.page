@@ -1,0 +1,276 @@
+<apex:page id="idDEPage" tabStyle="Full_Circle_CRM__tab" standardController="Opportunity" extensions="FCRM.FCI_VFDealExplorerController,FCRM.FCR_VFDealExplorerController" title="{!$Label.fcrm__FCR_Deal_Explorer}" action="{!OnPageLoad_old}" >
+    <apex:outputPanel rendered="{!OldCIModelsActive = false}">
+      <apex:stylesheet value="{!$Resource.FCRM__FCI_StyleSheet}"/>    
+      <apex:form >      
+        <!-- do not make CloseDate an inputHidden field. does not work well with other stuff on this page -->
+        <apex:inputHidden value="{!Opportunity.Amount}" />
+
+        <apex:actionFunction name="RefreshInfluence" action="{!CalculateInfluence}" oncomplete="CheckRefreshInfluence()" reRender="idInfluencePanel" />
+    
+        <apex:sectionHeader title="{!$Label.fcrm__FCI_Deal_Explorer}" help="https://fullcirclecrm.com/fcrm/app/influence/" />
+        <apex:outputText rendered="{!AND(ISNULL(Opportunity.id),NOT(AppDisabled))}" value="{!$Label.fcrm__FCI_No_Opportunity}" />
+        <apex:outputPanel id="idMainPanel" rendered="{!AND(NOT(ISNULL(Opportunity.id)),NOT(AppDisabled))}">
+            <apex:outputPanel id="DEUpperSection">
+                <apex:pageBlock mode="edit">
+                    
+                    <apex:pageBlockSection ID="IDDealExplorerSummary" columns="2"> 
+                        <apex:outputText rendered="false" styleClass="DealSectionHeader" value="{!$Label.fcrm__FCI_Name_Header & ' ' & Opportunity.Name}" />
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel styleClass="DealSectionHeader" Value="{!$Label.fcrm__FCI_Name_Header}" />
+                            <apex:outputLink styleClass="DealSectionHeader" value="{!URLFOR('/' + Opportunity.id)}">{!Opportunity.Name}</apex:outputLink>
+                        </apex:pageBlockSectionItem>
+                        <apex:outputText styleClass="DealSectionHeader" />
+                        
+                         <c:FCT_VFSectionFieldList id="old_idLeftPanel" obj="{!Opportunity}" defaultfields="Account.OwnerID,CloseDate,Amount"
+                             fieldset="{!LeftPanelFieldSet}"  currencydatefield="CloseDate" />
+                         <c:FCT_VFSectionFieldList id="old_idRightPanel"  obj="{!Opportunity}" 
+                         defaultfields="FCR_Admin_Originating_Contact__c,FCR_First_Campaign_Touch__c,CampaignID,FCR_Last_Campaign_Touch__c" 
+                         labeloverrides="FCR_Admin_Originating_Contact__c,Originating Contact"
+                         fieldset="{!RightPanelFieldSet}"  currencydatefield="CloseDate" />                                                                                
+
+                    </apex:pageBlockSection>                 
+                    <apex:pageBlockButtons location="Bottom">
+                        <apex:CommandButton action="{!getOpReturnPageReference}" value="{!$Label.fcrm__FCI_Return_to_Opportunity}"/>
+                    </apex:pageBlockButtons>
+                </apex:pageBlock>
+            </apex:outputPanel>
+            <apex:tabPanel id="idMainTab" activeTabClass="DEActiveTab" inactiveTabClass="DEInactiveTab" contentClass="DETabContent" switchType="server" value="{!ISelectedTab}"  >
+                <apex:tab id="idprofile" name="Profile" label="{!$Label.fcrm__FCI_Profile_tab}" styleClass="DETabTableContent">
+                    <c:FCT_VFDealDetailComponent rendered="{!ISelectedTab = 'Profile'}" name="profile" />
+                </apex:tab>
+                <apex:tab rendered="{!InfluenceVisible}" id="idinfluence" name="Influence" label="{!$Label.fcrm__FCI_Influence_tab}" styleClass="DETabTableContent" >
+                    <apex:outputPanel rendered="{!ISelectedTab = 'Influence'}" id="idInfluencePanel">
+                        <apex:outputPanel rendered="{!InfluenceLoadState==0}" >
+                            <apex:outputText value="{!$Label.fcrm__FCI_Data_Loading}" />
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!AND(InfluenceLoadState==1,NOT(InfluenceModelsFound))}">
+                            <apex:outputText value="{!$Label.fcrm__FCI_No_Influence_Models}"  />
+                        </apex:outputPanel>
+                        <apex:pageBlock rendered="{!AND(InfluenceLoadState==1,InfluenceModelsFound)}" mode="edit">
+                            <apex:PageBlockTable value="{!InfluenceRowData}" var="row" >
+                                <apex:repeat value="{!Influencecolumns}" var="col">
+                                    <apex:column rendered="{!col.Visible}" >
+                                        <apex:facet name="header">
+                                        <apex:commandLink action="{!InfluenceSortcommand}" reRender="idInfluencePanel">
+                                            <apex:param name="isortcolumn" value="{!col.ColumnName}" />
+                                            <apex:outputText value="{!col.ColumnLabel}"  />
+                                            <apex:image styleClass="{!IF(col.ColumnName=InfluenceSortcolumn, IF(InfluenceSortascending!=true, 'RLSortedDescending','RLSortedAscending'),'RLNotSorted') }" value="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="  />                                
+                                        </apex:commandLink>
+                                        
+                                        </apex:facet>
+                                        <apex:outputLink rendered="{!NOT(ISNULL(row.valuemap[col.ColumnName].LinkValue))}" value="{!'/' & row.valuemap[col.ColumnName].LinkString}">
+                                            <apex:outputText value="{!row.valuemap[col.ColumnName].TextValue}" />
+                                        </apex:outputLink>
+                                        <apex:outputText rendered="{!ISNULL(row.valuemap[col.ColumnName].LinkValue)}" value="{!row.valuemap[col.ColumnName].TextValue}"/>
+                                    </apex:column>
+                                </apex:repeat>
+                            </apex:PageBlockTable>                    
+                          </apex:PageBlock>      
+                          <apex:PageBlock rendered="{!AND(m_WeightingInfos != null, m_WeightingInfos.size > 0)}">       
+                            <apex:pageBlockSection title="Influence Model Details" columns="1">
+                                <apex:repeat value="{!m_WeightingInfos}" var="weightingInfo">
+                                    <apex:outputPanel rendered="{!weightingInfo.TableData != null}">                            
+                                        <c:FCI_VFInfluenceModelDetails id="modelDetailTable" HeaderString="{!weightingInfo.HeaderString}" 
+                                            AdditionalData="{!weightingInfo.AdditionalData}" TableData="{!weightingInfo.TableData}" TableHeaders="{!weightingInfo.TableHeaders}" />
+                                    </apex:outputPanel>
+                                </apex:repeat>                                                  
+                            </apex:pageBlockSection>                           
+                          </apex:PageBlock>                          
+                        <!-- <apex:outputText value="{!weightLoggingString}" escape="false" /> -->                   
+                            
+                         <script type="text/javascript">
+                             function CheckRefreshInfluence()
+                             {
+                                 if({!InfluenceLoadState} == 0 && '{!ISelectedTab}'=='Influence') RefreshInfluence();
+                             }
+                             //CheckRefreshInfluence();
+                        </script>  
+                    </apex:outputPanel>    
+                </apex:tab>
+                <apex:tab rendered="{!InfluenceVisible}" id="idvisualization" name="Visualization" label="{!$Label.fcrm__FCI_Visualization_tab}" styleClass="DETabTableContent" >
+                    <center>                    
+                        <p style="margin-right: 140px; font-size:18px;"><apex:outputText value="{!$Label.fcrm__FCI_Visualization_Caption}" styleClass="DEVisualizationCaption" /></p><br/>
+                        <apex:chart rendered="{!AND(NOT(ISNULL(visualizationData)), visualizationData.size > 0)}" data="{!visualizationData}" height="500" width="800">
+                            <apex:legend position="right"/>
+                            <apex:axis type="Numeric" steps="{!barChartStepCnt}" position="left" title="" grid="true" fields="{!FieldList}" >
+                                <apex:chartLabel />
+                            </apex:axis>
+                            <apex:axis type="Category" position="bottom" fields="stage" title="">
+                                <apex:chartLabel display="middle" rotate="45" />
+                            </apex:axis>
+                            <apex:barSeries tips="false" orientation="vertical" axis="left" stacked="true" xField="stage" yField="{!FieldList}" title="{!yFields}" colorSet="{!FieldColors}">
+                                <apex:chartTips rendererFn="renderTip"/>
+                            </apex:barSeries>   
+                        </apex:chart>                                                   
+                    </center>                                         
+                </apex:tab>            
+            </apex:tabPanel>        
+         </apex:outputPanel>
+      </apex:form>
+      <c:FCI_PageFooter />    
+      <script type="text/javascript">
+        if('{!ISelectedTab}'=='Influence') CheckRefreshInfluence();
+    
+    
+        function renderTip(storeItem, item)
+        {
+            var fields = "{!FieldList}"
+            var titles = "{!yFields}"
+            var fieldarray = fields.split(",");
+            var titlearray = titles.split(",");
+            this.setSize(100,null);
+            for(fn in fieldarray)
+            {
+                if(fieldarray[fn]==item.yField) 
+                {
+                    this.setTitle(titlearray[fn]);
+                }
+            }
+        }
+    
+      </script>               
+    </apex:outputPanel>
+    
+    
+  <apex:outputPanel rendered="{!OldCIModelsActive = true}">    
+      <apex:stylesheet value="{!$Resource.FCRM__FCRStyleSheet}"/> 
+      <apex:form >
+        <!-- do not make CloseDate an inputHidden field. does not work well with other stuff on this page -->
+        <apex:inputHidden value="{!Opportunity.Amount}" />
+        
+        <apex:actionFunction name="RefreshInfluence" action="{!CalculateInfluence_old}" oncomplete="CalculateInfluence_old()" reRender="old_idInfluencePanel" />
+        <apex:actionFunction name="RefreshVisualization" action="{!CalculateVisualization}" oncomplete="CheckRefreshVisualization()" reRender="old_idVisualizationPanel" />
+    
+        <apex:sectionHeader title="{!$Label.fcrm__FCR_Deal_Explorer}" help="https://www.fullcirclecrm.com/fcrm/app/deal-explorer/" />
+        <apex:outputText rendered="{!AppDisabled_old}">{!$Label.FCR_App_Disabled_2} &nbsp; <apex:outputLink value="{! ConfigMainReference_old}">{!$Label.fcrm__FCR_Configuration_Page}</apex:outputLink>.</apex:outputText>    
+        <apex:outputText rendered="{!AND(ISNULL(Opportunity.id),NOT(AppDisabled_old))}" value="{!$Label.fcrm__FCR_No_Opportunity}" />
+        <apex:outputPanel id="old_idMainPanel" rendered="{!AND(NOT(ISNULL(Opportunity.id)),NOT(AppDisabled_old))}">
+            <apex:outputPanel id="old_DEUpperSection">
+                <apex:pageBlock mode="edit">
+                    <apex:pageBlockSection id="old_IDDealExplorerSummary" columns="2">
+                        <apex:outputText rendered="false" styleClass="DealSectionHeader" value="{!$Label.fcrm__FCR_Name_Header & ' ' & Opportunity.Name}" />
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel styleClass="DealSectionHeader" Value="{!$Label.fcrm__FCR_Name_Header}" />
+                            <apex:outputLink styleClass="DealSectionHeader" value="{!URLFOR('/' + Opportunity.id)}">{!Opportunity.Name}</apex:outputLink>
+                        </apex:pageBlockSectionItem>
+                        <apex:outputText styleClass="DealSectionHeader" value="{!$Label.fcrm__FCR_Marketing_Header}" />
+                         <c:FCT_VFSectionFieldList id="old_idLeftPanel" obj="{!Opportunity}" defaultfields="Account.OwnerID,CloseDate,Amount"
+                             fieldset="{!LeftPanelFieldSet_old}" currencydatefield="CloseDate" />
+                         <c:FCT_VFSectionFieldList id="old_idRightPanel"  obj="{!Opportunity}" 
+                         defaultfields="FCR_Admin_Originating_Contact__c,FCR_First_Campaign_Touch__c,CampaignID,FCR_Last_Campaign_Touch__c" 
+                         labeloverrides="FCR_Admin_Originating_Contact__c,Originating Contact"
+                         fieldset="{!RightPanelFieldSet_old}"  currencydatefield="CloseDate"  />
+                    </apex:pageBlockSection>
+                    <apex:pageBlockButtons location="Bottom">
+                        <apex:CommandButton action="{!getOpReturnPageReference_old}" value="{!$Label.fcrm__FCR_Return_to_Opportunity}"/>
+                    </apex:pageBlockButtons>
+                </apex:pageBlock>
+            </apex:outputPanel>
+            <apex:tabPanel id="old_idMainTab" activeTabClass="DEActiveTab" inactiveTabClass="DEInactiveTab" contentClass="DETabContent" switchType="server" value="{!ISelectedTab_old}" >
+                <apex:tab id="old_idprofile" name="Profile" label="{!$Label.fcrm__FCR_Profile_tab}" styleClass="DETabTableContent">
+                    <c:FCT_VFDealDetailComponent rendered="{!ISelectedTab_old = 'Profile'}" name="profile" />
+                </apex:tab>
+                <apex:tab rendered="{!InfluenceVisible_old}" id="old_idinfluence" name="Influence" label="{!$Label.fcrm__FCR_Influence_tab}" styleClass="DETabTableContent" >
+                    <apex:outputPanel rendered="{!ISelectedTab_old = 'Influence'}" id="old_idInfluencePanel">
+                        <apex:outputPanel rendered="{!InfluenceLoadState_old==0}" >
+                            <apex:outputText value="{!$Label.fcrm__FCR_Data_Loading}" />
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!AND(InfluenceLoadState_old==1,NOT(InfluenceModelsFound_old))}">
+                            <apex:outputText value="{!$Label.fcrm__FCR_No_Influence_Models}"  />
+                        </apex:outputPanel>
+                        <apex:pageBlock rendered="{!AND(InfluenceLoadState_old==1,InfluenceModelsFound_old)}" mode="edit">
+                            <apex:PageBlockTable value="{!InfluenceRowData_old}" var="row" >
+                                <apex:repeat value="{!Influencecolumns_old}" var="col">
+                                    <apex:column rendered="{!col.Visible}" >
+                                        <apex:facet name="header">
+                                        <apex:commandLink action="{!InfluenceSortcommand_old}" reRender="old_idInfluencePanel">
+                                            <apex:param name="isortcolumn" value="{!col.ColumnName}" />
+                                            <apex:outputText value="{!col.ColumnLabel}"  />
+                                            <apex:image styleClass="{!IF(col.ColumnName=InfluenceSortcolumn_old, IF(InfluenceSortascending_old!=true, 'RLSortedDescending','RLSortedAscending'),'RLNotSorted') }" value="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="  />                                
+                                        </apex:commandLink>
+                                        
+                                        </apex:facet>
+                                        <apex:outputLink rendered="{!NOT(ISNULL(row.valuemap[col.ColumnName].LinkValue))}" value="{!'/' & row.valuemap[col.ColumnName].LinkString}">
+                                            <apex:outputText value="{!row.valuemap[col.ColumnName].TextValue}" />
+                                        </apex:outputLink>
+                                        <apex:outputText rendered="{!ISNULL(row.valuemap[col.ColumnName].LinkValue)}" value="{!row.valuemap[col.ColumnName].TextValue}"/>
+                                    </apex:column>
+                                </apex:repeat>
+                            </apex:PageBlockTable>
+                          </apex:PageBlock>
+        
+    
+                         <script type="text/javascript">
+                             function CalculateInfluence_old()
+                             {
+                                 if({!InfluenceLoadState_old} == 0 && '{!ISelectedTab_old}'=='Influence') RefreshInfluence();
+                             }
+                             //CheckRefreshInfluence();
+                        </script>  
+                    </apex:outputPanel>    
+                </apex:tab>
+                <apex:tab rendered="{!false && InfluenceVisible_old}" id="old_idvisualization" name="Visualization" label="{!$Label.fcrm__FCR_Visualization_tab}" styleClass="DETabTableContent" >
+                    <apex:outputPanel rendered="{!ISelectedTab_old = 'Visualization'}" id="old_idVisualizationPanel">
+                        <apex:outputPanel layout="block" rendered="{!VisualizationLoadState==0}" >
+                            <apex:outputText value="{!$Label.fcrm__FCR_Data_Loading}" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="block" rendered="{!VisualizationLoadState==1}" id="old_v_chart" style="text-align:center">
+                            <apex:image value="{!ImageURL}"/><p>
+                            <apex:outputText value="{!$Label.fcrm__FCR_Visualization_Caption}" styleClass="DEVisualizationCaption" /></p>
+                        </apex:outputPanel>
+                        <script type="text/javascript">
+                             function CheckRefreshVisualization()
+                             {
+                                 if({!VisualizationLoadState} == 0 && '{!ISelectedTab}'=='Visualization') RefreshVisualization();
+                                 if({!VisualizationLoadState} == 1 && '{!ISelectedTab}'=='Visualization') {
+     
+                                 }          
+                             }
+    
+                        </script>  
+                    </apex:outputPanel>
+                </apex:tab>
+                <apex:tab rendered="{!InfluenceVisible_old}" id="old_idvisualization2" name="Visualization2" label="{!$Label.fcrm__FCR_Visualization_tab}" styleClass="DETabTableContent" >
+                    <center>                    
+                        <p style="margin-right: 140px; font-size:18px;"><apex:outputText value="{!$Label.fcrm__FCR_Visualization_Caption}" styleClass="DEVisualizationCaption" /></p><br/>                             
+                        <apex:chart rendered="{!NOT(ISNULL(visualizationData_old))}" data="{!visualizationData_old}" height="500" width="800">
+                            <apex:legend position="right"/>
+                            <apex:axis type="Numeric" steps="{!barChartStepCnt_old}" position="left" title="" grid="true" fields="{!FieldList_old}" >
+                                <apex:chartLabel />
+                            </apex:axis>
+                            <apex:axis type="Category" position="bottom" fields="stage" title="">
+                                <apex:chartLabel display="middle" rotate="{!if(VisualizationData_old.size>3, 45, 0)}" />
+                            </apex:axis>
+                            <apex:barSeries tips="false" orientation="vertical" axis="left" stacked="true" xField="stage" yField="{!FieldList_old}" title="{!yFields_old}" colorSet="{!FieldColors_old}">
+                                <apex:chartTips rendererFn="renderTip"/>
+                            </apex:barSeries>   
+                        </apex:chart>  
+                    </center>                                         
+                </apex:tab>                          
+            </apex:tabPanel>
+         </apex:outputPanel>
+      </apex:form>
+          
+      <script type="text/javascript">
+        if('{!ISelectedTab_old}'=='Influence') CalculateInfluence_old();
+        if('{!ISelectedTab_old}'=='Visualization') CheckRefreshVisualization();
+    
+        function renderTip(storeItem, item)
+        {
+            var fields = "{!FieldList_old}"
+            var titles = "{!yFields_old}"
+            var fieldarray = fields.split(",");
+            var titlearray = titles.split(",");
+            this.setSize(100,null);
+            for(fn in fieldarray)
+            {
+                if(fieldarray[fn]==item.yField) 
+                {
+                    this.setTitle(titlearray[fn]);
+                }
+            }
+        }
+      </script>  
+  </apex:outputPanel>
+    
+</apex:page>

@@ -1,0 +1,23 @@
+<apex:component allowDML="true" controller="FCRM.FCR_Diagnostics" >
+    <apex:attribute name="DiagnosticType" assignTo="{!DiagnosticType27}" type="string" description="Type of diagnostic info to process"/>
+    <apex:attribute name="DiagnosticInfo" assignTo="{!DiagnosticInfo27}" type="string[]" description="Array of diagnostic strings"/>
+    <apex:attribute name="LimitResults" assignTo="{!LimitResults27}" type="Integer" description="Max errors to display - 0 for all"/>
+    <apex:attribute name="SingleMessageOnError" assignTo="{!SingleMessageOnError27}" type="String" description="Single message to display if any error is found"/>
+    <apex:attribute name="SpecialFlags" assignTo="{!SpecialFlags27}" type="Integer" description="Diagnostic specific control flag" default="0"/>
+    <apex:outputPanel layout="inline" rendered="{!DataReady}">
+    <ul style="margin:0;padding:0">
+        <apex:repeat value="{!DiagData}" var="diag">
+            <li>
+                <apex:outputText style="color:{!diag.color}" value="{!diag.text}" />
+            </li>
+        </apex:repeat>        
+    </ul>
+    </apex:outputPanel>
+    <apex:outputPanel layout="inline" rendered="{!NOT(DataReady)}">
+        <ul style="margin:0;padding:0">
+            <li>Processing...</li>
+        </ul>
+
+    </apex:outputPanel>
+
+</apex:component>

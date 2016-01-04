@@ -1,0 +1,235 @@
+<apex:page tabStyle="Response_Intelligence__tab" controller="FCRM.FCR_VFResponseSummaryController" title="{!$Label.fcrm__FCR_Response_Intelligence}" >
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!$Resource.FCRM__FCRStyleSheet}"/>
+     <link rel="icon" type="image/x-icon" href="{!$Resource.fcr_favicon}" />
+
+    <apex:sectionHeader title="{!$Label.fcrm__FCR_Response_Intelligence}" help="https://www.fullcirclecrm.com/fcrm/app/response-intelligence/"/>
+    <script type="text/javascript">
+        function setFocusOnLoad() {}
+    </script>
+    <apex:pageBlock mode="MainDetail" rendered="{!AsyncDatabaseStatus>0}">
+        <apex:outputText rendered="{!AsyncDatabaseStatus=1}">{!$Label.fcrm__FCR_Database_Rebuilding}  ({!AsyncRebuildState})</apex:outputText>
+        <apex:outputText rendered="{!AsyncDatabaseStatus=2}">{!$Label.FCR_Database_not_built}&nbsp; <apex:outputLink value="{! ResponseIntelligenceConfig}">{!$Label.fcrm__FCR_Configuration_Page}</apex:outputLink>.</apex:outputText>
+        <apex:outputText rendered="{!AsyncDatabaseStatus=3}">{!$Label.FCR_App_Disabled_2} &nbsp; <apex:outputLink value="{! ConfigMainReference}">{!$Label.fcrm__FCR_Configuration_Page}</apex:outputLink>.</apex:outputText>
+    </apex:pageBlock>
+
+    <apex:form id="idRIForm" onkeypress="return notenterpressed(event)"  > 
+      <script type="text/javascript"> 
+          function openLookup(baseURL, width, modified, searchParam){
+            var originalbaseURL = baseURL;
+            var originalwidth = width;
+            var originalmodified = modified;
+            var originalsearchParam = searchParam;
+ 
+            var lookupType = baseURL.substr(baseURL.length-3, 3);
+            if (modified == '1') baseURL = baseURL + searchParam;
+ 
+            var isCustomLookup = false;
+ 
+            // Set lookup type
+            if(lookupType == "701"){
+ 
+                var urlArr = baseURL.split("&");
+                var txtId = '';
+                if(urlArr.length > 2) {
+                    urlArr = urlArr[1].split('=');
+                    txtId = urlArr[1];
+                }
+ 
+                // Following is the url of Custom Lookup page. You need to change that accordingly
+                baseURL = "/apex/FCR_VFCampaignLookup?txt=" + txtId;
+ 
+                // Following is the id of apex:form control "myForm". You need to change that accordingly
+                baseURL = baseURL + "&frm=" + escapeUTF("{!$Component.idRIForm}");
+                if (modified == '1') {
+                    baseURL = baseURL + "&lksearch=" + searchParam;
+                }
+ 
+                // Following is the ID of inputField that is the lookup to be customized as custom lookup
+               if(txtId.indexOf('idCampaignSelect') > -1 ){
+                    isCustomLookup = true;
+               }
+            }
+ 
+ 
+            if(isCustomLookup == true){
+                  openPopup(baseURL, "lookup", 350, 480, "width="+width+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+            }
+            else {
+                if (modified == '1') originalbaseURL = originalbaseURL + originalsearchParam;
+                openPopup(originalbaseURL, "lookup", 350, 480, "width="+originalwidth+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+            } 
+    }
+</script>    
+    
+    
+        <apex:actionPoller rendered="{!AsyncDatabaseStatus=1}" interval="15" action="{!PerformAsyncCheck}"/>
+
+        <apex:tabPanel id="idGraphPanel" activeTabClass="RIActiveTab" inactiveTabClass="RIInactiveTab" contentClass="RITabContent" rendered="{!AsyncDatabaseStatus=0}" switchType="server" value="{!SelectedTab}" >
+            <apex:tab name="Quality" rendered="{!Not(PageHasErrors)}" label="{!$Label.fcrm__FCR_Response_Results}" >
+                <apex:pageBlock id="idQualityBlock" mode="MainDetail"   >
+                    <apex:pageBlockSection rendered="true" columns="3" collapsible="false" showHeader="false">
+                        <apex:repeat value="{!SelectedChartEnumerator}" var="loc">
+                            <apex:pageBlockSectionItem labelStyle="padding:6px 0px">
+                                <apex:iframe rendered="true" height="430" width="480" src="{!ChartWindowURL + '&t=0&l=' + TEXT(loc) + '&bk=FBF8F1&core.apexpages.devmode.url=1'}" scrolling="false"/>
+                                <apex:outputText value="" />
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                </apex:pageBlock>        
+            </apex:tab>
+            <apex:tab name="Period" rendered="{!Not(PageHasErrors)}"  label="{!$Label.fcrm__FCR_Response_Comparisons}" >
+                <apex:pageBlock id="idPeriodBlock" mode="MainDetail"   >
+                    <apex:pageBlockSection columns="2" collapsible="false" showHeader="false">
+                        <apex:repeat value="{!SelectedChartEnumerator}" var="loc">
+                            <apex:pageBlockSectionItem labelStyle="padding:6px 0px" >
+                                <apex:iframe height="430" width="480" src="{!ChartWindowURL + '&t=1&l=' + TEXT(loc) + '&bk=F1F1F1&core.apexpages.devmode.url=1'}" scrolling="false"/>
+                                <apex:outputText value="" />
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                </apex:pageBlock>    
+        
+            </apex:tab>
+        </apex:tabPanel>
+        <apex:pageBlock id="idFilterPageBlock" mode="MainDetail" rendered="{!AsyncDatabaseStatus=0}">
+            <apex:actionFunction name="FilterTypeChanged" oncomplete="UpdateMainSections()" reRender="idSubFilter" action="{!FilterTypeChanged}"/>
+            <apex:actionFunction name="FilterDateChanged" action="{!FilterCustomDateChanged}" oncomplete="UpdateMainSections()" />
+            <apex:actionFunction name="FilterDateTypeChanged" action="{!FilterDateRangeChange}" reRender="iddatesection,idfilertypesection" oncomplete="UpdateMainSections()" />
+            <apex:actionFunction rendered="false" name="UpdateFromButton" reRender="idresponselist,idGraphPanel,idErrorList"  />
+            <apex:actionFunction name="UpdateSubFilterOptions" reRender="idsubfilteroptions,idErrorList"  />
+            <apex:actionFunction name="UpdateErrorList" reRender="idErrorList" />
+
+            <!--<apex:actionFunction name="UpdateMainSections" reRender="idresponselist,idGraphPanel"  /> -->
+            <script type="text/javascript">
+                function UpdateMainSections()
+                {
+                    var apbuttons = document.getElementsByName("{!$Component.idBlockButtons.idUpdateButton}");
+                    apbuttons[0].value = 'Filter changed - update charts and response list'; 
+                    apbuttons[1].value = 'Filter changed - update charts and response list'; 
+                    UpdateErrorList();
+                    swapicontitle('Precedence','Select Campaign');
+                }
+                function ResetButtonValue()
+                {
+                    var apbuttons = document.getElementsByName("{!$Component.idBlockButtons.idUpdateButton}");
+                    apbuttons[0].value = 'Refresh charts and response List'; 
+                    apbuttons[1].value = 'Refresh charts and response List'; 
+                }
+                
+            </script>
+
+            <apex:outputPanel id="idErrorList">
+                <apex:PageMessages />
+            </apex:outputPanel>
+            
+            <apex:pageBlockSection id="idfiltersection" columns="1" collapsible="true" title="{!$Label.fcrm__FCR_Response_Filters}"  >
+                <apex:pageblockSection id="idfunnelfilter" columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="idsourceselect" value="{!$Label.fcrm__FCR_Source_Filter}" />
+                        <apex:selectList value="{!FunnelSource}" size="1" onchange="UpdateMainSections()">
+                            <apex:selectOptions value="{!SourceOptions}" />
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                </apex:pageblockSection>
+                <apex:pageblockSection id="iddatesection" columns="3" >
+                    <apex:pageblockSectionItem >
+                        <apex:outputLabel for="idSelectedPeriod" value="{!$Label.fcrm__FCR_Date_Range}" />
+                        <apex:selectList id="idSelectedPeriod" onchange="FilterDateTypeChanged()" value="{!SelectedDateOption}"  size="1">
+                            <apex:selectOptions value="{!DateOptions}" />
+                        </apex:selectList>
+                    </apex:pageblockSectionItem>
+                    <apex:inputField id="idFilterStartDate" value="{!ProxyTask.RecurrenceStartDateOnly}" onchange="FilterDateChanged()" rendered="{!SelectedDateOption=='Custom'}"/>
+                    <apex:inputField id="idFilterStartEnd" value="{!ProxyTask.RecurrenceEndDateOnly}" onchange="FilterDateChanged()" rendered="{!SelectedDateOption=='Custom'}"/>
+                    <apex:pageBlockSectionItem rendered="{!SelectedDateOption!='Custom'}" />
+                    <apex:pageBlockSectionItem rendered="{!SelectedDateOption!='Custom'}" />
+    
+                    <apex:pageBlockSectionItem rendered="false" >
+                        <apex:outputText rendered="{!AND(SelectedTab=='Period',SelectedDateOption!='AllTime')}">{!$Label.fcrm__FCR_Comparison_period}:</apex:outputText>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem rendered="{!AND(SelectedTab=='Period',SelectedDateOption!='AllTime',NOT(IsBlank(PriorDateOptions)))}">
+                         <apex:outputLabel for="idPeriodCompareList" value="{!$Label.fcrm__FCR_Comparison_period}" 
+                             title="{!$Label.fcrm__FCR_Comparison_Period_Title}" />
+                         <apex:SelectList id="idPeriodCompareList" onchange="FilterDateChanged()" value="{!PeriodCompareOptionValue}" size="1">
+                             <apex:selectOptions value="{!PriorDateOptions}" />
+                         </apex:SelectList>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem rendered="{!AND(SelectedTab=='Period',SelectedDateOption!='AllTime',IsBlank(PriorDateOptions))}">
+                        <apex:outputText value="" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem rendered="{!AND(SelectedTab=='Period',SelectedDateOption!='AllTime',IsBlank(PriorDateOptions))}">
+                         <apex:outputLabel for="idPeriodCompareStart" value="{!$Label.fcrm__FCR_Comparison_Start_Date}" />
+                         <apex:inputField id="idPeriodCompareStart" value="{!ProxyTask.ActivityDate}" onchange="FilterDateChanged()"  />
+                    </apex:pageBlockSectionItem>
+
+                </apex:pageblockSection>
+                 
+                <apex:pageBlockSection id="idfilertypesection" columns="2">
+                    <apex:selectRadio value="{!FilterType}" layout="pageDirection" onclick="FilterTypeChanged()" >
+                        <apex:selectOptions value="{!filters}"  />
+                    </apex:selectRadio>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:pageBlockSection id="idSubFilter" columns="1" >
+                            <apex:pageBlockSectionItem rendered="false"  >
+                                <apex:outputLabel value="{!$Label.fcrm__FCR_Select_Value}" for="idAvailableFilterOptions"/>
+                                <apex:selectList id="idAvailableFilterOptions" onchange="UpdateMainSections()" size="5" value="{!SelectedFilterOptions}" multiselect="true" >
+                                    <apex:selectOptions value="{!AvailableFilterOptions}" />
+                                </apex:selectList>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem id="idsubfilteroptions" rendered="{!AND(FilterType!='All',FilterType!='Campaign')}" >
+                                <apex:outputLabel value="{!$Label.fcrm__FCR_Select_Value}" for="idAvailableFilterOptions2"/>
+                                <c:FCR_VFDualListSelect id="idAvailableFilterOptions2"  AvailableIDs="{!AvailableNonCampaignStrings}" AvailableStrings="{!AvailableNonCampaignStrings}" 
+                                    SelectedStrings="{!SelectedFilterStrings}" SelectedIDs="{!SelectedFilterOptions}" onchange="UpdateMainSections();UpdateSubFilterOptions()" >
+                                </c:FCR_VFDualListSelect>
+                            </apex:pageBlockSectionItem>
+
+                            <apex:pageBlockSectionItem rendered="{!AND(FilterType!='All',FilterType=='Campaign')}" >
+                                <apex:outputLabel value="{!$Label.fcrm__FCR_Select_Campaign2}" for="idCampaignSelect"/>
+                                <apex:inputField onchange="UpdateMainSections()" id="idCampaignSelect" value="{!ProxyCM.FCRM__FCR_Precedence_Campaign__c}"/>
+                            </apex:pageBlockSectionItem>
+
+                            <apex:pageBlockSection columns="1">
+                                    <apex:pageBlockSectionItem rendered="{!FilterType=='Campaign'}" >
+                                        <apex:outputLabel value="" />
+                                        <apex:outputPanel >
+                                            <apex:inputCheckbox id="idCheckAggregateChild" onchange="UpdateMainSections()" value="{!AggregateChildCampaigns}" />
+                                            <apex:outputText value=" {!$Label.fcrm__FCR_Aggregate_Campaigns}"  />
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+                                    <apex:pageBlockSectionItem rendered="{!FilterType=='Campaign'}" >
+                                        <apex:outputLabel value="" />
+                                        <apex:outputPanel >
+                                            <apex:inputCheckbox id="idCheckAggregateRepeat" onchange="UpdateMainSections()" value="{!AggregateRepeatCampaigns}" />
+                                            <apex:outputText value=" {!$Label.fcrm__FCR_Aggregate_Repeats}" />
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+
+                        </apex:pageBlockSection>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons id="idBlockButtons" >
+                <apex:commandButton id="idUpdateButton" value="{!$Label.fcrm__FCR_Refresh_Button}" oncomplete="ResetButtonValue()" reRender="idresponselist,idGraphPanel"/>
+                <apex:outputPanel style="float:right" layout="block">
+                    <apex:outputText >{!$Label.FCR_Last_Updated} {!LastDatabaseUpdate}&nbsp;</apex:outputText>
+                    <apex:commandButton value="{!$Label.fcrm__FCR_Configure}" action="{!getResponseIntelligenceConfig}" />
+                </apex:outputPanel>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+        <apex:pageBlock mode="MainDetail" rendered="{!AsyncDatabaseStatus=0}">
+            <apex:pageBlockSection id="idresponselist" columns="1" collapsible="true" title="{!$Label.fcrm__FCR_Response_Details}"  >
+                <apex:pageBlockSectionItem rendered="{!Not(PageHasErrors)}"  >
+                    <!-- <c:FCR_VFResponseList conditionalterm="{!CMListFilterTerm}" /> -->
+                    <apex:iframe width="100%" height="1400" scrolling="true" src="{!URLFOR($Page.FCRM__FCR_VFResponseListPage,NULL,[core.apexpages.devmode.url="1",q=CMListFilterTerm])}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+        
+ 
+
+    </apex:form>
+
+</apex:page>

@@ -1,0 +1,19 @@
+<apex:page controller="n2de.TagAssignController" sidebar="false"  tabStyle="Distribution_Tags__tab">
+    
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.8.21.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>
+    <link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-nc2.css')}" type="text/css" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
+    
+    <!--  Grid view, drag and drop -->
+    <c:TagsAssign rendered="{!$CurrentPage.parameters.id == null && $CurrentPage.parameters.view == null}"/>
+    
+    <!--  List view pages -->
+    <c:TagsUserList rendered="{!$CurrentPage.parameters.view == 'list' && $CurrentPage.parameters.id == null }"/>
+    <c:TagsUser rendered="{!$CurrentPage.parameters.id != null && $CurrentPage.parameters.action == null}"/>
+    <c:TagsUserAdd rendered="{!$CurrentPage.parameters.view == 'list' && $CurrentPage.parameters.id != null && $CurrentPage.parameters.action == 'add'}"/>
+    <c:TagsUserClone rendered="{!$CurrentPage.parameters.view == 'list' && $CurrentPage.parameters.id != null && $CurrentPage.parameters.action == 'clone'}"/>
+    <c:StatusPanel />
+</apex:page>

@@ -1,0 +1,3 @@
+<apex:page controller="n2de.ChartDistributionController" sidebar="false" tabstyle="Distribution_Analytics__tab">
+<!--  Deprecated -->
+</apex:page>

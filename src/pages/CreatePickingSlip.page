@@ -1,0 +1,7 @@
+<apex:page standardController="Sales_Order__c" extensions="CreatePickingSlipController" action="{!addAttachment}" sidebar="false" showHeader="false" >
+    <div style="margin-top:20%">
+    <apex:pageBlock >
+      <center><apex:messages style="color:red;font-size:17px" /></center>
+    </apex:pageBlock>
+    </div>
+</apex:page>

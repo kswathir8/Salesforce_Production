@@ -1,0 +1,164 @@
+<apex:page controller="FCRM.FCI_MainConfigurationController"
+    action="{!OnBeforePageRendered}"
+    tabStyle="Full_Circle_Campaign_Influence__tab">
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCI_StyleSheet)}" />
+    <apex:SectionHeader title="Full Circle Campaign Influence Settings" help="https://fullcirclecrm.com/fcrm/app/influence/" />
+    <style>
+        .ct { text-align: center; }
+    </style>
+    <apex:pagemessages />    
+    <apex:form id="idTheForm">
+        <input id="hiddenElement" type="hidden" />
+        <apex:actionFunction action="{!removeConfiguration}" name="removeConfiguration" rerender="configuration_manager_section">
+            <apex:param name="userIsSure" assignTo="{!userIsSure}" value="" />
+            <apex:param name="configurationToRemoveName" value="" assignTo="{!configurationToRemove}" />
+            <apex:param name="configurationTypeToRemoveName" value="" assignTo="{!configurationTypeToRemove}" />    
+            <apex:param name="configurationToRemoveSlotNumName" value="" assignTo="{!configurationToRemoveSlotNum}" />          
+        </apex:actionFunction>         
+
+        <apex:outputPanel layout="block" style="text-align: center;width:500px;margin-left:auto;margin-right:auto">
+            <apex:commandButton value="Save and return to main" rendered="{!$CurrentPage.parameters.FromRMConfig == 'true'}" action="{!SaveAllAndReturnToMain}" />&nbsp;
+            <apex:commandButton value="Save" action="{!SaveAll}" />&nbsp;
+            <apex:commandButton value="Advanced Configuration" action="{! URLFOR($Page.FCI_VFAdvancedConfiguration) + '?returl=' + URLFOR($Page.FCI_VFMainConfiguration) + IF($CurrentPage.parameters.FromRMConfig == 'true', '&FromRMConfig=true', '')}" />
+            <apex:commandButton value="Cancel" action="{!Cancel}" rendered="{!$CurrentPage.parameters.FromRMConfig == 'true'}"/>&nbsp;
+        </apex:outputPanel>
+        <br />   
+        
+        <apex:outputPanel rendered="{!AppDisabled}" id="idCIPanelDisabled">
+            <apex:outputText value="Application currently disabled - Campaign influence database cannot be rebuilt until the application is enabled." />
+        </apex:outputPanel>
+        
+        <apex:pageblock title="Data Processing" mode="edit">            
+            <apex:pageBlockSection id="idProg" title="Influence refresh is in progress" rendered="{!AND(Not(AppDisabled), AsyncRebuildStatus > 0)}" columns="1">
+                <apex:actionPoller interval="60" action="{!Poll}" reRender="idTheForm" />               
+                <br />
+                <apex:outputText style="font-weight:bold" value="Current Status : {!Status}" />
+                <apex:outputText value="Influence data refresh started: {!LastRebuildStart}" />
+                <apex:outputText value="Configuration changes are disabled during campaign influence refresh." />
+                <br />
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="idCalc" title="Manage Campaign Influence Database Rebuilds" rendered="{!AND(Not(AppDisabled), AsyncRebuildStatus = 0)}" columns="1">
+                <br />
+                <apex:outputText style="font-weight:bold"
+                    value="Rebuild the Campaign Influence Database" />
+                <apex:outputText value="Campaign influence data last refreshed: {!LastDatabaseBuild}" />
+                <apex:commandButton value="Refresh Campaign Influence Data Now" action="{!RefreshInfluenceData}" />
+                <br />
+                <apex:outputText style="font-weight:bold" value="Update Times" />
+                <apex:outputText value="Select a time during which automatic campaign influence database updates will process. Times are in local time (24 hour clock)." />
+                <apex:selectList value="{!scheduledRebuildDate}" size="1"
+                    multiselect="false">
+                    <apex:selectOptions value="{!rebuildDates}" />
+                </apex:selectList>
+                <br />
+            </apex:pageBlockSection>  
+                                  
+        </apex:pageblock>                                   
+
+        <apex:pageblock title="Configure Models" mode="edit" id="configuration_manager_section" rendered="{!AsyncRebuildStatus = 0}">
+            <apex:pageBlockSection title="Manage Custom Models" columns="1">
+                <br />
+                <apex:outputText style="font-style:italic;" rendered="{!configurations.size = 0}" value="No Model Configurations Created" />
+                <apex:dataTable rendered="{!configurations.size > 0}" var="config" value="{!configurations}" cellspacing="4px" cellpadding="4px">
+                    <apex:column headerValue="Configuration" headerClass="ct">  
+                        <apex:outputLink title="{!config.typeDescription}" rendered="{!NOT(ISBLANK(config.editpageurl))}" value="{!config.editpageurl}">{!config.description}</apex:outputLink>
+                        <apex:outputText title="{!config.typeDescription}" rendered="{!ISBLANK(config.editpageurl)}" value="{!config.description}" /> 
+                    </apex:column>
+                    <apex:column headerValue="Status" headerClass="ct">
+                        <apex:selectList value="{!config.activeSlotNumberSelected}"
+                            size="1" multiselect="false" style="width:80px;">
+                            <apex:selectOptions value="{!config.activationOptions}" />
+                        </apex:selectList>
+                    </apex:column>
+                    <apex:column headerValue="Delete" style="text-align:center;">
+                        <apex:commandLink value="X" onclick="removeConfigurationRequestHandler('{!config.name}', '{!config.typename}', '{!config.activeSlotNumber}');" rerender="null"/>
+                    </apex:column>
+                </apex:dataTable>
+                <br />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Add Configuration" columns="1"
+                id="new_configuration">
+                <br />
+                <apex:outputText style="font-weight:bold" value="" />
+                <apex:outputText style="font-style:italic;"
+                    rendered="{!configurationTypes.size = 0}"
+                    value="No Models Installed" />
+                <apex:panelGrid columns="3">
+                    <apex:selectList id="config_type_selection"
+                        rendered="{!configurationTypes.size > 0}"
+                        value="{!selectedConfigurationType}" size="1" multiselect="false">
+                        <apex:selectOptions value="{!configurationTypes}" />
+                    </apex:selectList>              
+                 &nbsp;&nbsp;&nbsp;
+                 <apex:commandButton value="New Configuration"
+                        action="{!createNewConfiguration}"
+                        rendered="{!configurationTypes.size > 0}"
+                        rerender="new_configuration" />
+                </apex:panelGrid>
+                <br />
+            </apex:pageBlockSection>
+        </apex:pageblock>
+
+        <apex:pageblock title="Deal Explorer" mode="edit">
+            <apex:pageBlockSection columns="2">
+                <apex:outputText style="font-weight:bold" value="Select event types to exclude." />
+                <apex:outputText style="font-weight:bold" value="Select task types to exclude." />
+                <apex:outputText >'{!LabelForEvent}' refers to events where no event type is specified.</apex:outputText>
+                <apex:outputText > '{!LabelForTask}' refers to tasks where no task type is specified.</apex:outputtext>
+                    <c:FCI_VFDualListSelect AvailableIDs="{!AvailableEventTypes}"
+                        AvailableStrings="{!AvailableEventTypeLabels}"
+                        SelectedIDs="{!SelectedEventTypes}"
+                        SelectedStrings="{!SelectedEventTypeLabels}" AllowReorder="false"
+                        LeftHeader="Include"
+                        RightHeader="Exclude"
+                        HideAddRemove="true"
+                        MaxSelect="15" />
+                    <c:FCI_VFDualListSelect AvailableIDs="{!AvailableTaskTypes}"
+                        AvailableStrings="{!AvailableTaskTypeLabels}"
+                        SelectedIDs="{!SelectedTaskTypes}"
+                        SelectedStrings="{!SelectedTaskTypeLabels}" AllowReorder="false"
+                        LeftHeader="Include"
+                        RightHeader="Exclude"
+                        HideAddRemove="true"
+                        MaxSelect="15" />
+                    <apex:pageBlockSectionItem >
+                    </apex:pageBlockSectionItem>
+                    <!-- Add some extra space -->
+                    <apex:pageBlockSectionItem >
+                    </apex:pageBlockSectionItem>
+                    <apex:inputText label="Days From Opportunity Create" value="{!daysFromCreate}" />
+                    <apex:outputtext >Only responses and activities that take place within this number of days prior to the opportunity create date, and
+                  between opportunity create and close, will be displayed. Leave blank for no date limits.</apex:outputtext>
+                    <apex:selectList size="1" label="Left Panel Fieldset"
+                        value="{!leftDealFieldset}">
+                        <apex:selectOptions value="{!OpportunityFieldsets}" />
+                    </apex:selectList>
+                    <apex:outputText >You can define Opportunity fieldsets that specify the fields to display in the upper left 
+                 and upper right panels of the Deal Explorer page. The list of available fieldsets will be blank if no Opportunity fieldsets are defined.
+                 </apex:outputText>
+                    <apex:selectList size="1" label="Right Panel Fieldset"
+                        value="{!rightDealFieldset}">
+                        <apex:selectOptions value="{!OpportunityFieldsets}" />
+                    </apex:selectList>
+                    <br />
+                    <br />
+            </apex:pageBlockSection>
+
+        </apex:pageblock>
+    </apex:form>
+    <script>
+        // focus on hidden input at top to avoid SF automatically focusing on the first input on page, which is way down at bottom
+        window.onload = setFocus;
+        function setFocus() {
+            document.getElementById("hiddenElement").focus();
+        }
+
+        function removeConfigurationRequestHandler(configname, configtypename, activeSlotNumber) {
+            var userIsSure = confirm("Are you sure?"); 
+            removeConfiguration(userIsSure, configname, configtypename, activeSlotNumber); 
+        }                           
+    </script>
+    <c:FCI_PageFooter />
+
+</apex:page>

@@ -1,0 +1,16 @@
+<apex:page standardController="Lead">
+
+  <script type="text/javascript"> 
+    var s = "";
+    var a = "{!JSENCODE(Lead.rrpu__Alert_Message__c)}";
+    if (a.length > 0)
+    { 
+      s = "Lead Alert: " + a + "\n"; 
+    } 
+    if (s.length > 0)
+    { 
+      window.alert(s); 
+    } 
+  </script> 
+  
+</apex:page>

@@ -1,0 +1,71 @@
+<apex:page standardController="Break_Fix__kav" showHeader="false" sidebar="false">
+<style>
+    .knowledgeTab .secondaryPalette, .individualPalette .knowledgeBlock .secondaryPalette {
+        background-color: transparent;
+        border-color: transparent;
+    }
+    .knowledgeTab .tertiaryPalette, .individualPalette .knowledgeBlock .tertiaryPalette, .layoutEdit .individualPalette .knowledgeBlock .tertiaryPalette {
+        background-color: #DCDCDC;
+    }
+    .apexp .bPageBlock.apexDefaultPageBlock .pbBody .pbSubheader {
+        color: #333333;
+    }
+    .labelStyle{    
+        font-size:91%;
+        font-weight:bold;
+        color:#53b2d1;
+    }
+    .globalBlock{
+        border: 1px;
+        width : 95%;
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .panelColFirst{
+        width:1%;
+    }
+    .panelColLeft{
+        width:10%;
+        text-align: left;
+        vertical-align:text-top;
+    }
+    .panelColRight{
+        width:95%;
+    }
+</style>  
+   <apex:image url="{!$Resource.AxcientLogo_New}"  rendered="{!IF($CurrentPage.parameters.mode == 'p', false,true)}"/>
+     <div style="border: 1px Solid #EEEEEE;backgrond-color:#F6F4F0;padding-left:100px;Padding-right:100px;">
+        <!-- Article View Top Links --> 
+        <apex:outputpanel style="width:95%;text-align:right;border:0px;" layout="block" rendered="{!IF($CurrentPage.parameters.mode == 'p', false,true)}">                  
+            <a href="javascript:openPopupFocus('/{!Break_Fix__kav.KnowledgeArticleId}?mode=p', 'PrintableView');" title="Printable View (New Window)">
+                <span class="configLinks">Printable View</span>
+            </a>
+        </apex:outputpanel>
+        <apex:outputpanel layout="block" rendered="{!IF($CurrentPage.parameters.mode == 'p', false,true)}">
+            <apex:sectionHeader subtitle="{!Break_Fix__kav.title}" title="Article"/>        
+        </apex:outputpanel>
+        
+        <!-- Article Details Field Set -->  
+        <apex:outputpanel styleClass="globalBlock">
+            <knowledge:articleRendererToolBar articleId="{!$CurrentPage.parameters.id}" canVote="true" />
+        </apex:outputpanel>
+        
+        <!-- Article Content-->
+        <apex:outputpanel styleClass="globalBlock">
+            <apex:pageBlock title="Content" >
+                <apex:repeat value="{!$ObjectType.Break_Fix__kav.FieldSets.Break_Fix_Field_Set}" var="f">
+                    <apex:panelGrid columns="3" style="width:100%;" cellspacing="5px" columnClasses="panelColFirst,panelColLeft,panelColRight" id="theGrid">
+                        <apex:outputLabel ></apex:outputLabel>
+                            <apex:outputLabel styleClass="labelStyle" value="{!f.Label}"/>
+                                <apex:panelGrid columns="1" style="width:100%;border-left:1px solid transparent;border-bottom:1px solid transparent;">
+                                    <apex:outputField value="{!Break_Fix__kav[f]}"/>
+                                </apex:panelGrid>
+                    </apex:panelGrid>
+                </apex:repeat>
+                <br/>
+                    <apex:outputPanel ></apex:outputPanel>
+                <br/>
+            </apex:pageBlock>
+        </apex:outputpanel>
+    </div>
+</apex:page>

@@ -1,0 +1,9 @@
+<apex:page standardController="opportunity" sidebar="false">
+    <!--<apex:pageBlock >
+        <apex:pageblockSection title="Contact Roles" collapsible="true">
+            <apex:pageblockSectionItem >-->
+                <apex:relatedList list="OpportunityContactRoles"/> 
+          <!--  </apex:pageblockSectionItem> 
+        </apex:pageblockSection>
+    </apex:pageBlock> -->
+</apex:page>

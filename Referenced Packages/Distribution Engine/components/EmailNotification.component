@@ -1,0 +1,97 @@
+<apex:component controller="n2de.EmailNotificationController" access="global">
+<apex:attribute name="LogId" assignTo="{!distributionLogId}" description="Id of the log" type="Id" />
+<body style="font-family: arial;">
+
+<!--  Assignment message -->
+<apex:outputPanel rendered="{!DistributedObject.NotificationType == 'Assigned'}">
+<h1>Assignment notification</h1>
+<p>The following {!DistributedObject.ObjectName} has been assigned to you.</p>
+</apex:outputPanel>
+
+<!--  Alert message -->
+<apex:outputPanel rendered="{!DistributedObject.NotificationType == 'Alert'}">
+<h1>Alert notification</h1>
+<p>The following {!DistributedObject.ObjectName} is now in alert because it has not been actioned quickly enough.</p>
+<p>{!DistributedObject.logMessage}</p>
+</apex:outputPanel>
+
+<!-- Reassign message -->
+<apex:outputPanel rendered="{!DistributedObject.NotificationType == 'Reassigned'}">
+<h1>Reassignment notification</h1>
+The following {!DistributedObject.ObjectName} has been reassigned because it was not actioned quickly enough.
+<p>{!DistributedObject.logMessage}</p>
+</apex:outputPanel>
+
+<hr/>
+<table>
+	<tr>
+		<td>{!DistributedObject.ObjectName} Name:</td>
+		<td>{!DistributedObject.RecordName}</td>
+	</tr>
+	<tr>
+		<td>{!DistributedObject.ObjectName} Link:</td>
+		<td><a href="{!DistributedObject.RecordLink}">Click here to go to the {!DistributedObject.objectName}</a></td>
+	</tr>
+	<apex:variable var="v" value="" rendered="{!DistributedObject.distributedCase != null}">
+		<tr>
+			<td>{!$ObjectType.Case.fields.Subject.Label}: </td>
+			<td>{!DistributedObject.distributedCase.Subject}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Case.fields.Priority.Label}: </td>
+			<td>{!DistributedObject.distributedCase.Priority}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Case.fields.Type.Label}: </td>
+			<td>{!DistributedObject.distributedCase.Type}</td>
+		</tr>
+		<tr>
+			<td>Account: </td>
+			<td>{!DistributedObject.caseAccountName}</td>
+		</tr>
+		<tr>
+			<td>Contact: </td>
+			<td>{!DistributedObject.caseContactName}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Case.fields.Status.Label}: </td>
+			<td>{!DistributedObject.distributedCase.Status}</td>
+		</tr>
+	</apex:variable>
+	<apex:variable var="v" value="" rendered="{!DistributedObject.distributedLead != null}">
+		<tr>
+			<td>{!$ObjectType.Lead.fields.LeadSource.Label}:</td>
+			<td>{!DistributedObject.distributedLead.LeadSource}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Lead.fields.Company.Label}:</td>
+			<td>{!DistributedObject.distributedLead.Company}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Lead.fields.Rating.Label}:</td>
+			<td>{!DistributedObject.distributedLead.Rating}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Lead.fields.Status.Label}:</td>
+			<td>{!DistributedObject.distributedLead.Status}</td>
+		</tr>
+	</apex:variable>
+	<apex:variable var="v" value="" rendered="{!DistributedObject.distributedOpp != null}">
+		<tr>
+			<td>{!$ObjectType.Opportunity.fields.LeadSource.Label}:</td>
+			<td>{!DistributedObject.distributedOpp.LeadSource}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Opportunity.fields.Type.Label}: </td>
+			<td>{!DistributedObject.distributedOpp.Type}</td>
+		</tr>
+		<tr>
+			<td>{!$ObjectType.Opportunity.fields.StageName.Label}:</td>
+			<td>{!DistributedObject.distributedOpp.StageName}</td>
+		</tr>
+	</apex:variable>
+</table>
+<hr/>
+
+</body>
+</apex:component>

@@ -1,0 +1,22 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case" sidebar="false" wizard="true" >
+ 
+  <apex:sectionHeader title="RMA Wizard" subtitle="Step 7 of 8"/>
+  <apex:form id="theForm" > 
+      
+      
+      <apex:pageBlock id="theSearchBlock" title="Additional Emails for Shipment notifications" mode="edit" >
+          <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!step5}" value="Previous" />          
+           <apex:commandButton action="{!step7}" value="Next" />
+          </apex:pageBlockButtons>
+          
+      
+      
+      
+       
+        </apex:pageBlock>
+        
+       
+       
+  </apex:form>
+</apex:page>

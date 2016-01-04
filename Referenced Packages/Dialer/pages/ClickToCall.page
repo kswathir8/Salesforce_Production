@@ -1,0 +1,26 @@
+<apex:page id="ClickToCall" showHeader="false">
+    <apex:includeScript value="/support/api/33.0/interaction.js"/>
+    <apex:includeScript value="/support/console/33.0/integration.js"/>
+    <apex:includeScript value="/soap/ajax/28.0/connection.js"/>
+    <apex:includeScript value="/jslibrary/1418325280000/sfdc/main.js"/>
+    <script type="text/javascript">
+        var using_open_cti = true;
+
+        sforce.connection.sessionId="{!$Api.Session_ID}";
+        sforce.interaction.cti.enableClickToDial();
+
+        // Callback for onClickToDial API method.
+        var onClickToDialListener = function (response) {
+            if (response.result) {
+                var result = JSON.parse(response.result);
+                var number = result.number;
+                var external_id = result.objectId;
+                pd.dial(number, external_id, window, null, null);
+            }
+        };
+
+        // Registers a callback function that will execute when a user clicks on a phone link.
+        sforce.interaction.cti.onClickToDial(onClickToDialListener );
+    </script>
+    <c:c2c_component />
+</apex:page>

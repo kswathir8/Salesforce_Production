@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scontrol xmlns="http://soap.sforce.com/2006/04/metadata">
+    <contentSource>HTML</contentSource>
+    <description>This s-Control is used to popup alert messages. It works for Accounts, Contacts, Leads, Opportunities, and Cases.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Popup Alert</name>
+    <supportsCaching>true</supportsCaching>
+</Scontrol>

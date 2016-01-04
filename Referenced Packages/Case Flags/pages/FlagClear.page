@@ -1,0 +1,125 @@
+<apex:page standardController="case" extensions="FLAGS.CaseFlags" showHeader="false" title="{!Case.CaseNumber}: Clear Flag"><!-- showHeader="{!LOWER($CurrentPage.parameters.showheader) != 'false'}">-->
+    <style>
+        .datePicker {
+            display: none;
+        }
+        .message-container {
+            position: fixed;
+            height: 100%;
+            width: 100%;
+        }
+        .message-box {
+            position: relative;
+            top: 40%;
+            background-color: #354452;
+            width: 100px;
+            min-height: 100px;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin: auto;
+            color: white;
+            text-align: center;
+            font-family: "ProximaNovaSoft-Regular", Calibri, 
+                "Gill Sans", "Gill Sans MT", Candara, Segoe, "Segoe UI", 
+                 Arial, sans-serif;
+        }
+        @-moz-keyframes spin {
+            0% {
+                -moz-transform: rotate(0deg);
+            }
+            100% {
+                -moz-transform: rotate(359deg);
+            }
+        }
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(359deg);
+            }
+        }
+        @-o-keyframes spin {
+            0% {
+                -o-transform: rotate(0deg);
+            }
+            100% {
+                -o-transform: rotate(359deg);
+            }
+        }
+        @-ms-keyframes spin {
+            0% {
+                -ms-transform: rotate(0deg);
+            }
+            100% {
+                -ms-transform: rotate(359deg);
+            }
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(359deg);
+            }
+        }
+        .spinner {
+            -webkit-animation: spin 1.6s infinite linear;
+            -moz-animation: spin 1.6s infinite linear;
+            -o-animation: spin 1.6s infinite linear;
+            animation: spin 1.6s infinite linear;
+        }
+    </style>
+    <apex:form >
+        <apex:actionFunction name="clearFlag" action="{!clearFlag}"/>
+        <apex:pageBlock rendered="{!complete && !ConsoleNavigate}">
+            <apex:pageMessages />
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton action="{!returnToCase}" value="Back" oncomplete="if ({!ConsoleNavigate}) sforce.one.back();"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        
+        <apex:outputPanel styleClass="message-container" rendered="{!!complete}">
+            <div class="message-box">
+                <img class="spinner" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2M3B4IiBoZWlnaHQ9IjYzcHgiIHZpZXdCb3g9IjAgMCA2MyA2MyI+PHBhdGggZmlsbD0iI2FmYjViOSIgZD0iTTMxLjUwMSwxNi43ODF2LTQuODg2Yy0xMC43ODksMC0xOS41MzYsOC43NDUtMTkuNTM2LDE5LjUzNWMwLDEwLjc4OSw4Ljc0NywxOS41MzUsMTkuNTM2LDE5LjUzNWMxMC43ODgsMCwxOS41MzQtOC43NDYsMTkuNTM0LTE5LjUzNWMwLTUuMjE0LTIuMDQ5LTkuOTQ4LTUuMzc3LTEzLjQ1Mmw0LjcxOS00LjQ4M2M0LjQ0LDQuNjcxLDcuMTY4LDEwLjk4Myw3LjE2OCwxNy45MzdjMCwxNC4zODUtMTEuNjYyLDI2LjA0My0yNi4wNDIsMjYuMDQzYy0xNC4zODYsMC0yNi4wNDctMTEuNjU4LTI2LjA0Ny0yNi4wNDNjMC0xNC4zODgsMTEuNjYxLTI2LjA0NywyNi4wNDctMjYuMDQ3VjAuNWw5Ljc2Nyw4LjEzOUwzMS41MDEsMTYuNzgxeiIvPjwvc3ZnPg=="/>
+                <!--<img src="/img/spinner.gif"/>-->
+                <p style="display:inline-block;">Clearing Flag...</p>
+            </div>
+        </apex:outputPanel>
+    </apex:form>
+    
+    <apex:includeScript value="/soap/ajax/22.0/connection.js"/>
+    <apex:includeScript value="/support/console/23.0/integration.js"/>
+    <apex:includeScript value="/canvas/sdk/js/29.0/publisher.js"/>
+    
+    <script language="javascript">
+        function CloseCommentTabNCA() {
+            sforce.console.getEnclosingPrimaryTabId(refreshTabNCA);
+        }
+        
+        var refreshTabNCA = function refreshTabNCA(result){
+            sforce.console.refreshPrimaryTabById(result.id, false, openCustomTabNCA(result));
+        } 
+        
+        var openCustomTabNCA = function openCustomTabNCA(result){
+            sforce.console.openPrimaryTab(null,'{!JSENCODE(ConsoleNavigateURL)}',true,'',sforce.console.getEnclosingTabId(closeSubtabNCA));  
+        };
+        
+        var closeSubtabNCA = function closeSubtabNCA(result){
+            var tabId = result.id;
+            sforce.console.closeTab(tabId);     
+        };
+        
+        if ({!ConsoleNavigate}) {
+            if (sforce && sforce.one) {
+                sforce.one.back(true);
+            } else
+                CloseCommentTabNCA();
+        }
+        
+        if ({!!complete})
+            clearFlag();
+    </script>
+</apex:page>

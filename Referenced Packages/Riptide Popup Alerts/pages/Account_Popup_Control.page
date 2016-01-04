@@ -1,0 +1,16 @@
+<apex:page standardController="Account">
+
+  <script type="text/javascript"> 
+    var s = "";
+    var a = "{!JSENCODE(Account.rrpu__Alert_Message__c)}";
+    if (a.length > 0)
+    { 
+      s = "Account Alert: " + a + "\n"; 
+    } 
+    if (s.length > 0)
+    { 
+      window.alert(s); 
+    } 
+  </script> 
+  
+</apex:page>

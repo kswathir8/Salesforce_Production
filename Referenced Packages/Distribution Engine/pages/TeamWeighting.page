@@ -1,0 +1,84 @@
+<apex:page sidebar="false" controller="n2de.TeamController" tabstyle="n2de__Team__c">
+<apex:form >
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}" type="text/javascript"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.8.21.min.js')}" type="text/javascript"></script>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-lefrog-1.8.21.css')}" type="text/css" media="all"/>
+<style>
+#demo-frame > div.demo { padding: 10px !important; }
+#eq{
+	width:60%;
+}
+#eq td{
+	//border: 1px solid gray;
+	padding: 10px;
+}
+#eq th{
+	padding: 10px;
+	background-color: #c0c0c0;
+	color: white;
+}
+</style>
+<script>
+var total = 0;
+$(function() {
+	$( ".slider" ).each(function() {
+		// read initial values from markup and remove that
+		var value = parseFloat( $( this ).text(), 10 );
+		$( this ).empty().slider({
+			value: value,
+			range: 'max',
+			min: 0.25,
+			max: 4,
+			step: 0.25,
+			range: "min",
+			animate: true,
+			orientation: "horizontal",
+			slide: function(event, ui) { 
+				$(this).parent().parent().find(".weight_label span").html(ui.value);
+				$(this).parent().parent().find(".weight_label input").val(ui.value);
+				calculatePercent();
+			}
+		});
+	});
+});
+function calculatePercent(){
+	total = 0;
+	$(".weight_label input").each(function() {
+		total += parseFloat($(this).val());
+	});
+	$(".weight_label input").each(function() {
+		var thisPercent = parseInt(($(this).val() / total) * 100) + ' %';
+		$(this).parent().parent().find(".percent_label").text(thisPercent);
+	});
+}
+</script>
+<c:CommonHelp help_page="weighting"/>
+<apex:sectionHeader title="Team Weighting" subtitle="{!teamWrap.Name}"/>
+<apex:pageMessages escape="false"/>
+<apex:pageBlock title="Weighting">
+<apex:pageBlockButtons >
+	<apex:commandButton action="{!saveWeighting}" value="Save"/>
+	<apex:commandButton action="{!cancelWeighting}" value="Cancel"/>
+</apex:pageBlockButtons>	
+<table id="eq">
+	<tr>
+		<th>Team member</th>
+		<th colspan="2">Weighting</th>
+		<th>Percentage</th>
+	</tr>
+	<apex:repeat value="{!teamMemberList}" var="t">
+	<tr>
+		<td width="30%">{!t.Name}</td>
+		<td width="60%"><div class="slider">{!t.weighting}</div></td>
+		<td width="10%" class="weight_label">
+			<span>{!t.weighting}</span>
+			<apex:inputHidden value="{!t.weighting}"/>
+		</td>
+		<td class="percent_label">{!t.percentWeight}%</td>
+	</tr>
+	</apex:repeat>
+</table>
+</apex:pageBlock>
+</apex:form>
+<c:StatusPanel />
+</apex:page>

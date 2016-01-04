@@ -1,0 +1,94 @@
+<apex:page standardController="Case" extensions="CaseTimerController" sideBar="false" showHeader="false" title="Case Timer - {!Case.CaseNumber}">
+<apex:includeScript value="{!$Resource.JQuery}"/>
+<script>
+
+	var startDate;
+	var intervalForTimeUpdate;
+	
+	$(document).ready(function(){
+		
+	});
+	
+	function initTimer(){
+		console.log("click");
+		$('#startTimer').hide();
+		$('#stopTimer').show();
+		startDate = new Date();
+		intervalForTimeUpdate = setInterval(updateTime,25);
+	}
+	
+	function createNewTimerObject(){
+		$('.btn').hide();
+		var currentTime = new Date();
+		var milliseconds = currentTime.getTime() - startDate.getTime();
+		CaseTimerController.createNewCaseTimerObject("{!Case.Id}","{!Case.Status}",milliseconds,handleTimerCallback);
+		
+	}
+	
+	function handleTimerCallback(result,event){
+		if(event.status){
+			clearInterval(intervalForTimeUpdate);
+			$('input[id$="saveButton"]').click();
+		} 
+		else{
+			
+			//error handle
+			$('#Errors').children().each(function(){
+				$(this).remove();
+			});
+			
+			$('#Errors').append('<p> Error: ' + event.message + '</p>');
+			
+		}
+	}
+	
+	function updateTime(){
+		var currentTime = new Date();
+		var milliseconds = currentTime.getTime() - startDate.getTime();
+		console.log(milliseconds,startDate.getTime(),currentTime.getTime());
+		var hours = Math.floor(milliseconds / 3600000);
+		var minutes = Math.floor( ( milliseconds - ( hours * 3600000) ) / 60000 );
+		var seconds = Math.floor( ( milliseconds - ( hours * 3600000) - (minutes * 60000) ) / 1000 );
+		milliseconds = milliseconds - ( hours * 3600000) - (minutes * 60000) - ( seconds * 1000);
+		milliseconds = Math.floor(milliseconds / 10 );
+		$('span[id$="TotalTime"]').text(pad2(hours) + ':' + pad2(minutes) + ':' + pad2(seconds) + ':' + pad2(milliseconds));
+	}
+	
+	function pad2(number) {
+     	return (number < 10 ? '0' : '') + number
+	}
+	
+</script>
+<style>
+	.hidden{
+		display: none;
+	}
+	
+	#Errors{
+		margin-bottom: 10px;
+	}
+	
+	#Errors p{
+		color: red;
+	}
+</style>
+<div id="Errors">
+</div>
+<apex:form >
+	<apex:pageblock title="Case Timer - {!Case.CaseNumber}">
+		<apex:pageBlockButtons location="top">
+			<input value="Start Timer" type="button" class="btn" id="startTimer" onclick="initTimer()"/>
+			<input value="Stop Timer" type="button" class="btn hidden" id="stopTimer" onclick="createNewTimerObject()"/>
+			<apex:commandButton action="{!refreshPage}" value="Save" id="saveButton" styleclass="hidden"/>
+		</apex:pageBlockButtons>
+		<apex:pageblockSection columns="2">
+			<apex:outputField value="{!Case.status}"/>
+			<apex:pageBlockSection >
+				<apex:outputLabel value="Total Time" for="TotalTime"/>
+				<apex:outputText value="00:00:00:00" id="TotalTime"/>
+			</apex:pageBlockSection>
+		</apex:pageblockSection>
+	</apex:pageblock>
+</apex:form>
+	<apex:relatedList list="Case_Timers__r" title="Previous Times"/>
+</apex:page>

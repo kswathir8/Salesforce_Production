@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>24.0</apiVersion>
+    <available>true</available>
+    <description>Use this Visualforce template to include a Case Solution directly in the body of the email, along with the latest case comment. The template includes instructions to reply by responding directly to the email within the designated markers, thus appearing as a system-generated email. Includes the 25 most recent public comments, Case Number, Status, Priority level, Subject, and Description.</description>
+    <encodingKey>ISO-8859-1</encodingKey>
+    <name>New Comment w/ Solutions (VF)</name>
+    <style>none</style>
+    <subject>Case:</subject>
+    <type>visualforce</type>
+</EmailTemplate>

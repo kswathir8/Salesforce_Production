@@ -1,0 +1,260 @@
+<apex:page controller="n2de.TeamLevelCapController" sidebar="false" tabStyle="n2de__Team__c">
+
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>	
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/requiredBlockUtil.js')}"></script>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4.css')}" type="text/css" />
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
+ 
+<style>
+	.tagCol {
+		padding-right: 15px;
+		padding-top: 5px;
+	}
+	.tableHeader {
+		padding-right: 15px;
+	}
+	.change_link {
+		font-size: 90%;
+		text-decoration: underline;
+	}
+	.change_link:hover {
+		cursor: pointer;
+	}
+	.category_label {
+		font-size: 14px;
+		font-family: FontAwesome, Arial;
+		font-weight: bold;
+		color: #808080 !important;
+		padding-left: 16px;
+	}
+	.category_label:hover {
+		cursor: pointer;
+		color: black !important;
+	}
+	.operator {
+		padding-right: 25px;
+		padding-left: 25px;
+		font-size: 90%;
+		text-transform: uppercase;
+	}
+	.default_panel {
+		padding-left: 18px;	
+	}
+	.tag-cap-panel {
+		padding-left: 16px;
+	}
+	.tag{
+        border: 1px solid #56aa1c;
+        background-color: #56aa1c;
+        color: white;
+        padding: 5px;
+        float: left;
+        margin: 3px;
+        border-radius: 5px;
+        font-size: 10pt;
+        font-family: FontAwesome, Arial;
+     }
+     .tag-cap-val {
+     	margin: 3px;
+     	height: 18px;
+     }
+     .remove-tag img{
+     	margin-top: 5px;
+     }
+     .remove-tag:hover {
+     	cursor: pointer;
+     }
+     .change_link img {
+     	width: 13px;
+     	margin-top: 5px;
+     	padding-right: 2px;
+     }
+     .action-btn {
+		height: 22px !important;
+		text-decoration: none;
+		padding: 4px 4px !important;
+	}
+	.action-btn:hover {
+		text-decoration: none;
+		color: #333;
+	}
+</style>
+
+<c:CommonMask />
+<c:CommonHelp help_page="team-level-caps"/>	
+
+<apex:form styleClass="cap_form">
+<apex:actionFunction action="{!addTag}" name="addTagAF" oncomplete="hideMask()" rerender="page_block">
+	<apex:param name="tagId" assignTo="{!NewTagId}" value=""/>
+	<apex:param name="tagName" assignTo="{!NewTagName}" value=""/>
+</apex:actionFunction>
+<apex:actionFunction action="{!removeTagCap}" name="removeTagAF" oncomplete="hideMask()" rerender="page_block">
+	<apex:param name="rowIndex" assignTo="{!RowToRemoveIndex}" value=""/>
+</apex:actionFunction>
+<apex:actionFunction action="{!saveCaps}" name="saveCapsAF"/>
+<apex:sectionHeader subtitle="{!Team.Name}" title="Team level caps"/>
+
+<apex:pageBlock id="page_block" title="Tag-based caps">
+
+	<script>
+		$(document).ready(function() {
+			repopulateTagValues();
+			if ($('.category_select').val() == '') {
+				$('.category_select').show();
+				$('#change_tag_collection').hide();
+			}
+
+			$('.cap_form').on("keyup keypress", function(e) {
+			  	var code = e.keyCode || e.which; 
+			  	if (code  == 13) {               
+			    	e.preventDefault();
+			    	return false;
+				}
+			});
+		});
+	
+		function changeTagCollection() {
+			if (confirm('This will remove your existing caps - would you like to continue?')) {
+				$('.category_select').show();
+				$('.category_label').hide();
+				$('#change_tag_collection').hide();
+				$('#cancel_change_tc').show();
+			}
+		}
+		
+		function cancelTagCollectionChange() {
+			$('.category_select').hide();
+			$('.category_label').show();
+			$('#change_tag_collection').show();
+			$('#cancel_change_tc').hide();
+		}
+		
+		function selectNewTag() {
+			saveTagCapValues();
+			var tagId = $('#tag_select').val();
+			var el = document.getElementById('tag_select');
+			var tagName = el.options[el.selectedIndex].label;
+			showMask();
+			addTagAF(tagId, tagName);
+		}
+		
+		function saveTagCapValues() {
+			var allTagCaps = $('.tag-cap-val');
+			for (var i = 0; i < allTagCaps.length; i++) {
+				var capInput = allTagCaps[i];
+				var tagId = $(capInput).data('tagid');
+				$('.' + tagId + '_hidden input').val($(capInput).val());
+			}
+		}
+		
+		function repopulateTagValues() {
+			var hiddenInputs = $('[id$=hidden_input]');
+			for (var i = 0; i < hiddenInputs.length; i++) {
+				var inp = hiddenInputs[i];
+				var tagId = $(inp).data('tagid');
+				$('#' + tagId).val($(inp).val());
+			}
+		}
+		
+		function addNewTagCap() {
+			$('#tag_select').show();
+		}
+		
+		function removeTagCap(rowIndex) {
+			saveTagCapValues();
+			showMask();
+			removeTagAF(rowIndex);
+		}
+		
+		function saveAllCaps() {
+			saveTagCapValues();
+			saveCapsAF();
+		}
+	</script>
+
+	<apex:pageMessages />
+	<apex:pageBlockButtons location="top">
+		<a href="" onclick="saveAllCaps()" class="btn action-btn">Save</a>
+		<apex:commandButton value="Cancel" action="{!cancel}"/>
+	</apex:pageBlockButtons>
+	
+	<apex:pageBlockSection columns="1">
+		<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Capping_Pattern__c.Fields.n2de__Type__c.InlineHelpText}">
+			<apex:outputLabel value="Select cap type"/>
+			<apex:selectRadio value="{!CappingPattern.n2de__Type__c}" styleClass="cap_type" style="width: 280px;">
+				<apex:selectOptions value="{!CapTypeOptions}"/>
+			</apex:selectRadio>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Capping_Pattern__c.Fields.n2de__Default_cap__c.InlineHelpText}">
+			<apex:outputLabel value="Default cap"/>
+			<apex:outputPanel id="default_panel" styleClass="default_panel">
+				<apex:outputLabel value="Unlimited"/>
+				<apex:inputCheckbox value="{!DefaultIsNoCap}">
+					<apex:actionSupport event="onchange" onsubmit="showMask()" rerender="default_panel" oncomplete="hideMask()"/> 
+				</apex:inputCheckbox>&nbsp;
+				<apex:outputLabel value="OR" styleClass="operator"/>&nbsp;
+				<apex:outputLabel value="Cap "/><apex:inputText value="{!DefaultCapValue}" style="margin: 3px; height: 18px;" size="6" disabled="{!DefaultIsNoCap}"/>
+			</apex:outputPanel>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem /> 
+		<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Capping_Pattern__c.Fields.n2de__Tag_collection__c.InlineHelpText}">
+			<apex:outputLabel value="Tag collection"/>
+			<apex:outputPanel >
+				<apex:selectList value="{!CappingPattern.n2de__Tag_collection__c}" size="1" styleClass="category_select" style="display:none;">
+					<apex:selectOptions value="{!TagCollectionOptions}"/>
+					<apex:actionSupport event="onchange" action="{!changeTagCollection}" onsubmit="showMask()" oncomplete="hideMask()" rerender="page_block"/>
+				</apex:selectList>
+				<apex:outputLink rendered="{!CappingPattern.n2de__Tag_collection__c != null}" target="_blank" styleClass="category_label" value="/apex/{!NamespacePrefix}TagCollectionView?id={!CappingPattern.n2de__Tag_collection__c}">{!TagCollectionName}</apex:outputLink>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="" onclick="changeTagCollection()" class="change_link" id="change_tag_collection">Change</a>
+				<a href="" onclick="cancelTagCollectionChange()" style="display:none;" class="change_link" id="cancel_change_tc">Cancel</a>
+			</apex:outputPanel>
+		</apex:pageBlockSectionItem> 
+	</apex:pageBlockSection>
+	<br/>
+	<apex:pageBlockSection columns="1" id="tag_list_section" rendered="{!CappingPattern.n2de__Tag_collection__c != null}">
+		<apex:pageBlockSectionItem helpText="Set team-level caps for team members carrying the selected tags. Leave value blank for no cap.">		
+			<img src="{!URLFOR($Resource.n2de__DEResources, 'images/tag_multi32.png')}" style="width: 23px;"/>
+			<apex:outputPanel layout="block" id="tag_cap_panel" styleClass="tag-cap-panel">
+				<apex:variable var="rowcount" value="{!0}"/>
+				<apex:dataTable value="{!TagCapList}" var="tag" headerClass="tableHeader">
+					<apex:column styleClass="tagCol">
+						<apex:facet name="header">Tag</apex:facet>
+						<div class="tag fa fa-tag fa-lg">&nbsp;&nbsp;{!tag.tagValueName}</div>
+					</apex:column>
+					<apex:column styleClass="tagCol">
+						<apex:facet name="header">Cap</apex:facet>
+						<input type="number" class="tag-cap-val" id="{!tag.tagValueId}" min="0" data-tagid="{!tag.tagValueId}" style="width: 60px;"/>
+						<apex:outputPanel layout="block" styleClass="{!tag.tagValueId}_hidden">
+							<apex:inputHidden value="{!tag.tagCap}" html-data-tagid="{!tag.tagValueId}" id="hidden_input"/>
+						</apex:outputPanel>
+					</apex:column>
+					<apex:column styleClass="tagCol">
+						<apex:facet name="header"></apex:facet>
+						<a href="" onclick="removeTagCap({!rowcount})" class="remove-tag" title="Remove cap"><img src="{!URLFOR($Resource.DEResources, 'images/red_cross2.png')}" style="width: 16px;"/></a>
+					</apex:column>
+					<apex:column styleClass="tagCol">
+						<apex:variable var="rowcount" value="{!rowcount + 1}"/>
+					</apex:column>
+				</apex:dataTable>
+				<br/>
+				
+				<apex:outputPanel layout="block" styleClass="addRowLink" rendered="{!TagValueOptionsSize > 0}">
+					<a href="" onclick="addNewTagCap()" class="change_link" id="add_cap_link"><img src="{!URLFOR($Resource.DEResources, 'images/de_green_plus.png')}"/>Add new tag</a>&nbsp;&nbsp;
+					<select id="tag_select" style="display:none;" onchange="selectNewTag()">
+						<apex:repeat value="{!TagValueOptions}" var="tag">
+							<option value="{!tag.value}">{!tag.label}</option>
+						</apex:repeat>
+					</select>
+				</apex:outputPanel>
+			</apex:outputPanel> 
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+</apex:pageBlock>	
+<c:HistoryTable historyList="{!latestHistory}" blockTitle="Team-level cap History" sectionTitle="Change History"/>
+</apex:form>
+<c:StatusPanel />
+</apex:page>

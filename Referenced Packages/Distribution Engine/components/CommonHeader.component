@@ -1,0 +1,8 @@
+<apex:component >
+
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}" type="text/javascript"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.10.1.min.js')}" type="text/javascript"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery.ui.touch-punch.min.js')}" type="text/javascript"></script>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4.css')}" type="text/css" media="all"/>
+</apex:component>

@@ -1,0 +1,243 @@
+<apex:page controller="n2de.ChartLeadsController" sidebar="false" tabstyle="Distribution_Analytics__tab" >
+<c:CommonHeader />
+<c:CommonMask />
+<apex:form >
+    <style>
+    .chart{
+        float: left;
+        width: 450px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin: 20px;
+        padding: 10px;
+    }
+    #chart_settings{
+        float: right;
+        border: 1px solid #E0E0E0;
+        border-radius: 4px;
+        padding: 10px;
+        background-color: #F2F2F2;
+        width: 180px;
+        height: 400px;
+        display: none;
+    }
+    
+    #chart_settings .title{
+        color: gray;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    #clear{
+        clear: both;
+    }
+    </style> 
+    <!-- Google API inclusion -->
+    <apex:includeScript id="a" value="https://www.google.com/jsapi" />
+     
+    <apex:sectionHeader title="Analytics" subtitle="Leads"/>
+     
+    <!-- Google Charts will be drawn in this DIV -->
+    <apex:pageBlock title="Lead data">
+    	<apex:pageBlockButtons >
+			<apex:commandButton value="Back" action="{!gotoChartHome}"/>
+		</apex:pageBlockButtons>
+	
+        <apex:pageBlockSection title="All active leads" columns="1">
+            <apex:pageBlockSectionItem >
+                <div id="chart1" class="chart"/>
+                <div id="chart2" class="chart"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Active leads by team" columns="1">
+            <apex:pageBlockSectionItem >
+                <div id="chart3" class="chart"/>
+                <div id="chart4" class="chart"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Lead conversion rate" columns="1">
+            <apex:pageBlockSectionItem >
+                <div id="chart5" class="chart"/>
+                <div id="chart6" class="chart"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <script type="text/javascript">
+    
+    var visualization1;
+    var visualization2;
+    var visualization3;
+    var visualization4;
+    var visualization5;
+    var visualization6;
+    
+    showMask();
+    
+    // Load the Visualization API and the piechart package.
+    google.load('visualization', '1.0', {'packages':['corechart', 'table']});
+    google.setOnLoadCallback(initCharts);
+
+    function initCharts() { 
+        visualization1 = new google.visualization.PieChart(document.getElementById('chart1'));
+        visualization2 = new google.visualization.PieChart(document.getElementById('chart2'));
+        visualization3 = new google.visualization.ColumnChart(document.getElementById('chart3'));
+        visualization4 = new google.visualization.ColumnChart(document.getElementById('chart4'));
+        visualization5 = new google.visualization.ColumnChart(document.getElementById('chart5'));
+        visualization6 = new google.visualization.ColumnChart(document.getElementById('chart6'));
+        setTimeout(prepareCharts, 500);
+    } 
+    
+    function prepareCharts(){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartLeadsController.loadLeadsByStatus}','','',
+            function(result, event){  
+                if(result.length == 0){
+                    $("#chart2").html('<p>No active teams</p>');
+                    $("#chart4").html('<p>No active teams</p>');
+                }
+                drawChart2(result, visualization2, chartOptions2);
+                drawChart2(result, visualization4, chartOptions2);
+            }, {escape:true});
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartLeadsController.loadLeadsBySource}','','', 
+            function(result, event){ 
+                if(result.length == 0){
+                    $("#chart1").html('<p>No active teams</p>');
+                    $("#chart3").html('<p>No active teams</p>');
+                }
+                drawChart2(result, visualization1, chartOptions1);
+                drawChart2(result, visualization3, chartOptions1);
+            }, {escape:true});
+         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartLeadsController.loadConversionRatioBySource}','','', 
+            function(result, event){  
+                if(result.length == 0){
+                    $("#chart5").html('<p>No active teams</p>');
+                }
+                drawChart3(result, visualization5, chartOptions5);
+            }, {escape:true});
+         Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartLeadsController.loadConversionRatioByStatus}','','', 
+            function(result, event){  
+                if(result.length == 0){
+                    $("#chart6").html('<p>No active teams</p>');
+                }
+                drawChart3(result, visualization6, chartOptions6);
+                hideMask();
+            }, {escape:true});
+    }
+    
+    /* Convert the passed in JSON into google chart DataTable and render the chart */ 
+    function drawChart2(dataSourceList, chartVisualisation, chartOptions){  
+        
+        //If we don't have any data then stop
+        if(dataSourceList.length == 0){
+            return;
+        }
+        
+        var dataTableColCount = dataSourceList.length + 1;
+        var dataTableRowCount = dataSourceList[0].leadData.length;
+        
+        // load Column chart
+        // Prepare table model for chart with columns
+        data = new google.visualization.DataTable();
+        data.addColumn('string', 'category');
+        // add rows from the remoting dataSourceLists
+        for(var sourceIndex=0; sourceIndex<dataSourceList.length; sourceIndex++){
+           data.addColumn('number',  dataSourceList[sourceIndex].teamName);
+        }
+        
+        data.addRows(dataTableRowCount);
+        
+        for(var rowIndex=0; rowIndex<dataTableRowCount; rowIndex++){
+            var categoryName = dataSourceList[0].leadData[rowIndex].dataCategory;
+            data.setCell(rowIndex, 0, categoryName);
+            for(var colIndex=0; colIndex<dataTableColCount-1; colIndex++){
+                var recordCount = dataSourceList[colIndex].leadData[rowIndex].recordCount;
+                data.setCell(rowIndex, colIndex+1, recordCount);
+            }
+        }
+        
+        // all done, lets draw the chart with some options to make it look nice.
+        chartVisualisation.draw(data, chartOptions);
+    }
+    
+    /* Convert the passed in JSON into google chart DataTable and render the chart */ 
+    function drawChart3(dataSourceList, chartVisualisation, chartOptions){  
+        
+        //If we don't have any data then stop
+        if(dataSourceList.length == 0){
+            return;
+        }
+        
+        var dataTableColCount = dataSourceList.length + 1;
+        var dataTableRowCount = dataSourceList[0].leadConversionData.length;
+        
+        // load Column chart
+        // Prepare table model for chart with columns
+        data = new google.visualization.DataTable();
+        data.addColumn('string', 'category');
+        // add rows from the remoting dataSourceLists
+        for(var sourceIndex=0; sourceIndex<dataSourceList.length; sourceIndex++){
+           data.addColumn('number',  dataSourceList[sourceIndex].teamName);
+        }
+        
+        data.addRows(dataTableRowCount);
+        
+        for(var rowIndex=0; rowIndex<dataTableRowCount; rowIndex++){
+            var categoryName = dataSourceList[0].leadConversionData[rowIndex].dataCategory;
+            data.setCell(rowIndex, 0, categoryName);
+            for(var colIndex=0; colIndex<dataTableColCount-1; colIndex++){
+                var recordCount = dataSourceList[colIndex].leadConversionData[rowIndex].conversionRatio;
+                data.setCell(rowIndex, colIndex+1, recordCount);
+            }
+        }
+        
+        // all done, lets draw the chart with some options to make it look nice.
+        chartVisualisation.draw(data, chartOptions);
+    }
+    
+    var chartOptions1 = {
+        title: 'Active leads by source', 
+        titleTextStyle:{color: 'gray'}, 
+        is3D: false, 
+        chartArea:{left:72,top:50,width:"90%",height:"65%"}, 
+        legend : {position: 'bottom', alignment: 'center', textStyle: {color: 'blue', fontSize: 12}}, 
+        width:450, 
+        height:350,
+        vAxis:{textStyle:{fontSize: 10}, viewWindow: {min: 0}},
+        hAxis:{textStyle:{fontSize: 10},showTextEvery:1,slantedText:false}
+    }
+    var chartOptions2 = {
+        title: 'Active leads by status', 
+        titleTextStyle:{color: 'gray'}, 
+        is3D: false, 
+        chartArea:{left:72,top:50,width:"80%",height:"65%"}, 
+        legend : {position: 'bottom', alignment: 'center', textStyle: {color: 'blue', fontSize: 12}}, 
+        width:450, 
+        height:350,
+        vAxis:{textStyle:{fontSize: 10}, viewWindow: {min: 0}},
+        hAxis:{textStyle:{fontSize: 10},showTextEvery:1,slantedText:true}
+    }
+    var chartOptions5 = {
+        title: 'Conversion ratio by source', 
+        titleTextStyle:{color: 'gray'}, 
+        is3D: false, 
+        chartArea:{left:72,top:50,width:"80%",height:"65%"}, 
+        legend : {position: 'bottom', alignment: 'center', textStyle: {color: 'blue', fontSize: 12}}, 
+        width:450, 
+        height:350,
+        vAxis:{textStyle:{fontSize: 10}, viewWindow: {min: 0}},
+        hAxis:{textStyle:{fontSize: 10},showTextEvery:1,slantedText:true}
+    }
+    var chartOptions6 = {
+        title: 'Conversion ratio by status', 
+        titleTextStyle:{color: 'gray'}, 
+        is3D: false, 
+        chartArea:{left:72,top:50,width:"80%",height:"65%"}, 
+        legend : {position: 'bottom', alignment: 'center', textStyle: {color: 'blue', fontSize: 12}}, 
+        width:450, 
+        height:350,
+        vAxis:{textStyle:{fontSize: 10}, viewWindow: {min: 0}},
+        hAxis:{textStyle:{fontSize: 10},showTextEvery:1,slantedText:true}
+    }
+    </script>
+ </apex:form>
+ <c:StatusPanel />
+</apex:page>

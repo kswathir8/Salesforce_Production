@@ -1,0 +1,147 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Response Database Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValidCI}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Campaign Attribution and Response Database Configuration" help="https://www.fullcirclecrm.com/fcrm/app/campaign-influence/">
+    <apex:form id="idTheForm" >
+        <apex:pageblock id="idThePage" mode="edit" >
+            <apex:pagemessages />
+            <apex:pageBlockSection id="idCalc" title="Campaign Influence Data Processing" columns="1">
+                <c:FCR_VFCIBuilderComponent id="idCampaignRefresh" rendered="{!NOT(RDBCModelsReset)}" />
+                <apex:outputText rendered="{!RDBCModelsReset}" value="Models have changed - you must save changes before refreshing campaign influence data" />
+                <p>
+                <apex:outputtext style="font-weight:bold"  value="Detailed Influence Data Capture" />
+                <apex:outputText >You can enable capture of detailed influence data. 
+                Doing so may significantly increase your organizations data usage. You can specify field synchronization from responses to
+                Campaign Influence Detail objects on the Sync Fields configuration page.</apex:outputText>
+                <apex:outputText rendered="{!RDBRebuildInProgress}" value="You may not modify this setting while a database rebuild is in progress" />
+                <apex:inputCheckbox label="Enable detailed influence" disabled="{!RDBRebuildInProgress}" value="{!RDBCDetailedInfluenceEnabled}"/>
+                <apex:outputText style="font-weight:bold" value="Update times" />
+                <apex:outputText value="Enter times during which automatic campaign influence database updates should be blocked. Times are in local time (24 hour clock)" />
+                </p>
+            </apex:pageBlockSection>
+            <apex:pageblockSection columns="3">
+               <apex:repeat value="{!UpdateTimes}" var="theentry">
+                    <apex:inputCheckBox label="{!theentry.HourString}" value="{!theentry.IsBlocked}" />
+                </apex:repeat> 
+            </apex:pageblockSection>            
+            <apex:pageBlockSection id="idModels" title="Campaign Influence Models" columns="1">
+                <apex:outputtext styleclass="RIWarning" rendered="{!RDBRebuildInProgress}" 
+                value="Campaign Influence Models cannot be changed while database rebuild is in progress. Try again later." />
+                <apex:outputtext rendered="{!NOT(RDBRebuildInProgress)}" >Select a campaign influence model to use during response database processing. Only enabled 
+                models can be selected on this page. Use the configuration pages to enable and configure individual models.
+                </apex:outputtext>
+                <apex:pageBlockSectionItem rendered="{!NOT(RDBRebuildInProgress)}" >
+                    <apex:dataTable var="pluginname" value="{!ModelNames}" cellspacing="4px" cellpadding="4px">
+                        <apex:column headerValue="Model" >
+                            <apex:outputText value="{!Plugins[pluginname].Description}" />
+                        </apex:column>
+                        <apex:column headerValue="Developer">
+                            <apex:outputText value="{!Plugins[pluginname].Manufacturer}" />
+                        </apex:column>
+                        <apex:column headerValue="Active" styleClass="CenterHeader" >
+                            <apex:outputText rendered="{!pluginname = RDBCIModel1}" value="X" />
+                            <apex:commandLink rendered="{!AND(Plugins[pluginname].Enabled, pluginname <> RDBCIModel1, pluginname <> RDBCIModel2, pluginname <> RDBCIModel3 )}" value="Set" action="{!RDBC1SetCommand}">
+                                <apex:param name="cimodelset" value="{!pluginname}" />
+                            </apex:commandLink>
+                        </apex:column>
+                        <apex:column rendered="true" headerValue="Secondary" styleClass="CenterHeader" >
+                            <apex:outputText rendered="{!pluginname = RDBCIModel2}" value="X" />
+                            <apex:commandLink rendered="{!AND(Plugins[pluginname].Enabled, NOT(ISBLANK(RDBCIModel1)), pluginname <> RDBCIModel1, pluginname <> RDBCIModel2, pluginname <> RDBCIModel3 )}" value="Set" action="{!RDBC2SetCommand}">
+                                <apex:param name="cimodelset" value="{!pluginname}" />
+                            </apex:commandLink>
+                        </apex:column>
+                        <apex:column rendered="true" headerValue="Tertiary" styleClass="CenterHeader" >
+                            <apex:outputText rendered="{!pluginname = RDBCIModel3}" value="X" />
+                            <apex:commandLink rendered="{!AND(Plugins[pluginname].Enabled, NOT(ISBLANK(RDBCIModel1)), NOT(ISBLANK(RDBCIModel2)),  pluginname <> RDBCIModel1, pluginname <> RDBCIModel2, pluginname <> RDBCIModel3 )}" value="Set" action="{!RDBC3SetCommand}">
+                                <apex:param name="cimodelset" value="{!pluginname}" />
+                            </apex:commandLink>
+                        </apex:column>
+                        <apex:column headerValue="Configure" styleClass="CenterHeader" >
+                            <apex:commandLink rendered="{!NOT(IsBlank(Plugins[pluginname].ConfigurationPage))}" value="Configure" action="{!getRDBConfigPageReference}">
+                                <apex:param name="cimodelset" value="{!pluginname}" />
+                            </apex:commandLink>
+                        </apex:column>
+                    </apex:dataTable>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection id="idCampAttrSettings" title="Advanced Campaign Attribution Settings" columns="2">
+                <apex:inputcheckbox label="Clear Primary Campaign for Non-Response Record Types" value="{!ClearPrimaryNonResponse}"  />
+                <apex:outputtext >Non-Response record types are exempt from Full Circle CRM processing. 
+                                    The Salesforce default behavior is to populate the Opportunity Primary Campaign Source 
+                                    field with the last Campaign touch prior to Opportunity creation. 
+                                    This setting will clear the Primary Campaign Source field on the Opportunity.
+                </apex:outputtext>
+                <apex:inputcheckbox label="Allow Primary Campaign Defaults for Non-Active Response Opportunities" value="{!DontClearPrimaryPassive}"  />
+                <apex:outputtext >Full Circle CRM, by default, clears the Opportunity Primary Campaign Source when an Opportunity 
+                    is created in passive mode without an active response. 
+                    When checked, the primary campaign source is not cleared and is allowed to be set based on the Salesforce default behavior, 
+                    which is to populate the Opportunity Primary Campaign Source field with the last Campaign touch prior to Opportunity creation. 
+                    This last Campaign touch may not be a response.
+                </apex:outputtext>
+                <apex:inputText maxlength="5" label="First Touch Campaign Days to Filter" id="idFirstTouchFilter" value="{!FirstTouchCampaignDaysFilter}"/>
+                <apex:outputtext >Full Circle CRM, by default, sets the First Campaign to the earliest response from the originating contact. 
+                    Organizations with many years of data may choose to restrict how far back the application searches to find and credit 
+                    the First Touch Campaign. When populated the oldest response within the date filter will be set as the First Touch Campaign 
+                    in the opportunity lookup field. Leave blank to disable this filter.
+                </apex:outputtext>
+            </apex:pageBlockSection>            
+            <apex:pageBlockSection title="Processing Batch Sizes" columns="2">
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idRDBBatch" value="Response DB Batch Size" />
+                    <apex:inputText id="idRDBBatch" value="{!RDBDatabaseBatchSize}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Set the batch size used when building the Response Information Database. Reduce this number if limit errors 
+                    occur during response information database rebuilds. Valid numbers are 5 to 200.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idRDBRollup" value="Campaign Roll-up Batch Size" />
+                    <apex:inputText id="idRDBRollup" value="{!RDBCampaignRollupBatchSize}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Set the batch size used when populating campaign cascade statistics to parent campaigns. Reduce this number if limit errors 
+                    occur during response information database rebuilds. Valid numbers are 5 to 200.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idAccountBatch" value="Account Influence Batch Size" />
+                    <apex:inputText id="idAccountBatch" value="{!RDBAccountBatchSize}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Set the batch size used when calculating account based campaign influence. Reduce this number if limit errors 
+                    occur during influence calculations by campaign influence models that are account based. Valid numbers are 2 to 200.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idOpportunityBatch" value="Opportunity Influence Batch Size" />
+                    <apex:inputText id="idOpportunityBatch" value="{!RDBOpportunityBatchSize}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Set the batch size used when calculating opportunity based campaign influence. Reduce this number if limit errors 
+                    occur during influence calculations by campaign influence models that are opportunity contact and contact role based. 
+                    Valid numbers are 2 to 200.
+                </apex:outputText>
+                <apex:pageblockSectionItem >
+                    <apex:outputLabel for="idAccountSkewLimit" value="Max # of Responses On Account" />
+                    <apex:inputText id="idAccountSkewLimit" value="{!RDBAccountSkewLimit}"/>
+                </apex:pageblockSectionItem>
+                <apex:outputText >
+                    Set the maximum number of responses allowed on all contacts for an account during account influence processing. 
+                </apex:outputText>
+
+            </apex:pageBlockSection>            
+            <apex:pageblockSection id="idDiagnostics" columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on currently saved configuration data.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!InfluenceDiagnosticInfo}" />
+            </apex:pageblockSection>
+                   
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!ResponseDBSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    </apex:SectionHeader>
+    <script type="text/javascript">    
+        swapicontitle('Opportunity Created','Select User or Profile');
+    </script>    
+</apex:page>

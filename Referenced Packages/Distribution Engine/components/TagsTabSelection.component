@@ -1,0 +1,37 @@
+<apex:component >
+<apex:attribute name="activeTab" type="String" required="false" description="Currently active tab"/>
+<style>
+.tab_selection {
+	float: right;
+	height: 0;
+	position: relative;
+	top: -40px;
+	right: 50px;
+}
+.tab_selection img {
+	width: 25px;
+	position: relative;
+	top: 5px;
+	margin-right: 5px;
+}
+.tab_selection a{
+	border: 1px solid gray;
+	padding: 15px;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+	margin-right: 10px;
+	text-decoration: none;
+}
+.tab_selection a.active{
+	background-color: #F8F8F8;
+}
+</style>
+<div class="tab_selection">
+	<a id="manage_tab" href="{!IF(activeTab != 'manage', '/apex/TagCollectionList', '')}" class="{!IF(activeTab == 'manage', 'active', '')}" onclick="{!IF(activeTab == 'manage', 'return false;', '')}"><img title="Manage tags" src="{!URLFOR($Resource.DEResources, 'images/tag32.png')}"/>
+	Manage
+	</a>
+	<a id="assign_tab" href="{!IF(activeTab != 'assign', '/apex/TagAssignment', '')}" class="{!IF(activeTab == 'assign', 'active', '')}" onclick="{!IF(activeTab == 'assign', 'return false;', '')}"><img title="Assign tags" src="{!URLFOR($Resource.DEResources, 'images/teammember32.png')}"/>
+	Assign
+	</a>
+</div>
+</apex:component>

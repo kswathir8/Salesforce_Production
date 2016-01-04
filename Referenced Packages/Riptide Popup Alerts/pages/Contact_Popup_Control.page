@@ -1,0 +1,21 @@
+<apex:page standardController="Contact">
+
+  <script type="text/javascript"> 
+    var s = "";
+    var a = "{!JSENCODE(Contact.Account.rrpu__Alert_Message__c)}";
+    if (a.length > 0)
+    { 
+      s += "Account Alert: " + a + "\n"; 
+    } 
+    var c = "{!JSENCODE(Contact.rrpu__Alert_Message__c)}";
+    if (c.length > 0)
+    { 
+      s += "Contact Alert: " + c + "\n"; 
+    } 
+    if (s.length > 0)
+    { 
+      window.alert(s); 
+    } 
+  </script> 
+  
+</apex:page>

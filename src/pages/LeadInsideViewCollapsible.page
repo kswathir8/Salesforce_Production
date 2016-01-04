@@ -1,0 +1,47 @@
+<apex:page tabStyle="Lead" id="myPage" standardController="Lead">
+
+<script language="javascript">
+/**
+    <!-- Collapse PageBlockSection on Page Load-->
+    **/
+
+    function addLoadEvent(func) {
+      var oldonload = window.onload;
+      if (typeof window.onload != 'function') {
+        window.onload = func;
+      } else {
+        window.onload = function() {
+          if (oldonload) {
+            oldonload();
+          }
+          func();
+        }
+      }
+    }
+
+    function dotest() {
+     
+     if(document.getElementById('myPage:myForm:myBlock:mySection') != null){
+         twistSection(document.getElementById('myPage:myForm:myBlock:mySection').childNodes[0].childNodes[0]);
+     }
+    }
+
+    addLoadEvent(dotest);
+
+</script>
+ 
+<apex:form id="myForm">
+ 
+<apex:pageBlock id="myBlock">
+
+<apex:pageBlockSection title="CollapsablePageBlockSection" collapsible="true" id="mySection">
+
+<apex:include pagename="iv__InsideView_Lead_Connector"/>
+ 
+</apex:pageBlockSection>
+
+</apex:pageBlock>
+ 
+</apex:form>
+ 
+</apex:page>

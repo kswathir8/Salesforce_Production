@@ -1,0 +1,545 @@
+<apex:page controller="FLAGS.SetupWizCtrl" id="pg" tabStyle="Setup_Wizard__tab" title="Case Flags Setup Wizard">
+<style>
+.seeMore div {position:relative;z-index:70; cursor: default;}
+.seeMore div span {display: none; z-index:90;}
+
+.seeMore div:hover span {
+    display: block;position:absolute;
+    top:1em; padding:5px; left:5em; width:30em; border:1px solid #0cf; z-index:100;
+    background-color:#eff; color:black;
+} 
+
+.primaryPalette {background-color:#D36D00 !important;}
+.brdPalette, .secondaryPalette {border-top-color:#D36D00 !important;}
+
+.pbSubheader { 
+    background: #e96e25 !important; /* Fallback to solid color for older browsers */ 
+    background-image: linear-gradient(to top, #b95e15, #f97e35) !important; 
+    border-radius: 4px; 
+    text-shadow: -1px 0 #b95e15, 0 1px #b95e15,1px 0 #b95e15, 0 -1px #b95e15; 
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+} 
+        
+.pbSubheader img {
+    outline: none !important;
+}
+
+.pageTitleIcon { 
+   /* background-image: url(/img/icon/wrench32.png) !important; */ /* Change this URL to point to the icon you want to use */ 
+} 
+
+.historySettingIndent {
+    margin-left: 32px;
+}
+
+.disabled {
+    color: #999 !important;
+}
+
+</style>
+<apex:sectionHeader title="Case Flags" subtitle="Setup Wizard" help="http://kb.internetcreations.com "/>
+<apex:form id="frm" >
+    
+    <apex:pageMessages showDetail="false" />
+    <apex:actionFunction action="{!refreshPage}" name="refreshPage" reRender="flagSection"/>
+    <apex:actionFunction action="{!radioChange}" name="radioChange" reRender="generalSection,SFDCSetup"/>
+    
+    <apex:pageBlock >
+    
+        <apex:pageBlockSection Title="Introduction" columns="2">
+        <apex:outputPanel >
+            Case Flags is a purpose-built add-on for Salesforce that helps you monitor your organization’s response times with cases, at a glance, via color coded flags. Case Flags allows you to quickly view cases requiring responses to customers.
+            <ul>
+                <li>Eliminate case neglect</li>
+                <li>Avoid SLA violations</li>
+                <li>Measure &quot;Initial Response&quot; (even in business hours)</li>
+            </ul>
+        </apex:outputPanel>
+        <apex:outputPanel style="float:right;">
+            <iframe style="z-index:0;" width="350" height="208" src="https://www.youtube.com/embed/__6vmZpf87c?wmode=opaque" frameborder="0"></iframe><br/>
+            <div style="text-align:center">
+                About Case Flags
+            </div>
+        </apex:outputPanel>
+        </apex:pageBlockSection>
+    
+    </apex:pageBlock>
+    
+    <apex:pageBlock id="pgBlk" >
+    
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!save}" value="Save"/>
+        </apex:pageBlockButtons>
+        
+        <apex:pageBlockSection columns="2" id="generalSection" title="General Setup">
+            <apex:pageBlockSection columns="1">
+            
+           
+                <apex:pageBlockSectionItem helpText="Enter a comma separated list of User IDs which should not clear the case flag when adding a comment. Typically, this would be for application context users who perform automated tasks. Be sure to include the Automated Case User in Support Settings or for Email to Case Premium, your Email Service Routing Address Context User(s).">
+                    <apex:outputLabel value="API Users"/>
+                    <apex:outputPanel >
+                        <apex:inputField value="{!dummyObject.AuthorId}" style="width:225px;" required="false"/> <apex:commandButton value="Add" action="{!addUser}"/> <br/>
+                        <apex:inputField value="{!fp.FLAGS__ExcludedUsers__c}" style="width:425px;"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="formatRadio">
+                    <apex:outputLabel >Hours</apex:outputLabel>
+                    <apex:outputPanel >
+                        <apex:selectRadio value="{!formatSelection}" onchange="radioChange();">
+                            <apex:selectOption itemLabel="Standard Hours" itemValue="24"></apex:selectOption>
+                            <apex:selectOption itemLabel="Business Hours" itemValue="Business"></apex:selectOption>
+                        </apex:selectRadio>
+                        <apex:outputPanel style="color:red;" rendered="{!jobNotFound}">Job not found, reselect Business Hours to reschedule Business Hours Job</apex:outputPanel>
+                        <apex:outputText rendered="{!IF(formatSelection == 'Business',TRUE,FALSE)}">
+                            Case Flags will exclude time elapsed outside of your company’s normal hours of operation. For example, if your company’s business hours are 8am to 6pm Mon-Fri, and a customer submits a case comment at 5pm on Friday, Case Flags will count 1 hour. Then at 6pm it will stop counting time until Monday at 8am when it will resume.&nbsp;
+                            <apex:outputLink value="/01m" target="_blank">See your company&#39;s business hours.</apex:outputLink>
+                        </apex:outputText>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Organization Wide</apex:outputLabel>
+                        <apex:outputPanel layout="block">
+                            <apex:inputCheckbox value="{!fp.FLAGS__Organization_Wide__c}">
+                                <apex:actionSupport event="onchange" action="{!organizationWideChange}"/>
+                            </apex:inputCheckbox>
+                            <br/>
+                            When enabled, all cases in the organization will be processed by Case Flags. If this option is disabled, you can set up workflow or an Apex trigger to set the "Enable Case Flags" checkbox field to true, based on criteria, for cases that should be processed.
+                        </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+             </apex:pageBlockSection>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection id="advanceSetupSection" columns="1" title="Optional Setup" >
+            <apex:pageBlockSectionItem helpText="Enter the domain from which your company's email is sent. This is used to distinguish between emails from your users and those from customers when setting or clearing the flag. For a complete description of the behavior, refer to the chart below.">
+                <apex:outputLabel value="Company Domain"/>
+                <apex:inputField value="{!fp.FLAGS__CompanyDomain__c}" style="width:220px;"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem helpText="A private comment can be added to the case if a trigger cannot update flag fields, usually due to validation rules error.">
+                <apex:outputLabel value="Add Error Comments"/>
+                <apex:inputField value="{!fp.FLAGS__InsertTriggerErrorComments__c}"/>
+            </apex:pageBlockSectionItem>   
+            <apex:pageBlockSectionItem rendered="{!fp.FLAGS__UseFuture__c || BizHoursCount > 1}" helpText="Apex Future methods will be used to set the custom Business Hours lookup on new cases. It is only necessary to enable this if your organization actively uses multiple sets of business hours and you have escalation rules that switch cases to non-default hours. Note that these jobs will count against certain Salesforce resource usage limits.">
+                <apex:outputLabel value="Use Jobs to Set Case Hours"/>
+                <apex:inputField value="{!fp.FLAGS__UseFuture__c}"/>
+            </apex:pageBlockSectionItem>   
+        </apex:pageBlockSection>
+        
+        <a name="sf-setup"/>
+        <apex:pageBlockSection id="SFDCSetup" columns="2" title="Salesforce Setup">
+            <apex:pageBlockSection columns="1">
+            
+                <!-- <apex:pageBlockSectionItem >
+                <apex:outputLabel value="" />
+                You must modify your case page layouts and/or case views to use the Case Flags functionality. If you intend to use the age in business hours then you must create a scheduled job as well.
+                </apex:pageBlockSectionItem> -->
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Page Layout" />
+                    <apex:outputPanel >
+                        In order to see the flag on the case page, you must add the field to your page layout(s).
+                        <p/>
+                        1. Go to Setup > Customize > Cases > Page Layouts. <a target="_blank" href="/ui/setup/layout/PageLayouts?type=Case&setupid=CaseLayouts">(click here to go there now)</a><br/>
+                        2. Choose &quot;Edit&quot; next to the layout(s) you want to update. <br/>
+                        3. Locate the &quot;Flag{!addBH}&quot; field and drag it onto your layout. <br/>
+                        4. Optional: Locate the Initial Response and Initial Response{!addBusiness} Hours fields, and drag them onto your layout(s).
+                        <p/>
+                        Optional: Two custom buttons are available to manually clear and set the flag.
+                        <p/>
+                        1. While still on the case page layout, click &quot;Buttons&quot; on the left, then drag and drop the &quot;Clear Flag&quot; and &quot;Set Flag&quot; buttons to the &quot;Custom Buttons&quot; area of the page layout.  <br/>
+                        2. Click &quot;Save&quot;.<br/>
+                        3. To grant profiles the ability to manually Clear a flag via a custom button on the case page, <a href="/_ui/perms/ui/profile/ApexPageProfilePermissionEdit/e?apex_id={!ClearFlagPageId}&apex_name=FlagClear&apex_namespace=FLAGS&save_button=has_save_button&setupid=ApexPages" target="_blank">click here and move desired profiles to the Enabled box.</a> <br/>
+                        4. To grant profiles the ability to manually Set a flag via a custom button, <a href="/_ui/perms/ui/profile/ApexPageProfilePermissionEdit/e?apex_id={!SetFlagPageId}&apex_name=FlagNow&apex_namespace=FLAGS&save_button=has_save_button&setupid=ApexPages" target="_blank">click here and move desired profiles to the Enabled box.</a>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="List Views" />
+                    <apex:outputPanel >
+                    
+                    The flag field can also be added to your case list views.
+                    <p/>
+                    1. While displaying a case view, click &quot;Edit&quot; above the header bar to enter the view setup tool. <br/>
+                    2. In the &quot;Available Fields&quot; box, select the &quot;Flag{!addBH}&quot; item and click the &quot;Add&quot; arrow. Position the field using the arrows to the right of the &quot;Selected Fields&quot; box.<br/>
+                    3. Click &quot;Save&quot;.<br/>
+                    <p/>
+                    Optional: Two custom buttons are available to clear and set the flags on multiple cases from list views. (Note: All users will have access to set and clear flags via these buttons.)
+                    <p/>
+                    1. <a target="_blank" href="/ui/setup/layout/ListLayouts?type=Case&setupid=CaseSearchLayouts">Click here to open Case Search Layouts.</a><br/>
+                    2. Edit Cases List View or Search Results and then move &quot;Set Flags&quot; and &quot;Clear Flags&quot; into the &quot;Selected Buttons&quot; panel.
+                    
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+      
+            </apex:pageBlockSection>
+            <apex:outputPanel >
+                <apex:image value="{!URLFOR($Resource.Case_Flags_Assets,'case-flags-assets/case-detail.png') }" style="float:right;"/>
+       
+                <apex:image value="{!URLFOR($Resource.Case_Flags_Assets,'case-flags-assets/list-view.png') }" style="float:right;margin-top:100px;"/>
+            </apex:outputPanel>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection id="flagSection" columns="2" title="Flag Icons and Default Hours">
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="" />
+                    Choose the flag icons and when to set them.
+                </apex:pageBlockSectionItem>          
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Flag 1"/>
+                    <apex:outputPanel id="list2">
+                        <apex:image value="/servlet/servlet.FileDownload?file={!fp.FLAGS__Offset1Image__c}" style="margin-right:5px;"/>
+                        After <apex:inputField value="{!fp.FLAGS__TimeOffset1__c}" style="margin-left:5px;margin-right:5px;width:40px;"/> Hours        
+                        <apex:selectList multiselect="false" size="1" onchange="refreshPage();" style="margin-left:20px;" value="{!fp.FLAGS__Offset1Image__c}">
+                            <apex:selectOptions value="{!FlagImageOptions}"/>
+                        </apex:selectList>
+                        <apex:inputField value="{!fp.FLAGS__Offset1Image__c}" rendered="false"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Flag 2"/>
+                    <apex:outputPanel id="list3">
+                        <apex:image value="/servlet/servlet.FileDownload?file={!fp.FLAGS__Offset2Image__c}" style="margin-right:5px;"/>
+                        After <apex:inputField value="{!fp.FLAGS__TimeOffset2__c}" style="margin-left:5px;margin-right:5px;width:40px;"/> Hours        
+                        <apex:selectList multiselect="false" size="1" onchange="refreshPage();" style="margin-left:20px;" value="{!fp.FLAGS__Offset2Image__c}">
+                            <apex:selectOptions value="{!FlagImageOptions}"/>
+                        </apex:selectList>
+                        <apex:inputField value="{!fp.FLAGS__Offset2Image__c}" rendered="false"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Flag 3"/>
+                    <apex:outputPanel id="list4">
+                        <apex:image value="/servlet/servlet.FileDownload?file={!fp.FLAGS__Offset3Image__c}" style="margin-right:5px;"/>
+                        After <apex:inputField value="{!fp.FLAGS__TimeOffset3__c}" style="margin-left:5px;margin-right:5px;width:40px;"/> Hours        
+                        <apex:selectList multiselect="false" size="1" onchange="refreshPage();" style="margin-left:20px;" value="{!fp.FLAGS__Offset3Image__c}">
+                            <apex:selectOptions value="{!FlagImageOptions}"/>
+                        </apex:selectList>
+                        <apex:inputField value="{!fp.FLAGS__Offset3Image__c}" rendered="false"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Flag 4"/>
+                    <apex:outputPanel id="list5">
+                        <apex:image value="/servlet/servlet.FileDownload?file={!fp.FLAGS__Offset4Image__c}" style="margin-right:5px;"/>
+                        After <apex:inputField value="{!fp.FLAGS__TimeOffset4__c}" style="margin-left:5px;margin-right:5px;width:40px;"/> Hours        
+                        <apex:selectList multiselect="false" size="1" onchange="refreshPage();" style="margin-left:20px;" value="{!fp.FLAGS__Offset4Image__c}">
+                            <apex:selectOptions value="{!FlagImageOptions}"/>
+                        </apex:selectList>
+                        <apex:inputField value="{!fp.FLAGS__Offset4Image__c}" rendered="false"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="" />
+                    You may also add custom icons by uploading them to the Case Flags Documents folder in the Documents tab. Image files should be either GIF or PNG and 16x16. After uploading graphic files to Documents, you must refresh this page to be able to select them. <a href="/015?fcf={!ImageFolderId}" target="_blank">Click here to add custom icons</a>.
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:outputPanel >
+                <apex:image value="{!URLFOR($Resource.Case_Flags_Assets,'case-flags-assets/flag-example.png') }" style="float:right;"/>
+            </apex:outputPanel>
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection id="pbsALF" columns="2" title="Account Level Flags (optional)">
+            <apex:pageBlockSection columns="1">
+            
+                <apex:pageBlockSectionItem >        
+                <apex:outputLabel value="" />
+                <apex:outputPanel >
+                Account Level Flags allow you to override the default hours specified
+                on an account-by-account basis. Account Level Flags can be set
+                individually or en masse. Account Level Flags need not be specified for
+                every account; the default hours specified above will be used automatically
+                in the absence of Account Level Flags. See our <a href="http://ic.force.com/cfash" target="_blank">frequently asked
+                questions (FAQ) on Account Level Flags</a>.
+                </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Account Fields" />
+                <apex:outputPanel >
+                To get started, add the Case Flags Age 1, Case Flags Age 2, Case Flags Age 3, and Case Flags Age 4
+                custom fields to your account page layout(s). Use the properties available
+                in Field Level Security (EE and UE only) and Page Layouts to ensure that only
+                the desired profiles can view and edit the values on these fields.
+                </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Configuration" />
+                <apex:outputPanel >
+                To configure for individual accounts, simply edit
+                the values in the Case Flags Age fields directly.
+                <p/>
+                To configure account level flags en masse, or to configure sets of hours
+                based on Account criteria, use one of the following approaches:
+                <ul>
+                <li>Enhanced List Views with Inline Editing allow for mass editing 200
+                records at a time. Carefully review <a href="https://help.salesforce.com/HTViewHelpDoc?id=inline_editing_in_a_list.htm&language=en_US" target="_blank">this Salesforce Help article</a>,
+                paying specific attention to considerations if you use Record Types. Configure a
+                list view with the desired criteria, record type filter (if applicable),
+                and include the Case Flags Age X fields.</li>
+                <li>Reporting and DataLoader will allow for mass editing an unlimited
+                quantity of records. You can simply run an update operation on accounts
+                matching criteria to set the desired hour values. Consult your Salesforce
+                administrator, consulting partner or Internet Creations professional
+                services for assistance with setting account level flags.</li>
+                <li>DemandTools and other data manipulation tools will also make quick work
+                of setting account level flags.</li>
+                </ul>
+                </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel >
+            </apex:outputPanel>
+            
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection id="pbsCLF" columns="2" title="Case Level Flags (optional)">  
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >        
+                    <apex:outputLabel value="" />
+                    <apex:outputPanel >
+                    Case Level Flags allow you to override the default hours specified on a Case with the use of Workflow Rules and Triggers.  Refer to <a href="http://kb.internetcreations.com/?kb=000001893" target="_blank">our knowledge base</a> for additional assistance.
+                    <p/>
+                    For further assistance, please contact your Salesforce administrator, Salesforce implementation partner, or your Internet Creations account executive to inquire about professional services.
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem> 
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel >
+            </apex:outputPanel>
+        </apex:pageBlockSection>
+
+        <apex:pageBlockSection id="pbsEventRules" columns="2" title="Event Rules">
+            <apex:pageBlockSection id="pbsEventRulesLeft" columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Case Open / Close</apex:outputLabel>
+                    <apex:outputPanel styleClass="seeMore">
+                        <apex:inputField id="setOnCCreate" value="{!fp.FLAGS__SetOnCaseCreate__c}"/> 
+                        <apex:outputLabel for="setOnCCreate"><strong>Set flag on case creation</strong></apex:outputLabel> <br/>
+                        Select if you want the case flag to automatically be set when a new case is created. <br/>
+                        <div style="width:60px;"><u>See Logic</u><span>Case is created.</span></div>
+                        <br/><br/>
+                        <apex:inputField id="clearOnCClose" value="{!fp.FLAGS__ClearOnCaseClose__c}"/> 
+                        <apex:outputLabel for="clearOnCClose"><strong>Clear flag on case close</strong></apex:outputLabel> <br/>
+                        Select if you want the case flag to automatically clear when the case has been closed.<br/>
+                        <div style="width:60px;"><u>See Logic</u><span>Case is updated to have a closed status.</span></div>
+                        <br/><br/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Email to Case</apex:outputLabel>
+                    <apex:outputPanel styleClass="seeMore">
+                        <apex:inputField id="setOnInbound" value="{!fp.FLAGS__AllowWriteAfterEmail__c}"/> 
+                        <apex:outputLabel for="setOnInbound"><strong>Set flag on inbound email</strong></apex:outputLabel> <br/>
+                        Select if you want the case flag to automatically be set after a customer has sent an email to the case.<br/>
+                        <div style="width:60px;"><u>See Logic</u><span>Inbound equals True<br/>Email domain not equal to company domain (if supplied)</span></div>
+                        <br/><br/>
+                        <apex:inputField id="clearOnOutbond" value="{!fp.FLAGS__AllowClearAfterEmail__c}"/> 
+                        <apex:outputLabel for="clearOnOutbond"><strong>Clear flag on outbound email</strong></apex:outputLabel> <br/>
+                        Select if you want the case flag to automatically clear after a user has sent an email to the customer.<br/>
+                        <div style="width:60px;"><u>See Logic</u><span>Inbound equals False<br/>Email domain equals company domain (if supplied)</span></div>
+                        <br/><br/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="pbsiWebPortal">
+                    <apex:outputLabel >Communities &amp; Portals</apex:outputLabel>
+                    <apex:outputPanel styleClass="seeMore">
+                        <apex:inputField id="setOnCustComment" value="{!fp.FLAGS__AllowWriteAfterComment__c}" onchange="updateExamineCommentCompanyDomain();"/> 
+                        <apex:outputLabel for="setOnCustComment"><strong>Set flag on customer or partner comment</strong></apex:outputLabel> <br/>
+                        Select if you are using either the Customer / Partner Communities or Portals or the Self Service Portal, and would like the flag set on cases when an external user adds a comment.<br/>
+                        <div style="width:80px;"><u>See Logic</u><span>Public equals True<br/>UserType not equal to &quot;Standard&quot; OR Self-service user equals true OR user is listed in API User list above</span></div>
+                        <br/><br/>
+                        <span id="examineCommentCompanyDomainWrapper" style="padding-left: 32px; display:block;">
+                            <apex:inputField id="examineCommentCompanyDomain" value="{!fp.FLAGS__ExamineCommentCompanyDomain__c}"/> 
+                            <apex:outputLabel for="examineCommentCompanyDomain"><strong>Exclude Comments with Company Domain</strong></apex:outputLabel> <br/>
+                            Select if Case Flags is being used in conjunction with Email to Case Premium.<br/>
+                            <div style="width:60px;"><u>See Logic</u><span>Description contains &quot;From: &lt;{!IF(fp.CompanyDomain__c <> '', 'someone@' & fp.CompanyDomain__c, 'someone@company-domain-set-above.com')}&gt;&quot;</span></div>
+                        </span>
+                        <br/><br/>
+                        <apex:inputField id="clearOnUserComment" value="{!fp.FLAGS__AllowClearAfterComment__c}"/> 
+                        <apex:outputLabel for="clearOnUserComment"><strong>Clear flag on user comment</strong></apex:outputLabel> <br/>
+                        Select if you are using either the Customer / Partner Communities or Portals or the Self Service Portal, and would like the flag cleared when an internal user adds a comment.<br/>
+                        <div style="width:80px;"><u>See Logic</u><span>Public equals True<br/>UserType equals &quot;Standard&quot; OR Self-service user equals False<br/> CreatedBy Does Not Equal API User(s)</span></div>
+                        <br/><br/>
+                        <apex:inputField id="setOnEAttachment" value="{!fp.FLAGS__AllowWriteAfterAttachment__c}"/>
+                        <apex:outputLabel for="setOnEAttachment"><strong>Set flag on case attachment</strong></apex:outputLabel> <br/>
+                        Select if you want the case flag to automatically be set when an attachment is added to a case by an external user. <br/>
+                        <div style="width:80px;"><u>See Logic</u><span>Attachment added to case AND attachment owner UserType not equal to &quot;Standard&quot;.</span></div>
+                        <br/><br/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Activities</apex:outputLabel>
+                    <apex:outputPanel styleClass="seeMore">
+                        <apex:inputField id="clearOnActivity" value="{!fp.FLAGS__AllowClearAfterActivity__c}"/>
+                        <apex:outputLabel for="clearOnActivity"><strong>Clear flag on activity/task.</strong></apex:outputLabel> <br/>
+                        Select if your users log calls by adding activities and the flag should be cleared when a completed activity (task) is added. <br/>
+                        Be sure that the Type field on the Task object is visible to all profiles.<br/>
+                        <div style="width:60px;"><u>See Logic</u><span>Activity Status is set to Closed = True (defined on the Type Picklist Field Value)<br/>Activity Type = '[Specified Type]'</span></div><br/><br/>
+                        <apex:outputLabel for="activityType"><strong>Activity Type</strong></apex:outputLabel><br/>
+                        <apex:selectList id="activityType" value="{!fp.FLAGS__EnabledActivityType__c}" size="1">
+                        Select the activity type which should clear the flag when completed if clear flag on activity/task is enabled. <br/>
+                            <apex:selectOptions value="{!activityTypeOptions}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:outputPanel >
+                <apex:image value="{!URLFOR($Resource.Case_Flags_Assets,'case-flags-assets/flag-diagram.png') }" style="float:right;"/>
+            </apex:outputPanel>
+           
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection id="pbsHist" columns="2" title="Case Flags History Tracking">
+            <apex:pageBlockSection id="pbsHist1Column" columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel >
+                        Case Flags History Tracking enables you to report on your performance handling
+                        cases. For example, you can determine which users respond to customers
+                        the fastest (and the slowest).<br/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="pbsiEnableHistory">
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel >
+                        <apex:inputField id="enableHistory" value="{!fp.FLAGS__Enable_History__c}" onchange="checkDisableHistoryCBs();"/>
+                        <apex:outputLabel for="enableHistory"><strong>Enable Case Flags History</strong></apex:outputLabel>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="pbsiTrackClear">
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel styleClass="historySettingIndent">
+                        <apex:inputField id="trackClear" value="{!fp.FLAGS__Track_Flag_Clear__c}"/>
+                        <apex:outputLabel id="lblTrackClear" for="trackClear"><strong>Track Case flag clear</strong></apex:outputLabel>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="pbsiTrackSet">
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel styleClass="historySettingIndent">
+                        <apex:inputField id="trackSet" value="{!fp.FLAGS__Track_Flag_Set__c}"/>
+                        <apex:outputLabel id="lblTrackSet" for="trackSet"><strong>Track Case flag set</strong></apex:outputLabel>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="pbsiTrackOwner">
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel styleClass="historySettingIndent">
+                        <apex:inputField id="trackOwner" value="{!fp.FLAGS__Track_Case_Ownership__c}"/>
+                        <apex:outputLabel id="lblTrackOwner" for="trackOwner"><strong>Track Case Ownership changes</strong></apex:outputLabel>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="pbsiTrackStatus">
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel styleClass="historySettingIndent">
+                        <apex:inputField id="trackStatus" value="{!fp.FLAGS__Track_Case_Status__c}"/>
+                        <apex:outputLabel id="lblTrackStatus" for="trackStatus"><strong>Track Case Status changes</strong></apex:outputLabel>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <!-- indents the output panel below -->
+                    <apex:outputLabel value=""/>
+                    <apex:outputPanel >
+                    In order for Case Flags History Tracking records to be created for Users their profile must have permissions on the object enabled.
+                    <p/>
+                    1. Go to Setup > Customize > Administration Setup > Manage Users > Profiles. <a target="_blank" href="{!profilesPage}">(click here to go there now)</a><br/>
+                    2. Find the Profile you would like to enable History Tracking for and click on the name.<br/>
+                    3. Click &quot;Edit&quot; at the top of the profile detail page.<br/>
+                    3. Locate the section titled &quot;Custom Object Permissions&quot; and find Case Flags History Tracking within it. Make sure the &quot;Read&quot; and &quot;Create&quot; options are checked and click &quot;Save&quot;.<br/>
+                    4. Locate the section title &quot;Custom Field-Level Security&quot; and find Case Flags History Tracking within it. Click &quot;View&quot; next to it.<br/>
+                    5. Check the &quot;Visible&quot; option for each field and click &quot;Save&quot;.
+                    
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:outputPanel />
+        </apex:pageBlockSection>
+        
+    </apex:pageBlock>
+    
+</apex:form>
+<script>
+    function checkDisableHistoryCBs() {
+        var historyEnabled = document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiEnableHistory:enableHistory').checked;
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackClear:trackClear').disabled = !historyEnabled;
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackSet:trackSet').disabled = !historyEnabled;
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackOwner:trackOwner').disabled = !historyEnabled;
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackStatus:trackStatus').disabled = !historyEnabled;
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackClear:lblTrackClear').style.color = historyEnabled ? '#000' : '#999';
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackSet:lblTrackSet').style.color = historyEnabled ? '#000' : '#999';
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackOwner:lblTrackOwner').style.color = historyEnabled ? '#000' : '#999';
+        document.getElementById('pg:frm:pgBlk:pbsHist:pbsHist1Column:pbsiTrackStatus:lblTrackStatus').style.color = historyEnabled ? '#000' : '#999';
+    }
+    checkDisableHistoryCBs();
+
+    //overwrite help
+    var hlinks = getElementsByClassName('links')[0];
+    hlinks.innerHTML = '<a href="http://ic.force.com/cfdocs" target="_blank">Documentation</a> | <a href="http://kb.internetcreations.com" target="_blank">Knowledge Base</a> | <a href="mailto:caseflags@internetcreations.com">caseflags@internetcreations.com</a> <img src="/s.gif" alt="Help" class="helpIcon" title="Help">';
+    hlinks.innerHTML += '<br/><div style="font-size:smaller">Free implementation assistance is available.</div>';    
+    
+    hlinks.style.fontSize = 'larger';
+    hlinks.style.position = 'absolute';
+    hlinks.style.float  = 'right';
+    hlinks.style.right = '0%';
+    
+    //elements by CSS style
+    function getElementsByClassName(className) {
+        var hasClassName = new RegExp("(?:^|\\s)" + className + "(?:$|\\s)");
+        var allElements = document.getElementsByTagName("*");
+        var results = [];
+    
+        var element;
+        for (var i = 0; (element = allElements[i]) != null; i++) {
+            var elementClass = element.className;
+            if (elementClass && elementClass.indexOf(className) != -1 && hasClassName.test(elementClass))
+                results.push(element);
+        }
+    
+        return results;
+    }
+
+    twistSection(document.getElementById("{!$Component.pg.frm.pgBlk.advanceSetupSection}").childNodes[0].childNodes[0]);
+    twistSection(document.getElementById("{!$Component.pg.frm.pgBlk.pbsALF}").childNodes[0].childNodes[0]);
+    twistSection(document.getElementById("{!$Component.pg.frm.pgBlk.pbsCLF}").childNodes[0].childNodes[0]);
+
+    function updateExamineCommentCompanyDomain() {
+        var comment = document.getElementById('pg:frm:pgBlk:pbsEventRules:pbsEventRulesLeft:pbsiWebPortal:setOnCustComment');
+        var wrapper = document.getElementById('examineCommentCompanyDomainWrapper');
+        var checkbox = wrapper.getElementsByTagName('input')[0];
+        
+        if(comment.checked) {
+            wrapper.className = wrapper.className.replace(' disabled', '');
+            checkbox.disabled = false;
+        }
+        else {
+            wrapper.className += ' disabled';
+            checkbox.disabled = true;
+        }
+    }
+    updateExamineCommentCompanyDomain();
+
+    try {
+        var headers = document.querySelectorAll('.pbSubheader');
+        for(var i = 0; i < headers.length; ++i)
+             headers[i].addEventListener('click', function(evt) { 
+                 var header = evt.target;
+                 if(header.nodeName == 'IMG')
+                     return;
+                 else if(header.nodeName == 'H3')
+                     header = header.parentNode;
+                     
+                 header.querySelector('img').click();
+             });
+    }
+    catch(e) {} //IE < 9
+    </script>
+
+</apex:page>

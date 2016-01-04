@@ -1,0 +1,33 @@
+<apex:page controller="PartnerMarketingAssets" showHeader="false" sidebar="false" standardStylesheets="false">
+    <apex:composition template="PartnerTemplate">
+
+    	<apex:define name="page-title"> Marketing Assets</apex:define>
+
+    	<apex:define name="main-content">
+    		<div class="bootstrap-styles">
+		        <div class="container">
+		        	<div class="row">
+			        	<h2>Axcient Marketing Assets</h2>
+				        <table class="table table-striped">
+				        	<thead style="font-weight: bold;">
+				        		<tr>
+				        			<td>Title (Click to View)</td>
+				        			<td>Description</td>
+				        		</tr>
+				        	</thead>
+				        	<tbody>
+					        	<apex:repeat value="{!documents}" var="document" id="documentRow">
+					        		<tr>
+					        			<td><apex:outputLink value="/servlet/servlet.FileDownload?file={!document.Id}" target="_blank">{!document.Name}</apex:outputLink></td>
+					        			<td>{!document.Description}</td>
+					        		</tr>
+					        	</apex:repeat>
+				        	</tbody>
+				        </table>
+			        </div>
+		        </div>
+			</div>
+	    </apex:define>
+
+    </apex:composition>
+</apex:page>

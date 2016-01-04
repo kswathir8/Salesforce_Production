@@ -1,0 +1,68 @@
+<apex:page controller="FCRM.FCR_CI_DefaultOpModelVFController" title="Default Opportunity Model Configuration" tabStyle="Full_Circle_CRM__tab" >
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full-Circle Opportunity-based Campaign Influence Configuration"  help="https://www.fullcirclecrm.com/fcrm/app/fccrm-influence-model1/">
+        <apex:form >
+            <apex:pageblock mode="edit">
+                <apex:pageblocksection columns="2" title="General configuration">
+                    <apex:inputCheckbox label="Enabled" value="{!Enabled}"/>
+                    <apex:outputtext value="Enable or disable this campaign influence model" />
+                    <apex:selectRadio label="Date Filter" value="{!configobject.FCRM__DateFilter__c}" layout="pageDirection" >
+                        <apex:selectOption itemvalue="create" itemlabel="From opportunity create date" />
+                        <apex:selectOption itemValue="close" itemlabel="From opportunity close date" />
+                    </apex:selectRadio>
+                    <apex:outputText value="Specify the type of filter to apply - only responses within the filtered date range are considered (except for the first touch response that is always considered)" />
+                    <apex:inputfield label="Days to filter" value="{!configobject.FCRM__DaysFromClose__c}"/>
+                    <apex:outputtext value="Only responses within this many days before opportunity create or close are considered (depending on date filter)" />
+                    <apex:inputField label="Close Date Cut-off" value="{!configobject.FCRM__CloseDateCutoff__c}"/>
+                    <apex:outputText value="When selected, do not attribute influence to any responses after the close date, even if the opportunity is still open and the close date is in the past." />
+                    <apex:inputField label="Capture zero amount attribution details" value="{!configobject.FCRM__IncludeZeroDollarInfluence__c}"/>
+                    <apex:outputText value="When selected, capture influence detail objects even for opportunities with zero or no amount specified." />
+                </apex:pageblocksection>
+                <apex:pageblocksection columns="2" title="Weighting">
+                    <apex:inputfield value="{!configobject.FCRM__Originating_Response_Weight__c}" />
+                    <apex:outputtext value="Points applied to the 'tipping point' responses that was active when this opportunity was created" />
+                    <apex:inputfield value="{!configobject.FCRM__Originating_Contact_Weight__c}" />
+                    <apex:outputtext value="Points applied to responses on contact that originated this opportunity" />
+                    <apex:inputfield value="{!configobject.FCRM__Primary_Contact_Weight__c}" />
+                    <apex:outputtext value="Points applied to responses on primary contacts for this opportunity" />
+                    <apex:inputfield value="{!configobject.FCRM__Other_Contact_Weight__c}" />
+                    <apex:outputtext value="Points applied to responses on other contacts for this opportunity" />
+                    <apex:inputfield value="{!configobject.FCRM__First_Campaign_Touch_Weight__c}" />
+                    <apex:outputtext value="Points applied to first response on first campaign touch campaign" />
+                    <apex:inputfield value="{!configobject.FCRM__Last_Campaign_Touch_Weight__c}" />
+                    <apex:outputtext value="Points applied to first response on last campaign touch campaign" />
+                    <apex:inputfield value="{!configobject.FCRM__Repeat_Response_Weight__c}" />
+                    <apex:outputText value="Point applied to repeat responses (may be negative)" />
+                </apex:pageblocksection>
+                <apex:pageblocksection columns="2" title="Exclude campaigns by type">
+                <apex:pageblockSectionItem >
+                    <c:FCR_VFDualListSelect AvailableIDs="{!AvailableCampaignTypes}" AvailableStrings="{!AvailableCampaignTypeLabels}"
+                        SelectedIDs="{!SelectedCampaignTypes}" SelectedStrings="{!SelectedCampaignTypeLabels}" AllowReorder="false" MaxSelect="15"
+                        ListSize="8" />
+                <apex:outputText > Responses can be excluded by campaign type</apex:outputText>
+                </apex:pageblockSectionItem>
+                
+                </apex:pageblocksection>                
+                <apex:pageblockSection title="Instance control" columns="5">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Current Instance" />
+                        <apex:outputText value="{!IF(InstanceNumber=0,'Default',TEXT(InstanceNumber))}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageblockSectionItem >
+                        <apex:outputlabel value="Additional Instances" />
+                        <apex:outputText value="{!AdditionalInstanceCount}" />
+                    </apex:pageblockSectionItem>
+                    <apex:commandButton value="Create Instance" action="{!CreateInstance}"/>
+                    <apex:commandButton rendered="{!And(InstanceNumber>0, InstanceNumber=AdditionalInstanceCount)}" value="Delete Instance" action="{!DeleteLastInstance}" />
+                </apex:pageblockSection>
+                <apex:pageBlockSection columns="1">
+                    <apex:outputtext value="Note: Configuration changes are not saved when creating or deleting instances." />
+                </apex:pageBlockSection>
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Save and return" action="{!Save}"/>
+                    <apex:commandButton value="Cancel" immediate="true" action="{!Cancel}"/>
+                </apex:pageBlockButtons>
+            </apex:pageblock>
+        </apex:form>
+    </apex:SectionHeader>
+</apex:page>

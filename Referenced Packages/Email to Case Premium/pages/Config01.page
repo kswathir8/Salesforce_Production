@@ -1,0 +1,201 @@
+<apex:page controller="E2CP.Config01" tabStyle="setup_wizard__tab" title="Email to Case Premium Preferences Configuration">
+    <style>
+        div.pbSubheader{color:#000000 !important;}
+    </style>
+    <apex:sectionHeader title="Email to Case Premium" subtitle="Preferences Configuration" help=""/>
+    <apex:form >
+        <apex:pageMessages showDetail="false" />
+        <apex:pageBlock title="Initial Setup"> 
+            <!--
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!previous}" value="Previous"/>
+                <apex:commandButton action="{!next}" value="Next"/>
+            </apex:pageBlockButtons>
+            -->
+            
+            <apex:facet name="header">
+                <apex:outputpanel >
+                <table width="100%">
+                <tr>
+                
+                <td style="width:75%; text-align:center;">
+                    <apex:commandButton action="{!previous}" value="Previous"/>
+                    <apex:commandButton action="{!next}" value="Next"/>
+                </td>
+                
+                <td style="text-align:right;">
+                    <!--pageJumper start-->
+                    <apex:outputPanel >
+                         <apex:actionStatus id="pjStatus">
+                            <apex:facet name="start">
+                                <apex:outputtext value="{!pj.statusText}"/> 
+                            </apex:facet>
+                            <apex:facet name="stop">
+                                <apex:outputpanel >
+                                    <apex:outputLabel for="pagejump" value="Jump to "/>
+                                    <apex:selectList value="{!pj.currentPage}"  id="pagejump" size="1">
+                                        <apex:selectOptions value="{!pj.allPages}"/>
+                                        <apex:actionSupport event="onchange" action="{!pj.goToPage}" status="pjStatus"/>
+                                    </apex:selectList> 
+                                </apex:outputpanel>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:outputpanel>
+                    <!--pageJumper end-->
+                </td>
+                
+                </tr>
+                </table>
+                </apex:outputPanel>
+            </apex:facet>
+
+            <apex:facet name="footer">
+                <apex:outputpanel >
+                <table width="100%">
+                <tr>
+                <td style="width:75%; text-align:center;">
+                    <apex:commandButton action="{!previous}" value="Previous"/>
+                    <apex:commandButton action="{!next}" value="Next"/>
+                </td>
+                <td>
+                </td>
+                </tr>
+                </table>
+                </apex:outputPanel>
+            </apex:facet>
+            
+<div>
+
+<p><b>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></b><b>Link to the New Comment Page:</b><!-- To access the premium New
+Comment page included in the package, you must add a custom button
+to your page layout. </p>
+
+<p style='margin-left:1.0in'><b>a.<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></b><b>Override
+Standard New Button: </b>The New button for case comments cannot be
+overridden directly so we must override the entire case detail page layout with
+a special Visualforce page that we developed. This will only affect the
+standard New comment button and will not impact customizations that you have
+made using the page layout editor. <a
+href="/p/setup/link/CustomResourceLinkList?pageName=Case&type=Case&setupid=CaseLinks" target="_blank">Click
+here to access Case Buttons and Links</a> or browse to <i>Setup &gt; Customize
+&gt; Cases &gt; Buttons and Links</i>. Click <i>Edit</i> next to <i>View</i>.</p>
+
+<p style='margin-left:1.0in'><b>
+
+<apex:image url="{!$Resource.image005_0}" width="531" height="111" />
+
+</b></p>
+
+<p style='margin-left:1.0in'>Select the radio button for
+Visualforce Page and choose Case_Page [E2CP__Case_Page] from the drop down
+box. Click Save.</p>
+
+<p style='margin-left:1.0in'>
+
+<apex:image url="{!$Resource.image006_0}" width="531" height="157" />
+
+</p>
+<p style='margin-left:1.0in'><b>b.<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></b><b>Add
+a Custom Button: </b>-->
+<a href="/ui/setup/layout/PageLayouts?type=Case&amp;setupid=CaseLayouts" target="_blank">Click
+here to access Case Page Layouts</a> or browse to <i>Setup &gt; Customize &gt;
+Cases &gt; Page Layouts</i> and click on Edit next to the page layout you want to
+work with. Drag and drop the New Comment button to the custom buttons area
+of the page layout. Save the page layout. Note, if you are unable to see the
+button, check the Page Layout Assignment.</p>
+
+<p>Additionally, we supply a custom sidebar component to override the comment related list New button. For details, please see <a href="" target="_new">this solution </a>.</p>
+
+<p style='margin-left:1.0in'><b>&nbsp;</b></p>
+
+<p ><b>5.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></b><b>Define an Organization Wide Address: </b>By setting up an
+Organization Wide Address, we can be sure that when customers reply to new
+comment emails sent from Salesforce.com, the replies are returned to your Email
+to Case Premium routing address rather than your support agent's personal
+mailbox.
+
+<br /><br />
+<a href="/0D2/e" target="_blank">Click here to add an Organization Wide Address</a> or navigate to Setup > Email Administration > Organization-Wide Addresses and click Add.
+<br />
+<apex:image url="{!$Resource.E2CP__image007}" width="620" height="312" />
+</p>
+<p></p>
+
+<p  style='margin-left:.5in'>In the example above, we use <a
+href="mailto:supporttest@yourcompany.com">supporttest@yourcompany.com</a> to
+aid with initial testing.  Click Save.</p>
+ 
+<p>
+    <b>When you add a new organization-wide address, it must be verified as a valid email address before becoming available for use. If the email address you entered is already forwarding to the salesforce.com routing address you created earlier, a new case will be created out of the verification email.  If you have not received your verification email/case, click Resend to have another one sent.</b>
+</p>
+<p><b>&nbsp;</b></p>
+</div>
+
+        </apex:pageBlock>
+    </apex:form>
+    
+    <script>
+    //overwrite help
+    var hlinks = getElementsByClassName('links')[0];
+    hlinks.innerText = '';
+    hlinks.appendChild(createLink('Documentation','http://ic.force.com/e2cpdocs'));
+    hlinks.appendChild(createTextElement('span',' | '));
+    hlinks.appendChild(createLink('Knowledge Base','http://kb.internetcreations.com/pkb_Home?l=en_US&c=Products%3AEmail_to_Case_Premium'));
+    hlinks.appendChild(createTextElement('span',' | '));
+    hlinks.appendChild(createLink('e2cpremium@internetcreations.com','mailto:e2cpremium@internetcreations.com'));
+    hlinks.appendChild(createTextElement('span',' '));
+    hlinks.appendChild(createHelpIcon());
+    hlinks.appendChild(createTextElement('span','\r\n'));
+    hlinks.appendChild(createTextElement('div','Free implementation assistance is available.'));
+    
+    hlinks.style.fontSize = 'larger';
+    hlinks.style.position = 'absolute';
+    hlinks.style.float  = 'right';
+    hlinks.style.right = '0%';
+    
+    function createLink(text,ref) {
+        var link = document.createElement('a');
+        link.innerText = text;
+        link.href = ref;
+        link.target = '_blank';
+        return link;
+    }
+    
+    function createTextElement(tag,text) {
+        var elem = document.createElement(tag);
+        elem.innerText = text;
+        if (tag == 'div')
+            elem.style.fontSize = 'smaller';
+        return elem;
+    }
+    
+    function createHelpIcon() {
+        var icon = document.createElement('img');
+        icon.src = '/s.gif';
+        icon.alt = 'Help';
+        icon.className = 'helpIcon';
+        icon.title = 'Help';
+        return icon;
+    }
+    
+    //elements by CSS style
+    function getElementsByClassName(className) {
+        var hasClassName = new RegExp("(?:^|\\s)" + className + "(?:$|\\s)");
+        var allElements = document.getElementsByTagName("*");
+        var results = [];
+    
+        var element;
+        for (var i = 0; (element = allElements[i]) != null; i++) {
+            var elementClass = element.className;
+            if (elementClass && elementClass.indexOf(className) != -1 && hasClassName.test(elementClass))
+                results.push(element);
+        }
+    
+        return results;
+    }
+    </script>
+</apex:page>

@@ -1,0 +1,57 @@
+<apex:page controller="n2de.TagListController" sidebar="false" tabStyle="Distribution_Tags__tab">
+	
+	<c:CommonHeader />
+	<c:CommonMask />
+	<c:CommonHelp help_page="distributor-tags"/>	
+	<script>
+	function confirmDelete(){
+		var numberOfRowsSelected = $(".selected_rows:checked").length;
+		var confirmResult = true;
+		if(numberOfRowsSelected == 0){
+			alert('No collections selected');
+			confirmResult = false;
+		}else{
+			confirmResult = confirm('This will delete the collection and all its tags. Are you sure?');
+		}
+		if(confirmResult){
+			showMask();
+		}
+		return confirmResult;
+	}
+	</script>
+	<apex:form >
+		<apex:sectionHeader title="Tag Collections" subtitle="Home"/>
+		<c:TagsTabSelection activeTab="manage"/>
+		<apex:pageBlock title="Tag Collections">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="New" action="{!newTagCategory}" rendered="{!$ObjectType.n2de__Tag_Category__c.Createable}"/>
+				<apex:commandButton value="Delete" action="{!deleteTagCategories}" rendered="{!$ObjectType.n2de__Tag_Category__c.Deletable}" onclick="return confirmDelete();"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockTable value="{!tagCategoryList}" var="t" styleClass="team_table">
+				<apex:column >
+					<apex:inputCheckbox value="{!t.checked}" disabled="{!t.inUse}" title="{!IF(t.InUse, 'This tag collection is used by one or more Distributor rules. It cannot be deleted while it is in use', '')}" styleClass="selected_rows"/>
+				</apex:column>
+				<apex:column headerValue="Tag collection name">
+					<a href="/apex/{!NamespacePrefix}TagCollectionView?id={!t.tagCategorySObject.id}" class="tag_category_id" team_id="{!t.tagCategorySObject.id}">{!t.tagCategorySObject.name}</a>
+				</apex:column>
+				<apex:column headerValue="Created by" styleClass="modifier">
+					{!t.tagCategorySObject.CreatedBy.Name}
+				</apex:column>
+				<apex:column headerValue="Created date" styleClass="date_col">
+					<apex:outputField value="{!t.tagCategorySObject.CreatedDate}" />
+				</apex:column>
+				<apex:column headerValue="Last modified by" styleClass="modifier">
+					{!t.tagCategorySObject.LastModifiedBy.Name}
+				</apex:column>
+				<apex:column headerValue="Last modified date" styleClass="date_col">
+					<apex:outputField value="{!t.tagCategorySObject.CreatedDate}" />
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">In use by distributor</apex:facet>
+					<img src="/img/checkbox_{!IF(t.InUse, '', 'un')}checked.gif" title="{!IF(t.InUse, 'This tag collection is used by one or more Distributor rules. It cannot be deleted while it is in use', 'This tag collection is not being used')}" />
+				</apex:column>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+	</apex:form>
+<c:StatusPanel />
+</apex:page>

@@ -1,0 +1,63 @@
+<apex:page standardController="Opportunity" extensions="RMCTempUpgrade" tabStyle="Opportunity" sidebar="false" wizard="true" >
+
+  <apex:sectionHeader title="Opportunity Upgrade Wizard" subtitle="Step 1 of 1"/>
+  <apex:form id="theForm" > 
+  
+      <apex:pageBlock id="theSearchBlock" title="Product Information"  mode="edit" >
+          <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!saveSF}" value="Save and Create the Temporary Upgrade Opportunity in SFDC" >
+           </apex:commandButton>
+           
+          </apex:pageBlockButtons>
+          
+  <apex:pageBlockSection columns="1" id="HW2" collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Is this an upgrade or downgrade?</apex:outputLabel>
+       <apex:inputField value="{!Opportunity.Upgrade_Downgrade__c}" required="true" >
+        </apex:inputField>
+        </apex:pageBlockSectionItem>
+  </apex:pageBlockSection>
+
+
+
+
+  
+  <apex:pageBlockSection columns="1" id="HW1" collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Select the Hardware Product</apex:outputLabel>
+       <apex:inputField value="{!Opportunity.Hardware_Product__c}" >
+        </apex:inputField>
+        </apex:pageBlockSectionItem>
+  </apex:pageBlockSection>
+      
+   <apex:pageBlockSection columns="1" id="SW1" collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Select the Software Product</apex:outputLabel>
+      <apex:inputField value="{!Opportunity.Software_Product__c}" >
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+ </apex:pageBlockSection>   
+       
+ 
+<apex:pageBlockSection id="Partner" columns="1"  collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Confirm the Partner</apex:outputLabel>
+      <apex:inputField value="{!Opportunity.Partner__c}" required="true">
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+
+
+<apex:pageBlockSection id="EC" columns="1"  collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Confirm the End Customer</apex:outputLabel>
+      <apex:inputField value="{!Opportunity.End_Customer__c}" required="true">
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+      
+</apex:pageBlock>
+       
+       
+  </apex:form>
+</apex:page>

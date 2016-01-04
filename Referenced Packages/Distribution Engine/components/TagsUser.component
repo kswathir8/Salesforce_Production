@@ -1,0 +1,184 @@
+<apex:component controller="n2de.TagAssignUserController" allowDML="true">
+<style>
+	.tag_collection{
+		float: left;
+		border: 1px solid lightgray;
+		border-radius: 5px;
+		clear: both;
+		margin: 3px;
+		padding: 3px;
+		width: 95%;
+		background-color: #fafafa;
+	}
+	.tag_collection_label{
+		float: left;
+		color: gray;
+		font-family: FontAwesome;
+		margin-left: 5px;
+	}
+	.tag{
+		border: 1px solid #56aa1c;
+		background-color: #56aa1c !important;
+		color: white;
+		padding: 5px;
+		float: left;
+		margin: 5px;
+		border-radius: 5px;
+	}
+	.tag input{
+		float: left;
+		font-size: 6pt;
+	}
+	.tag span{
+		margin-top: 4px;
+		font-size: 10pt;
+	}
+	.tag_collection span{
+		float: left;
+		font-family: FontAwesome;
+		margin-left: 5px;
+	}
+	.tag_collection .tag:first-of-type{
+		clear: both;
+	}
+	.commandLink{
+		margin: 5px;
+	}
+	#tag_table{
+		width: 100%;
+		border: 1px solid gray;
+	}
+	td.data_tag{
+		font-family: FontAwesome;
+		margin-left: 5px;
+	}
+	.view_selection {
+		float: right;
+		margin: 10px;
+		height: 0;
+		top: -50px;
+		position: relative;
+	}
+	.pagingToolBar {
+		background-color: #F3F3EC;
+		background-image: none;
+		border: none;
+	}
+	.search_box{
+		float: left;
+		margin-right: 15px;
+	}
+	</style>
+	<apex:outputPanel id="script_panel">
+	<script>
+	$(document).ready(function() {
+		init();
+	});
+	function init(){
+		$('.all_rows_select').click(function() {
+			var checkBoxState = false;
+			if($(this).is(':checked')){
+				checkBoxState = true;
+			}
+			$('input.row_select').each(function(){
+           		$(this).prop("checked", checkBoxState);
+			});
+		});
+        $('.tagFilter').keyup(function(){
+		    clearTimeout(typingTimer);
+		    typingTimer = setTimeout(filterTags, doneTypingInterval);
+		});
+		hideMask();
+	}
+
+	var tagFilter = '{!JSENCODE(tagFilter)}';
+	var typingTimer;               //timer identifier
+	var doneTypingInterval = 500;  //time in ms, 5 second for example
+	function filterTags(){
+		if($('.tagFilter').val() != tagFilter){
+			showMask();
+			doUpdateAF();
+		}
+	}
+	</script>
+	</apex:outputPanel>
+	<c:CommonMask />
+	<c:CommonHelp help_page="distributor-tags"/>	
+	<apex:form >
+		<apex:actionFunction name="doUpdateAF" action="{!doUpdate}" oncomplete="hideMask()" reRender="tag_table, script_panel" />
+		<apex:sectionHeader title="Assign Tags" subtitle="{!CurrentUser.Name}"/>
+		<apex:pageMessages id="pageMessages"/>
+		<c:TagsTabSelection activeTab="assign"/>
+		
+		<apex:pageBlock title="{!CurrentUser.Name}'s tags" id="pg_block">
+			<apex:outputPanel styleClass="view_selection" id="view_select">
+		        <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="List view" width="20" height="20" />
+		        <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_verticalbaricon.png')}" height="20" />
+		        <apex:outputLink value="/apex/TagAssignment">
+		        	<apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/grid-32.png')}" title="Grid view" width="20" height="20" />
+		        </apex:outputLink>
+	        </apex:outputPanel>
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Add" action="{!addTags}" />
+				<apex:commandButton value="Delete" action="{!deleteTags}" />
+				<apex:commandButton value="Clone" action="{!doClone}" />
+				<apex:commandButton value="Back" action="{!backToUserList}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1">
+				<apex:outputPanel >
+					<div class="search_box">
+						Tag Collection&nbsp;&nbsp;
+						<apex:selectList value="{!selectedTagCollection}" size="1">
+							<apex:selectOption itemValue="" itemLabel="All tag collections"/>
+							<apex:selectOptions value="{!tagCollectionList}"/>
+							<apex:actionSupport event="onchange" action="{!doUpdate}" reRender="tag_table" onSubmit="showMask()" onComplete="init()" />
+						</apex:selectList>
+					</div>
+					<div class="search_box">
+						Tag&nbsp;&nbsp;<apex:inputText styleClass="tagFilter" value="{!tagFilter}"/>
+					</div>
+				</apex:outputPanel>
+				<apex:pageBlockTable value="{!tagList}" var="tag" id="tag_table">
+					<apex:column >
+						<apex:facet name="header">
+							<input type="checkbox" class="all_rows_select"/>
+						</apex:facet>
+						<apex:inputCheckbox value="{!tag.selected}" styleClass="row_select"/>
+					</apex:column>
+					<apex:column headerValue="Tag name">
+						<apex:outputText value="{!tag.Name}"/>
+					</apex:column>
+					<apex:column headerValue="Collection name">
+						<apex:outputText value="{!tag.collectionName}"/>
+					</apex:column>
+					<apex:column headerValue="Added by" style="width: 15%">
+						<apex:outputText value="{!tag.createdBy}"/>
+					</apex:column>
+					<apex:column headerValue="Date added" style="width: 15%">
+						<apex:outputText value="{0,date,dd'/'MM'/'yyyy HH:mm}" >
+							<apex:param value="{!tag.createdDate}"/>
+						</apex:outputText>
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+			
+			<apex:toolbar styleClass="pagingToolBar">
+				<apex:toolbarGroup itemSeparator="none" location="left">
+					<apex:outputPanel rendered="{!totalRecords > 10}">
+						<apex:outputText >Display &nbsp;</apex:outputText>
+						<apex:selectList value="{!rowsPerPage}" size="1">
+							<apex:selectOptions value="{!rowsPerPageOptionList}"/>
+							<apex:actionSupport event="onchange" action="{!resetPage}" reRender="pg_block" onSubmit="showMask()" onComplete="init()" />
+						</apex:selectList>
+						<apex:outputText > records per page</apex:outputText>
+					</apex:outputPanel>
+				</apex:toolbarGroup>
+				<apex:toolbarGroup itemSeparator="line" location="right">
+					<apex:commandLink value="<Previous page" action="{!previousPage}"  rendered="{!hasPrevious}" reRender="pg_block" onclick="showMask()" onComplete="init()"/>
+					<apex:commandLink value="Next page>" action="{!nextPage}" rendered="{!hasNext}" reRender="pg_block" onclick="showMask()" onComplete="init()"/>
+				</apex:toolbarGroup>
+			</apex:toolbar>
+		</apex:pageBlock>
+		
+	</apex:form>
+</apex:component>

@@ -1,0 +1,237 @@
+<apex:component access="global" allowDML="true" controller="FCRM.FCR_VFResponseInfoGlobal">
+    <apex:stylesheet value="{!StyleSheet}"/>
+    <apex:includeScript value="/support/console/33.0/integration.js"/>
+    <apex:attribute name="recordId" access="global" type="id" description="ID of the lead, contact or person account being processed" assignTo="{!relatedRecordId}"  />
+    <apex:attribute name="recordUrlParam" access="global" type="String" description="String of the URL param containing the ID of the related contact" assignTo="{!relatedRecordURLParam}"  />
+    <apex:attribute name="showRecent" access="global" type="Boolean" description="True to display most recent responses on the component" default="true" assignTo="{!ShowRecentResponses}"  />
+    <apex:attribute name="showActive" access="global" type="Boolean" description="True to display existing active responses on the component" default="true" assignTo="{!ShowActiveResponses}"  />
+    <apex:attribute name="showStatus" access="global" type="Boolean" description="True to display prompts for selection of a campaign" default="true" assignTo="{!ShowPromptsForSelection}"  />
+    <apex:attribute name="buttonText" access="global" type="String" description="Alternate text to display on the go button" default="Go" assignTo="{!GoButtonText}"  />
+    <apex:attribute name="onProcessCompleteFunction" access="global" type="String" description="Name of JavaScript Function to run when processing is complete" assignTo="{!JavascriptRedirectFunction}"  />
+    
+
+    <apex:attribute name="errorMessage1" access="global" type="String" description="Error message when relatedRecordId is null" default="Record ID is not specified" assignTo="{!MessageNoRecordID}"  />
+    <apex:attribute name="errorMessage2" access="global" type="String" description="Error message when relatedRecordId does not reference a valid object type" default="Record ID must refer to a lead, contact or person account" assignTo="{!MessageBadRecordIDType}"  />
+    <apex:attribute name="errorMessage3" access="global" type="String" description="Error message when relatedRecordId is not a valid record" default="Record ID does not refer to a valid record" assignTo="{!MessageNoRecord}"  />
+    <apex:attribute name="errorMessage4" access="global" type="String" description="Error message when relatedRecordId references an account that is not a person account" default="Account Record is not a Person Account" assignTo="{!MessageRecordNotPersonAccount}"  />
+    <apex:attribute name="errorMessage5" access="global" type="String" description="Error message when relatedRecordId references a converted lead" default="Lead is converted" assignTo="{!MessageLeadIsConverted}"  />
+ 
+    <apex:outputtext rendered="{!NOT(ISBLANK(RecordIdErrorMessage))}" styleclass="RIWarning" value="{!RecordIdErrorMessage}" />
+    <apex:outputPanel id="mainform" layout="block" rendered="{!ISBLANK(RecordIdErrorMessage)}">
+        <apex:outputpanel id="idempty" layout="inline"> </apex:outputpanel>
+        <script type="text/javascript">
+      
+            var F{!relatedRecordId}_consoleTabId = null;
+            var F{!relatedRecordId}_isPotentialConsole = typeof(sforce)!='undefined' && typeof(sforce.console)!=undefined && typeof(sforce.one)=='undefined' && sforce.console!=null;
+
+            function F{!relatedRecordId}_storeConsoleTabId(result)
+            {
+                if(result!=null) F{!relatedRecordId}_consoleTabId = result.id;
+            }
+
+            function F{!relatedRecordId}_setRefreshRequest()
+            {
+                var theprocessing = document.getElementById('{!$Component.mainblock.responseblock.selectblock.buttonblock.idButtonprocessing}');
+                theprocessing.innerHTML = '{!$Label.fcrm__FCR_Refresh_For_Status}';
+            }
+        
+            function F{!relatedRecordId}_CloseAndRefresh()
+            {
+                var completionFunction = "{!JavascriptRedirectFunction}";
+                if(completionFunction.length>0)
+                {
+                    window[completionFunction]();
+                    return;
+                }
+                if(F{!relatedRecordId}_isPotentialConsole && F{!relatedRecordId}_consoleTabId!=null) 
+                {
+                    sforce.console.refreshPrimaryTabById(F{!relatedRecordId}_consoleTabId, true, null);
+                    return;
+                }                
+                var reloadurl = '{!ReloadURL}';
+                if(typeof sforce!='undefined' && sforce!=null && typeof(sforce.one)!='undefined')
+                {
+                    //sforce.one.navigateToURL('/{!relatedRecordId}');
+                    //alert('{!$Label.fcrm__FCR_Refresh_For_Status}');
+                    sforce.one.navigateToSObject('{!relatedRecordId}'); // This works
+                }
+                else
+                {                
+                    if(window.parent!=null)
+                    {
+                        //Unused console detection: if(window.location.href.indexOf('isdtp=mn')== -1)
+                        try
+                        {    // Its a console window
+                            window.parent.location = reloadurl;
+                            // Backup for old console case where same-origin fail doesn't trigger an exception
+                            window.setTimeout(F{!relatedRecordId}_setRefreshRequest, 5000);
+                        } catch(e)
+                        {    // Cant update
+                            F{!relatedRecordId}_setRefreshRequest();
+                        }
+                    }
+                    else window.location = reloadurl;
+                }
+            }
+            
+            // Quickly disable the button to prevent multiple clicks
+            function F{!relatedRecordId}_DisableTheButton()
+            {
+                if(F{!relatedRecordId}_isPotentialConsole && F{!relatedRecordId}_consoleTabId ==null) sforce.console.getEnclosingPrimaryTabId(F{!relatedRecordId}_storeConsoleTabId);    // Get console ID if it exists
+                var theselect = document.getElementById('{!$Component.mainblock.responseblock.selectblock.buttonblock.idPromptSelect}');
+                if(theselect.value==null) return false;
+                var thebutton = document.getElementById('{!$Component.mainblock.responseblock.selectblock.buttonblock.idCreateCMButton}');
+                var theprocessing = document.getElementById('{!$Component.mainblock.responseblock.selectblock.buttonblock.idButtonprocessing}');
+                thebutton.style.visibility='hidden';
+                theprocessing.innerHTML = '{!$Label.fcrm__FCR_Processing}';
+            }
+            
+            // Select button changed
+            function F{!relatedRecordId}_SelectChanged()
+            {
+                var theselect = document.getElementById('{!$Component.mainblock.responseblock.selectblock.buttonblock.idPromptSelect}');
+                var thebutton = document.getElementById('{!$Component.mainblock.responseblock.selectblock.buttonblock.idCreateCMButton}');
+
+                if(thebutton!=null)
+                {
+                    if(theselect==null || theselect.value=='null' || theselect.value==null)
+                    {
+                        thebutton.className = "btnDisabled";
+                        thebutton.disabled = true;
+                    }
+                    else
+                    {
+                        thebutton.className = "btn";
+                        thebutton.disabled= false;
+                    }
+                }
+            }
+            
+            function F{!relatedRecordId}_DoNothing() { }
+            
+        </script>
+        <apex:actionFunction name="F{!relatedRecordId}_KillExtraResponses" action="{!DeactivateExtraResponses}" oncomplete="F{!relatedRecordId}_CloseAndRefresh()"/>
+        <apex:actionFunction name="F{!relatedRecordId}_LoadResponsePrompts" action="{!ValidateResponsePrompts}" oncomplete="F{!relatedRecordId}_DoNothing()" >
+            <apex:param name="{!IF(ISBLANK(relatedRecordURLParam),'rid',relatedRecordURLParam)}" value="{!relatedRecordId}" />
+        </apex:actionFunction>
+        <apex:actionFunction name="F{!relatedRecordId}_CreateSalesResponse" action="{!DoCreateCM}" timeout="10000" oncomplete="F{!relatedRecordId}_CloseAndRefresh()" >
+            <apex:param name="{!IF(ISBLANK(relatedRecordURLParam),'rid',relatedRecordURLParam)}" value="{!relatedRecordId}" />
+        </apex:actionFunction>
+        <apex:actionFunction name="F{!relatedRecordId}_UpdatePromptSelect" reRender="idCreateCMButton" />
+        
+        <apex:pageBlock id="mainblock" rendered="true" mode="maindetail">
+            <apex:facet name="header"></apex:facet>
+            <apex:pageBlockSection columns="1" rendered="{! NOT(ApplicationEnabled) }" showHeader="false" >
+                <apex:outputText styleclass="RIWarning" value="{!$Label.fcrm__FCR_App_Disabled}" />
+                
+                <apex:pageBlockSectionItem rendered="{! ActiveResponseCount > 1}">
+                    <apex:outputlabel id="idReponseCountLabel" value="{!$Label.fcrm__FCR_Number_of_Responses}:" for="idResponseCount"/>
+                    <apex:outputPanel id="idResponseCount">
+                        <apex:outputtext value="{!ActiveResponseCount}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            
+            <apex:pageBlockSection columns="1" rendered="{! AND(ActiveResponseCount==1,ApplicationEnabled,ShowActiveResponses)}">
+                <!-- Section for display of existing response -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel id="idActiveResponseLabel" value="{!$Label.fcrm__FCR_Active_Response}" for="idCurrentResponseName" />
+                    <apex:outputPanel layout="inline">
+                        <apex:outputLink id="idCurrentResponseName" value="/{!theResponse.Campaign.id}" target="_top" >{!theResponse.Campaign.Name} </apex:outputLink>
+                        <apex:outputText escape="false" value="&nbsp; {!$Label.FCR_Responded_Date} &nbsp; {!FormattedDate} &nbsp;&nbsp;" />
+                        <apex:outputLink rendered="{!NOT(ISBLANK(theResponse.FCRM__FCR_Opportunity__c))}" value="/{!theResponse.FCRM__FCR_Opportunity__c}" target="_top">Related Opportunity</apex:outputLink>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(theresponse.Campaign.FCRM__FCR_Sales_Information__c))}" >
+                    <apex:outputLabel value="{!$Label.fcrm__FCR_Follow_Up}" for="idCurrentFollowup" />
+                    <apex:outputPanel id="idCurrentFollowup" layout="inline">
+                        <apex:outputText value="{!theresponse.Campaign.FCRM__FCR_Sales_Information__c}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="1" rendered="{!AND(ActiveResponseCount>1,ApplicationEnabled,ShowActiveResponses)}">
+                <!-- Section for display of existing responses (multiple responses with contacts) -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel id="idActiveResponsesLabel" value="{!$Label.fcrm__FCR_Active_Responses}" for="idCurrentResponsesName" />
+                    <apex:outputPanel layout="inline">
+                        <apex:repeat value="{!ActiveResponseIterator}" var="oneresponseindex">
+                            <apex:outputLink id="idCurrentResponsesName" value="/{!AllActiveResponses[oneresponseindex].Campaign.id}" target="_top" >{!AllActiveResponses[oneresponseindex].Campaign.Name} </apex:outputLink>
+                            <apex:outputText escape="false" value="&nbsp; {!$Label.FCR_Responded_Date} &nbsp; {!FormattedDates[oneresponseindex]} &nbsp;&nbsp;" />
+                            <apex:outputLink rendered="{!NOT(ISBLANK(AllActiveResponses[oneresponseindex].FCR_Opportunity__c))}" value="/{!AllActiveResponses[oneresponseindex].FCR_Opportunity__c}" target="_top">Related Opportunity</apex:outputLink><br />
+                        </apex:repeat>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+            </apex:pageBlockSection>
+            
+            
+            <apex:pageBlockSection columns="1" rendered="{!AND(ActiveResponseCount==0, ResponsePromptsCount == 0,ApplicationEnabled)}">
+               <!-- Section for display if no responses, and no drop-down list -->
+               <apex:pageBlockSectionItem >
+                    <apex:outputLabel id="idResponseStatusNoList" value="{!$Label.fcrm__FCR_Response_Status}" for="idCurrentResponseStatus1" />
+                    <apex:outputText id="idCurrentResponseStatus1" styleClass="{!If(PassiveMode,'','RIWarning2')}" dir=""
+                    value="{!IF(PassiveMode,$Label.fcrm__FCR_No_Active_Response,$Label.fcrm__FCR_Update_Message_1)}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="responseblock" columns="1" rendered="{! AND(ResponsePromptsCount!=0,ApplicationEnabled) }">
+               <!-- Section for display if no responses, with drop-down list -->
+               <apex:pageBlockSectionItem rendered="{!ActiveResponseCount==0 && ShowPromptsForSelection}" >
+                    <apex:outputLabel id="idResponseStatusNoList" value="{!$Label.fcrm__FCR_Response_Status}" for="idCurrentResponseStatus" />
+                    <apex:outputText id="idCurrentResponseStatusC0" styleClass="{!If(PassiveMode,'','RIWarning2')}"  
+                    value="{!If(PassiveMode,$Label.FCR_No_Active_Response_With_Picklist,
+                    $Label.FCR_Update_Message_2)}" />
+                </apex:pageBlockSectionItem>
+                <!-- Section for display if no responses, but drop-down list is available -->
+                <apex:pageBlockSectionItem id="selectblock"  >
+                    <apex:outputPanel layout="none">
+                        <apex:outputText rendered="{!ActiveResponseCount==0}" value="{!$Label.fcrm__FCR_Select_Campaign}" />
+                        <apex:outputText rendered="{!ActiveResponseCount>0}" value="{!$Label.fcrm__FCR_Additional_Sales_Campaigns}"/>
+                    </apex:outputPanel>
+                    <apex:pageBlockSectionItem id="buttonblock" >
+                        <apex:selectList disabled="{!DisableResponsePromptDropdown}" id="idPromptSelect" value="{!CurrentPromptCampaignID}" multiselect="false" size="1" onchange="F{!relatedRecordId}_SelectChanged();" >
+                            <apex:selectOptions value="{!ResponsePromptItems}" />
+                        </apex:selectList>
+                        <apex:outputPanel id="buttonpanel"  >
+                            <apex:commandButton id="idCreateCMButton" style="width:{!ButtonWidth};margin-left:10px" onclick="F{!relatedRecordId}_DisableTheButton();F{!relatedRecordId}_CreateSalesResponse();return(false)"  value="{!buttonText}"  
+                                        reRender="idempty" rendered="{!NOT(DisableResponsePromptDropdown)}"  />
+                            <apex:outputText id="idButtonprocessing" rendered="{!NOT(DisableResponsePromptDropdown)}"></apex:outputText>
+                            <apex:outputText rendered="{!DisableResponsePromptDropdown}" value=" {!$Label.fcrm__FCR_Selection_Unavailable}" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="1" rendered="{! AND(ApplicationEnabled, NOT ISBLANK(MostRecentResponse), ShowRecentResponses)}">
+               <!-- Section for display of most recent response if one is found -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel id="idRecentResponseLabel" value="{!$Label.fcrm__FCR_Most_Recent_Response}" for="idRecentResponse" />
+                    <apex:outputPanel id="idRecentResponse">
+                        <apex:outputLink value="/{!MostRecentResponse.Campaign.id}" target="_top" >{!MostRecentResponse.Campaign.Name} </apex:outputLink>
+                        <apex:outputText rendered="{!NOT(ISBLANK(MostRecentFormattedDate))}" escape="false" value="&nbsp;&nbsp;{!HTMLENCODE($Label.FCR_Responded_Date)} &nbsp; {!HTMLENCODE(MostRecentFormattedDate)} &nbsp;&nbsp;"/>
+                        <apex:outputText rendered="{!ISBLANK(MostRecentFormattedDate)}" escape="false" value="&nbsp;&nbsp;{!HTMLENCODE($Label.FCR_First_Responded_Date)} &nbsp; {!HTMLENCODE(MostRecentFirstRespondedDate)} &nbsp;&nbsp;"/>
+                        <apex:outputLink rendered="{!NOT(ISBLANK(MostRecentResponse.FCRM__FCR_Opportunity__c))}" value="/{!MostRecentResponse.FCRM__FCR_Opportunity__c}" target="_top">Related Opportunity</apex:outputLink>
+                        <apex:outputText rendered="false" escape="false" value="&nbsp;&nbsp; {!HTMLENCODE($Label.FCR_Status)} {!HTMLENCODE(MostRecentResponse.FCR_Response_Status__c)}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+    </apex:outputPanel>        
+ 
+     <script type="text/javascript">
+         var mainblock = document.getElementById('{!$Component.mainblock}');
+         if(mainblock!=null)
+         {
+             //mainblock.style.borderTopColor = 'transparent'; //#EAEAEA';
+             //mainblock.style.borderWidth = '0px';
+             //mainblock.style.backgroundColor = '#FFFFFF';
+             F{!relatedRecordId}_SelectChanged();
+         }
+         if({!NonOpActiveResponseCount} > 1 && {!ApplicationEnabled} ) F{!relatedRecordId}_KillExtraResponses();
+         F{!relatedRecordId}_LoadResponsePrompts();
+
+     </script>
+</apex:component>

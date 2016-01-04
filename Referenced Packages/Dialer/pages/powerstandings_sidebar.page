@@ -1,0 +1,10 @@
+<apex:page id="PowerStandingsSidebar">
+    <body style="margin:0">
+        <!--<h1>It Worked!</h1>
+        <p>User: {!$User.FirstName} {!$User.LastName}</p>
+        <p>SubDomain: {!$User.is_subdomain__c}</p>
+        <p>Token: {!$User.is_token__c}</p>
+        <p>Permissions: {!$User.permissions__c}</p>-->
+        <apex:iframe src="https://{!$User.is_subdomain__c}.insidesales.com/admin/standings/sidebar?token={!$User.is_token__c}" scrolling="true" id="profile" width="100%"/>
+    </body>
+</apex:page>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
+    <backgroundEndColor>#FFFFFF</backgroundEndColor>
+    <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
+    <backgroundStartColor>#FFFFFF</backgroundStartColor>
+    <dashboardType>SpecifiedUser</dashboardType>
+    <description>This Dashboard monitors Full Circle CRM adjusted data and custom processes. It highlights any data issues that need attention.</description>
+    <isGridLayout>false</isGridLayout>
+    <leftSection>
+        <columnSize>Medium</columnSize>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Metric</componentType>
+            <displayUnits>Integer</displayUnits>
+            <footer>A response with a status of Unmapped indicates an update to a lead/contact status not configured by the system. These responses will no longer sync.</footer>
+            <header>Data Exceptions - Should all be 0</header>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <metricLabel>Unmapped Response Status</metricLabel>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Unmapped_Response_Status</report>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Metric</componentType>
+            <displayUnits>Integer</displayUnits>
+            <footer>Deferred updates not cleared by the system. Will require manual check.</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <metricLabel>Deferred Update Items</metricLabel>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Deferred_Update_Items</report>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Metric</componentType>
+            <displayUnits>Integer</displayUnits>
+            <footer>All Resposnes should have a response status.</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <metricLabel>Missing Response Status</metricLabel>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Response_Status_Missing</report>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Metric</componentType>
+            <displayUnits>Auto</displayUnits>
+            <footer>Responses referencing an opportunity where the Response Id field is different. This indicates a data exception that needs to be cleaned up.</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <metricLabel>Opportunity Response Errors</metricLabel>
+            <report>FCR_Full_Circle_CRM_Check_Reports/Opportunity_Response_Errors</report>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Metric</componentType>
+            <displayUnits>Auto</displayUnits>
+            <footer>Async requests that have been pending for longer than 24hours.</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <metricLabel>Stalled Async Request</metricLabel>
+            <report>FCR_Full_Circle_CRM_Check_Reports/Stalled_Async_Requests</report>
+        </components>
+    </leftSection>
+    <middleSection>
+        <columnSize>Medium</columnSize>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <chartAxisRange>Auto</chartAxisRange>
+            <componentType>Column</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>false</enableHover>
+            <expandOthers>false</expandOthers>
+            <footer>Opportunities deleted that were related to responses.</footer>
+            <header>Business Process Monitoring</header>
+            <legendPosition>Bottom</legendPosition>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Opportunities_Cleared</report>
+            <showPercentage>false</showPercentage>
+            <showValues>true</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Opportunities Deleted</title>
+            <useReportChart>false</useReportChart>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Table</componentType>
+            <displayUnits>Integer</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <footer>This is a component for visibility only and does not imply a process issue. Updates of these members to a member status considered a ‘Response’ will not reprocess or generate repeat responses.</footer>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Responses_Undone</report>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Responses Undone</title>
+        </components>
+    </middleSection>
+    <rightSection>
+        <columnSize>Medium</columnSize>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Table</componentType>
+            <displayUnits>Integer</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <footer>These opportunities are still open but their close date is in the past (older than yesterday) - Advance the closed date because this date impacts campaign influence metrics.</footer>
+            <header>Data Quality</header>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Open_Opportunities_Old_Close_Date</report>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Open Opportunities With Old Close Dates</title>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+            <chartAxisRange>Auto</chartAxisRange>
+            <chartSummary>
+                <axisBinding>y</axisBinding>
+                <column>RowCount</column>
+            </chartSummary>
+            <componentType>Column</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <enableHover>true</enableHover>
+            <expandOthers>false</expandOthers>
+            <footer>These Campaigns need to be fixed - they are missing a value in the &apos;Campaign Sourced By&apos; field. This field is required on all campaigns and is used to define high-level funnels and funnel stages and reporting.</footer>
+            <groupingColumn>CREATED_BY</groupingColumn>
+            <legendPosition>Bottom</legendPosition>
+            <report>FCR_Full_Circle_CRM_Check_Reports/FCR_Campaigns_No_Campaign_Sourced_By</report>
+            <showPercentage>false</showPercentage>
+            <showValues>true</showValues>
+            <sortBy>RowLabelAscending</sortBy>
+            <title>Capaigns Missing &apos;Campaign Sourced By&apos;</title>
+            <useReportChart>false</useReportChart>
+        </components>
+        <components>
+            <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+            <componentType>Table</componentType>
+            <displayUnits>Auto</displayUnits>
+            <drillEnabled>false</drillEnabled>
+            <drillToDetailEnabled>false</drillToDetailEnabled>
+            <indicatorHighColor>#54C254</indicatorHighColor>
+            <indicatorLowColor>#C25454</indicatorLowColor>
+            <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+            <report>TP_Marketing_Reports/Campaign_Creation_This_Week</report>
+            <sortBy>RowLabelAscending</sortBy>
+        </components>
+    </rightSection>
+    <runningUser>tperry@axcient.com</runningUser>
+    <textColor>#000000</textColor>
+    <title>FCCRM Axcient Check Reports</title>
+    <titleColor>#000000</titleColor>
+    <titleSize>12</titleSize>
+</Dashboard>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPageWebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <availability>online</availability>
+    <description>Link to Full Circle CRM Configuration</description>
+    <displayType>link</displayType>
+    <height>600</height>
+    <linkType>page</linkType>
+    <masterLabel>Full Circle CRM Response Management Configuration</masterLabel>
+    <openType>sidebar</openType>
+    <page>FCR_VFConfigMain</page>
+    <protected>true</protected>
+</CustomPageWebLink>

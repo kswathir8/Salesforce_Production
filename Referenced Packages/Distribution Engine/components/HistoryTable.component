@@ -1,0 +1,48 @@
+<apex:component >
+	<apex:attribute name="historyList" description="Histories to display" type="n2de.HistoryDisplay[]" required="true"/>
+	<apex:attribute name="blockTitle" description="" type="String" required="true"/>
+	<apex:attribute name="sectionTitle" description="" type="String" required="true"/>
+	
+	<apex:pageBlock title="{!blockTitle}" id="history_block">
+		<script> 
+			$(document).ready(function() {
+				twistSection(document.getElementById('{!$Component.history_block.history_section}').getElementsByTagName('img')[0]);
+			});
+		</script>
+		<apex:pageBlockSection title="{!sectionTitle}" collapsible="true" columns="1" id="history_section">
+			<apex:outputPanel id="history_table_container">
+				<apex:pageBlockTable value="{!historyList}" var="hist" id="history_table" columnsWidth="10%, 10%, 80%" headerClass="headerRow">
+					<apex:column >
+						<apex:facet name="header">Date</apex:facet>
+						<apex:outputText value="{!hist.changeDate}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">User</apex:facet>
+						<apex:outputText value="{!hist.username}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Action</apex:facet>
+						<apex:outputPanel rendered="{!hist.action == 'UPDATE' && hist.oldValue != '' && hist.newValue != ''}">
+							<span>Changed <b>{!hist.fieldLabel}</b> from {!hist.oldValue} to <b>{!hist.newValue}</b></span>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!hist.action == 'UPDATE' && hist.oldValue == '' && hist.newValue != ''}">
+							<span>Changed <b>{!hist.fieldLabel}</b> to <b>{!hist.newValue}</b></span>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!hist.action == 'UPDATE' && hist.oldValue != '' && hist.newValue == ''}">
+							<span>Deleted {!hist.oldValue} in <b>{!hist.fieldLabel}</b></span>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!hist.action == 'INSERT'}">
+							<span>Created {!hist.objectLabel}: <b>{!hist.newValue}</b></span>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!hist.action == 'DELETE'}">
+							<span>Deleted {!hist.objectLabel}: <b>{!hist.oldValue}</b></span>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!hist.action == 'CLONE'}">
+							<span>Cloned {!hist.objectLabel}: <b>{!hist.newValue}</b></span>
+						</apex:outputPanel>
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:outputPanel>
+		</apex:pageBlockSection>
+		</apex:pageBlock>
+</apex:component>

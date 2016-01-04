@@ -1,0 +1,63 @@
+<apex:component controller="rh2.PS_SelectMaster_Controller" >
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+   <head> 
+     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+     <apex:stylesheet value="{! URLFOR($Resource.SFStyleSheets, 'SFStyleSheets/assets/styles/salesforce-lightning-design-system-vf.min.css')}" />
+     
+     </head> 
+     
+ <div class="slds slds-p-around--xx-large slds-container--large slds-container--center" role="main"> 
+        <div class="slds-card">
+             <header class="slds-card__header slds-grid">
+            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+              <div class="slds-media__body">
+                <h3 class="slds-text-heading--small slds-truncate">Additional Information</h3>
+              </div>
+            </div>
+          </header>
+          <section class="slds-card__body">
+    		<table class="slds-table slds-no-row-hover">
+                <apex:outputPanel rendered="{! notPaid }">
+                <tr><td>			
+                    <apex:outputtext >Active Rollups:&nbsp; <apex:outputLink target="_blank" value="http://www.passagetechnology.com/rollup-helper-order">
+                            {!activeRollupCount} (Maximum 3)  Click here to upgrade.
+                        </apex:outputLink> <br /><br /><div class="slds-size--1-of-6" id="progressbar"></div></apex:outputtext>
+                    </td></tr>
+                </apex:outputPanel>
+                <tr><td>
+               	<ul class="slds-list--dotted" >
+                        
+              		<li>
+                    <apex:outputtext >In This Release:&nbsp;</apex:outputtext>
+                                        <apex:outputLink target="_blank" value="http://rolluphelper.passagetech.com">http://rolluphelper.passagetech.com</apex:outputLink>
+                    </li>
+                    <apex:outputPanel rendered="{! notPaid }">
+                    <li>
+                    <apex:outputtext >Please Note:&nbsp;</apex:outputtext>
+                    <apex:outputText >
+                        Rollups can run in real-time once you&nbsp;<apex:outputLink target="_blank" value="http://www.passagetechnology.com/rollup-helper-order">upgrade</apex:outputLink>.<br />                      
+                    </apex:outputText>   
+                    </li>  
+                    </apex:outputPanel>    
+                	<apex:outputPanel rendered="{! !notPaid }">
+                	<li>
+                    <apex:outputtext >Please Note:&nbsp;</apex:outputtext>
+                    <apex:outputText >  
+                        By default, your rollups from Account, Attachment, Task, Case, Contact, and Event records are enabled for real-time.  <br/>
+                        To enable real time for other objects, you can use our Enable Real Time tab or email&nbsp; <apex:outputLink value="mailto:support@passagetech.com">support@passagetech.com</apex:outputLink>.  Please see the following&nbsp;  <apex:outputLink target="_blank" value="https://www.youtube.com/watch?v=BQF5qg8mZ7U">video</apex:outputLink> for assistance with the tab.
+                    </apex:outputText>
+                    </li> 
+                    </apex:outputPanel>  
+              </ul>    
+                    </td></tr>
+          <tr><td>      
+        <apex:outputLink value="{!URLFOR($Page.rh2__PS_ReferAFriend)}" styleClass="slds-button slds-button--brand"> 
+            Invite A Friend
+        </apex:outputLink>
+              </td></tr>    
+              </table>   
+            </section>       
+        </div>
+     </div>   
+    </html>
+</apex:component>

@@ -1,0 +1,383 @@
+<apex:page Controller="n2de.SettingsController" sidebar="false" tabstyle="Settings__tab" action="{!init}">
+<apex:form >
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'iphone-style-checkboxes/scripts/iphone-style-checkboxes.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>	
+
+<apex:actionFunction action="{!startScheduler}" name="startSchedulerAF" reRender="page_block" oncomplete="init()" />
+<apex:actionFunction action="{!stopScheduler}" name="stopSchedulerAF" reRender="page_block" oncomplete="init()" />
+<apex:actionFunction action="{!startHealthChecker}" name="startHealthCheckerAF" reRender="page_block" oncomplete="init()"/>
+<apex:actionFunction action="{!stopHealthChecker}" name="stopHealthCheckerAF" reRender="page_block" oncomplete="init()"/>
+<apex:actionFunction action="{!updateSettings}" name="updateSettingsAF" reRender="page_block" oncomplete="init()"/>
+<apex:actionFunction action="{!saveFrequencyChange}" name="saveFrequencyChangeAF" reRender="page_block" oncomplete="init()"/> 
+<apex:actionFunction action="{!saveLogDurationChange}" name="saveLogDurationChangeAF" reRender="page_block" oncomplete="init()"/> 
+<link type="text/css" rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'iphone-style-checkboxes/style.css')}"/>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-nc2.css')}" type="text/css" />
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+<style>
+	.change_link {
+		text-decoration: underline;
+	}
+	.change_link:hover {
+		cursor: pointer;
+	}
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+	init();
+});
+function updateSettings(){
+	showMask();
+	updateSettingsAF();
+}
+function toggleUserAuditLogging() {
+	if ($('.user_login_check').attr('checked')) {
+		$('.user_logging').prop('disabled', false);
+		$('.user_reason_check').prop('disabled', false);	
+	} else {
+		$('.user_logging').prop('disabled', true);
+		$('.user_reason_check').prop('disabled', true);
+	}
+}
+function init(){
+	toggleUserAuditLogging();
+
+	var $loggingPicklist = $('.logging');
+	$loggingPicklist.data('logging',  $loggingPicklist.val() );
+	
+	var onchange_checkbox = ($('.start_scheduler')).iphoneStyle({
+	    onChange: function(elem, isOn) {
+	    	showMask();
+	    	if(isOn == true){
+	    		startSchedulerAF();
+	    	}else{
+	    		stopSchedulerAF();
+	    	}
+	    }
+	});
+	$('.healthCheckSlider').iphoneStyle({
+	    onChange: function(elem, isOn) {
+	    	showMask();
+	    	if(isOn == true){
+	    		startHealthCheckerAF();
+	    	}else{
+	    		stopHealthCheckerAF();
+	    	}
+	    }
+	});
+	
+	
+	$('.multiselectUsers').multiselect({
+		minWidth: 400,
+		noneSelectedText: '--Select users to notify--',
+		selectedList: 2,
+		classes: 'notify-multiselect',
+		position: {
+			my: 'left top',
+     			at: 'left bottom',
+			collision: 'flip'
+		},
+		beforeclose: function() {
+           	updateSettings();
+		}
+	});	
+	
+	$('.logging').change(function(){
+		var newDuration = $(this).val();
+		var continueResult = true;
+		if(newDuration != 'Forever'){
+			var msg = 'Logs older than ' + newDuration + ' will be removed.';
+			if(newDuration == 'No logging'){
+				msg = 'No distribution logging will be held. This means you will not have any data in Distribution Log or Distribution Analytics. ';			
+			}
+			msg += ' Are you sure you want to change distribution logging duration?';
+			continueResult = confirm(msg);
+		}
+		if(continueResult == true){
+			showMask();
+			saveLogDurationChangeAF();
+		}else{
+			var oldValue = $(this).data('logging');
+			$(this).val(oldValue);
+			cancelLoggingChange();
+		}
+	});
+	$('.frequency').mousedown(function(){
+		var isSchedulerRunning = $(".start_scheduler").is(":checked");
+		if(isSchedulerRunning){
+			alert('You cannot change the frequency while the scheduler is running. Please stop the scheduler first');
+			return false;
+		}
+	});
+	$('.processing').mousedown(function(){
+		var isSchedulerRunning = $(".start_scheduler").is(":checked");
+		if(isSchedulerRunning){
+			alert('You cannot change the processing method while the scheduler is running. Please stop the scheduler first');
+			return false;
+		}
+	});
+	$('.frequency').change(function(){
+		var freq = $(this).val();
+		if (freq < 5) {
+			var msg = 'Scheduler timings are not guaranteed on the Salesforce platform. A frequency of 5 minutes or higher is recommended to minimize delays during busy periods. \n\nCancel and click the help icon on this page to learn more or click OK to continue.'; 
+			var continueResult = confirm(msg);
+			if (continueResult) {
+				showMask();
+				saveFrequencyChangeAF();
+			} else {
+				var oldValue = $(this).data('frequency');
+				$(this).val(oldValue);
+				cancelFreqChange();
+			}
+		} else {
+			showMask();
+			saveFrequencyChangeAF();
+		}
+	});
+	$('.processing').change(function(){
+		updateSettings();
+	});
+	$('.record_limit').change(function() {
+		updateSettings();
+	});
+	$('.triggers_off_check').change(function() {
+		updateSettings();
+	});
+	$('.max_teams_input').blur(function() {
+		var oldVal = $(this).attr('prevval');
+		var newVal = $(this).val();
+		if (newVal != oldVal) {
+			updateSettings();
+		}
+	});
+	$('.user_login_check').change(function(){
+		updateSettings();
+	});
+	$('.user_logging').change(function(){
+		updateSettings();
+	});
+	$('.user_reason_check').change(function(){
+		updateSettings();
+	});
+	
+	$('.hc_notify_admin').change(function(){
+		updateSettings();
+	});
+	$('.hc_auto_restart').change(function(){
+		updateSettings();
+	});
+	$('.hc_notify_support').change(function(){
+		updateSettings();
+	});
+	$('.history_logging').change(function(){
+		updateSettings();
+	});
+	hideMask();
+}
+
+function changeFrequency() {
+	$('.freq_label').hide(); 
+	$('#change_freq').hide(); 
+	$('#cancel_freq').show(); 
+	$('.frequency').show();
+}
+function cancelFreqChange() {
+	$('.freq_label').show(); 
+	$('#change_freq').show(); 
+	$('#cancel_freq').hide(); 
+	$('.frequency').hide();
+}
+function changeLogging() {
+	$('.log_time_label').hide(); 
+	$('#change_logging').hide(); 
+	$('#cancel_logging').show(); 
+	$('.logging').show();
+}
+function cancelLoggingChange() {
+	$('.log_time_label').show(); 
+	$('#change_logging').show(); 
+	$('#cancel_logging').hide();
+	$('.logging').hide();
+}
+</script>
+<apex:sectionHeader title="Settings" subtitle="Home"/>
+<c:CommonMask />
+<c:CommonHelp help_page="distribution-settings"/>
+<apex:pageBlock title="Distribution settings" id="page_block" mode="edit">
+	<apex:pageMessages />
+	<apex:pageBlockSection title="Scheduler settings" columns="2" collapsible="false" rendered="{!isSalesforceAdmin}">
+		<apex:pageBlockSectionItem helpText="Turn the Distribution Engine scheduler on or off by moving the slider">
+			<apex:outputLabel value="Distribution Engine scheduler"/>
+			<apex:inputCheckbox value="{!schedulerOn}" styleClass="start_scheduler"/>	
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Determine how frequently the scheduled job which initiates distribution will run. This cannot be changed while the scheduler is already running." >
+			<apex:outputLabel value="Scheduler frequency" />
+			<apex:outputPanel >
+				<apex:selectList value="{!frequency}" size="1" styleClass="frequency" style="display: none;">
+					<apex:selectOptions value="{!frequencyOptions}" />
+				</apex:selectList>
+				<apex:outputText value="{!frequencyLabel}" styleClass="freq_label" title="{!IF(schedulerOn, 'You cannot change frequency while the scheduler is running', '')}"/>&nbsp;&nbsp;
+				<apex:outputPanel rendered="{!NOT(schedulerOn)}"><a href="" onclick="changeFrequency()" class="change_link" id="change_freq">Change</a>
+				<a href="" onclick="cancelFreqChange()" style="display:none;" class="change_link" id="cancel_freq">Cancel</a>
+				</apex:outputPanel>
+			</apex:outputPanel>	
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem />
+		<apex:pageBlockSectionItem helpText="Determine how long to keep Distribution Logs - these are required for analytics, reports and dashboards">
+			<apex:outputLabel value="Maintain distribution logs"/>
+			<apex:outputPanel >
+				<apex:selectList value="{!logDuration}" size="1" styleClass="logging" style="display: none;">
+					<apex:selectOption itemValue="1 week" itemLabel="1 week"/>
+					<apex:selectOption itemValue="1 month" itemLabel="1 month"/>
+					<apex:selectOption itemValue="3 months" itemLabel="3 months"/>
+					<apex:selectOption itemValue="6 months" itemLabel="6 months"/>
+					<apex:selectOption itemValue="No logging" itemLabel="No logging"/>
+				</apex:selectList>
+				<apex:outputText value="{!logDuration}" styleClass="log_time_label"/>&nbsp;&nbsp;
+				<a href="" onclick="changeLogging()" class="change_link" id="change_logging">Change</a>
+				<a href="" onclick="cancelLoggingChange()" style="display:none;" class="change_link" id="cancel_logging">Cancel</a>
+			</apex:outputPanel>	
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection id="processing_block" title="Processing Method" rendered="{!showProcessing && isSalesforceAdmin}" columns="1">
+		<apex:pageMessage escape="false" summary="Please read the <a target=_blank href=http://help.nc-squared.com/processing-mode>Help</a> topic before making any changes to this section. This will affect the running of the scheduler. Turn off the scheduler before making any changes."
+		 severity="warning" strength="3" title="Warning"/>
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Processing method" />
+			<apex:selectList value="{!processingMethod}" size="1" styleClass="processing" disabled="{!schedulerOn}">
+				<apex:selectOption itemValue="Synchronous" itemLabel="Synchronous"/>
+				<apex:selectOption itemValue="Asynchronous" itemLabel="Asynchronous"/>
+				<apex:selectOption itemValue="MultipleSchedulers" itemLabel="MultipleSchedulers"/>
+				<apex:selectOption itemValue="Queueable" itemLabel="Queueable"/>
+			</apex:selectList>	
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection id="advanced" title="Advanced Scheduler Settings" rendered="{!showAdvancedOptions && isSalesforceAdmin}" columns="1">
+		<apex:pageMessage escape="false" summary="Please read the <a target=_blank href=http://help.nc-squared.com/processing-mode>Help</a> topic before making any changes to this section. These settings will affect the running of the scheduler. Turn off the scheduler before making any changes."
+		 severity="warning" strength="3" title="Warning"/>
+		<apex:pageBlockSectionItem helpText="The maximum number of records that can be assigned by each distributor in one run">
+			<apex:outputLabel value="Distributor record limit"/>
+			<apex:selectList value="{!recordLimit}" size="1" styleClass="record_limit" disabled="{!schedulerOn}">
+				<apex:selectOptions value="{!recordLimitOptions}" />
+			</apex:selectList>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Disables the running of ALL Distribution Engine triggers (action tracking, trigger distributors) - should only be used to help identify problems">
+			<apex:outputLabel value="Disable ALL DE triggers" />
+			<apex:inputCheckbox label="All triggers disabled" value="{!allTriggersDisabled}" styleClass="triggers_off_check" disabled="{!schedulerOn}"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Limit the maximum number of teams processed in a single scheduled job.">
+			<apex:outputLabel value="Maximum teams per run" />
+			<apex:inputText label="Max teams per run" value="{!maxTeamsPerRun}" html-prevval="{!maxTeamsPerRun}" styleClass="max_teams_input" disabled="{!schedulerOn}"/>
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection title="User login settings" columns="2" collapsible="false">
+		<apex:pageBlockSectionItem helpText="Allow users to use the On/Off slider in the Distribution Engine widget. This allows them to control when they are available for distribution">
+			<apex:outputLabel value="User login mode" />
+			<apex:inputCheckbox label="User login mode" value="{!userLoginMode}" styleClass="user_login_check" />
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Determine how long to maintain user activity logs">
+			<apex:outputLabel value="Maintain user activity logs"/>
+			<apex:selectList value="{!userLogDuration}" size="1" styleClass="user_logging">
+				<apex:selectOptions value="{!daysOptions}"/>
+			</apex:selectList>	
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Determines whether users must provide a reason when they log off from the widget.">
+			<apex:outputLabel value="Require user activity reason" />
+			<apex:inputCheckbox label="Require user activity reason" value="{!userLogTrackReason}" styleClass="user_reason_check"/>
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection title="Health checker settings" columns="2" collapsible="false" rendered="{!AND(isSalesforceAdmin, healthCheckerEnabled)}">
+		<apex:pageBlockSectionItem helpText="Turn the health checker on or off. The health checker monitors the Distribution Engine every hour to check everything is running correctly.">
+			<apex:outputLabel value="Health checker"/>
+			<apex:inputCheckbox value="{!healthCheckerStarted}" styleClass="healthCheckSlider"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Select users to notify by email in the event of an issue" rendered="{!NOT(IsSandbox)}">
+			<apex:outputLabel value="Notify users"/>
+			<apex:selectList value="{!NotifyUsersList}" size="5" multiSelect="true" styleClass="multiselectUsers">
+				<apex:selectOptions value="{!UsersForEmailOptions}"/>
+			</apex:selectList>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="Notify the user who started the scheduler by email in the event of an issue" rendered="{!IsSandbox}">
+			<apex:outputLabel value="Notify running user"/>
+			<apex:inputCheckbox value="{!healthCheckerNotifyAdmin}" styleClass="hc_notify_admin"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem helpText="In the event of an issue automatically restart the Distribution Engine scheduled job (recommended)">
+			<apex:outputLabel value="Auto restart scheduler"/>
+			<apex:inputCheckbox value="{!healthCheckerRestartScheduler}" styleClass="hc_auto_restart"/>
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection title="Change history settings" columns="2" collapsible="false">
+		<apex:pageBlockSectionItem helpText="Time to maintain log for changes in Distribution Engine e.g. team or distributor edits">
+			<apex:outputLabel value="Maintain change history logs"/>
+			<apex:selectList value="{!historyLogDuration}" size="1" styleClass="history_logging">
+				<apex:selectOptions value="{!historyDurationOptions}"/>
+			</apex:selectList>	
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection title="Licenses" columns="2" collapsible="false">
+		<!-- <apex:pageBlockSectionItem helpText="Once you have purchased licenses for the Distribution Engine you will be provided with an activation key. Paste the key here and click Activate.">
+			<apex:outputLabel value="License activation key"/>
+			<apex:outputPanel >
+				<apex:inputText value="{!LicenceSecurityKey}" size="30"/>
+				<apex:commandButton value="Activate" action="{!updateLicencedUsers}"/>
+			</apex:outputPanel>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem />-->
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Number of licensed users"/>
+			<apex:outputPanel >
+				<apex:outputPanel rendered="{!NOT(IsSandbox)}">
+					<apex:commandLink action="{!toLicensedUsers}"  title="View all licensed users" value="{!usedLicences} of {!LicencedUsers}"/>
+				</apex:outputPanel>
+				<apex:outputPanel rendered="{!IsSandbox}">
+					<apex:commandLink action="{!toLicensedUsers}"  title="View all licensed users" value="{!usedLicences}"/>
+				</apex:outputPanel>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<apex:outputPanel rendered="{!DaysToExpiry != null && DaysToExpiry > 0 && DaysToExpiry <= 7}">
+					<a href="http://help.nc-squared.com/purchasing-licences" target="_blank" style="color: red; font-weight: bold;">Your trial expires in {!DaysToExpiry} days</a>
+				</apex:outputPanel>
+				<apex:outputPanel rendered="{!DaysToExpiry != null && DaysToExpiry == 0}">
+					<a href="http://help.nc-squared.com/purchasing-licences" target="_blank" style="color: red; font-weight: bold;">Your trial expires today!</a>
+				</apex:outputPanel>
+				<apex:outputPanel rendered="{!DaysToExpiry != null && DaysToExpiry > 7}">
+					<a href="http://help.nc-squared.com/purchasing-licences" target="_blank" style="color: #4a4a56; font-weight: bold;">Your trial expires in {!DaysToExpiry} days</a>
+				</apex:outputPanel>
+			</apex:outputPanel>
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+	<apex:pageBlockSection title="Grant licenses" columns="2" collapsible="false" rendered="{!renderGrantLicences}">
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Licenses to grant"/>
+			<apex:inputText value="{!LicencesToGrant}"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Licensed organization id"/>
+			<apex:inputText value="{!LicencedOrgId}"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Ti edition"/>
+			<apex:inputCheckBox value="{!ProEditionToGrant}"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value=""/>
+			<apex:commandButton value="Generate security Key" action="{!grantLicencedUsers}"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem >
+			<apex:outputLabel value="Security key"/>
+			<apex:outputText value="{!GeneratedSecurityKey}"/>
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+</apex:pageBlock>
+
+</apex:form>
+<c:StatusPanel />
+</apex:page>

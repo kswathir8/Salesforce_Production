@@ -1,0 +1,51 @@
+<apex:component controller="FCRM.FCR_VFNITestController" allowDML="true">
+    <apex:attribute name="DisplayMode" default="Standard" type="String" description="Display mode - Standard, RunAll"/>
+    <apex:attribute name="Test" type="String" assignTo="{!CurrentTest}" description="API Name of test" />
+    <apex:attribute name="TestDescription" type="String" description="Test description" />
+    <apex:attribute name="TestName" type="String" description="Test name for command button" default="Run Test" />
+    
+    <apex:outputPanel id="idmainpanel" rendered="{!If(DisplayMode='Standard',true,false)}">
+        <tr>
+            <td>
+                <apex:commandButton style="width:160px"  rendered="{!Status>=0}" disabled="{!status=3}" action="{!RunTest}" value="{!TestName}" />
+            </td>
+            <td>
+                <apex:outputText rendered="{!Status= -1}" value="Test not found" />
+                <apex:outputText rendered="{!Status= 0}" value="No test results found" />
+                <apex:outputText rendered="{!Status= 1}" value="Success" />
+                <apex:outputText rendered="{!Status= 3}" value="Test in progress" />
+                <apex:outputPanel rendered="{!Status= 2}">
+                    <ul>
+                        <apex:repeat var="errstring" value="{!Errors}">
+                            <li><apex:outputtext style="color:red" value="{!errstring}" /></li>
+                        </apex:repeat>
+                    </ul>
+                </apex:outputPanel>
+
+            </td>
+            <td>
+                {!TestDescription}
+            </td>
+        </tr>
+    </apex:outputPanel>
+    <apex:actionFunction name="updatepage" action="{!updatePage}" />
+    
+    <apex:outputPanel id="idalltests" rendered="{!If(DisplayMode='RunAll',true,false)}">
+        <script type="text/javascript">
+            var timervar;
+            
+            if({!AnyTestInProgress})
+            {
+                setTimeout("updatepage()",4000);
+            }
+        </script>
+        <tr>
+            <td>
+                <apex:commandButton style="width:160px"  action="{!RunAllTests}" value="Run All Tests" />
+            </td>
+            <td></td>
+            <td>Executes all tests on this page</td>
+        </tr>
+    </apex:outputPanel>
+
+</apex:component>

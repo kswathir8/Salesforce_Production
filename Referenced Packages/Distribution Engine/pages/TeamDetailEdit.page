@@ -1,0 +1,362 @@
+<apex:page standardController="n2de__Team__c" extensions="n2de.TeamDetailController" tabStyle="n2de__Team__c" sidebar="false">
+
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>	
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/requiredBlockUtil.js')}"></script>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-nc2.css')}" type="text/css" />
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+
+<style>
+.tableHeader {
+	font-size: 11px;
+	color: #4A4A56;
+}
+.alertCol {
+	padding-right: 10px;
+}
+.alertSeq {
+	width: 20px;
+}
+.alertOperator {
+	width: 110px;
+}
+.addRowLink {
+	padding-top: 4px;
+	padding-bottom: 10px;
+}
+.label {
+	font-weight: bold;
+	color: #4A4A56;
+}
+.alertMsg {
+	color: red;
+	font-weight: bold;
+	padding-left: 40px;
+}
+.team-multiselect {
+	color: black !important;
+	font-weight: normal !important;
+	font-family: Verdana, Arial, sans-serif !important;
+}
+</style>
+<c:CommonMask />
+<c:CommonHelp help_page="team-detail"/>	
+<script>
+	showMask();
+</script>
+<apex:outputPanel id="script_panel">
+<script>
+	jQuery(document).ready(function($){
+		$('.team_form').on("keyup keypress", function(e) {
+		  	var code = e.keyCode || e.which; 
+		  	if (code  == 13) {               
+		    	e.preventDefault();
+		    	return false;
+			}
+		});	
+	
+		//Add default required field identifier
+		RequiredBlockUtil.addRequiredBlock('.requiredIndicator');
+		//Add multiselect control
+		$('.multiselectStatus').multiselect({
+			minWidth: 400,
+			noneSelectedText: 'Select active status values',
+			selectedList: 2,
+			classes: 'team-multiselect',
+			position: {
+				my: 'left top',
+ 				at: 'left bottom',
+				collision: 'flip'
+			}
+		});
+		$('.multiselectAction').multiselect({
+			minWidth: 400,
+			noneSelectedText: 'Select action to track',
+			selectedList: 2,
+			classes: 'team-multiselect',
+			multiple: true,
+			position: {
+	 			my: 'left top',
+				at: 'left bottom',
+				collision: 'flip'
+			}
+		});
+		$('.multiselectEvent').multiselect({
+			minWidth: 400,
+			noneSelectedText: '--All event types--',
+			selectedList: 4,
+			classes: 'team-multiselect',
+			position: {
+				my: 'left top',
+	      		at: 'left bottom',
+				collision: 'flip'
+			}
+		});
+		$('.multiselectTask').multiselect({
+			minWidth: 400,
+			noneSelectedText: '--All task types--',
+			selectedList: 4,
+			classes: 'team-multiselect',
+			position: {
+				my: 'left top',
+      			at: 'left bottom',
+				collision: 'flip'
+			}
+		});	
+		hideMask();
+	});
+	
+	function resetActionMultiSelect() {
+		$('.multiselectAction').multiselect({
+			minWidth: 400,
+			noneSelectedText: 'Select action to track',
+			selectedList: 2,
+			classes: 'team-multiselect',
+			multiple: false,
+			position: {
+				my: 'left top',
+				at: 'left bottom',
+				collision: 'flip'
+			}
+		});
+	}
+	
+	function toggleHoursEnabled(value) {
+		if (value && value != '') { 
+			disableHoursTable();
+		}
+	}
+</script>
+</apex:outputPanel>
+	<apex:form id="teamForm" styleClass="team_form">
+		<apex:sectionHeader title="Distribution Team Edit" subtitle="{!team.Name}" rendered="{!team.Name != null}"/>
+		<apex:sectionHeader title="Distribution Team Edit" subtitle="New Team" rendered="{!team.Name == null}"/>
+		<apex:pageBlock id="teamEditPageBlock" title="Team Edit" mode="edit">
+		
+			<apex:pageMessages escape="false"/>
+		
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!saveTeam}" value="Save"/>
+				<apex:commandButton action="{!cancelTeam}" value="Cancel" immediate="true"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Information" columns="2" collapsible="false">
+				<apex:inputText value="{!Team.Name}" styleClass="requiredIndicator" size="45" maxlength="45"/>
+				<apex:pageBlockSectionItem />
+				<apex:inputField value="{!Team.n2de__Is_active__c}" />
+				<apex:inputField value="{!Team.n2de__Is_distribute_to_queue__c}" rendered="{!Team.Id==null}">
+					<apex:actionSupport action="{!switchDistributeToQueue}" event="onchange" onsubmit="showMask();" reRender="teamEditPageBlock, script_panel"/>
+				</apex:inputField>
+				<apex:outputField value="{!Team.n2de__Is_distribute_to_queue__c}" rendered="{!AND(Team.Id!=null, Team.n2de__Is_distribute_to_queue__c)}"/>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="object_settings" title="Object settings" columns="2" collapsible="false">
+				<apex:pageBlockSectionItem />
+				<c:CommonInlineHelp help_page="active-status"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_name__c.Label}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!Team.n2de__Object_name__c}" size="1" styleClass="requiredIndicator" rendered="{!Team.Id==null}">
+							<apex:selectOptions value="{!ObjectOptionList}"/>
+							<apex:actionSupport action="{!changeObject}" event="onchange" onsubmit="showMask();" reRender="teamEditPageBlock, script_panel"/>
+						</apex:selectList>
+						<apex:outputText value="{!ObjectLabel}" rendered="{!Team.Id!=null}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!Team.Id==null}" helpText="Custom objects from installed packages are not shown by default. Click this checkbox to show these objects">
+					<apex:outputLabel value="Show objects from installed packages" />
+					<apex:inputCheckbox value="{!showAllNamespaces}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="object_settings" oncomplete="hideMask()"/>
+					</apex:inputCheckbox>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection id="object_Status_settings" columns="2">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_active_status_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_active_status_field_name__c.Label}"/>
+					<apex:selectList value="{!Team.n2de__Object_active_status_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!ActiveStatusFieldOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="object_Status_settings, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_active_status_values_long__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_active_status_values_long__c.Label}"/>
+					<apex:selectList value="{!ActiveStatusValues}" size="5" multiselect="true" styleClass="multiselectStatus requiredIndicator">
+						<apex:selectOptions value="{!ActiveStatusValuesOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!Team.n2de__Inactive_object_not_filtered__c}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__New_status_value__c.InlineHelpText}" rendered="false">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__New_status_value__c.Label}"/>
+					<apex:selectList value="{!Team.n2de__New_status_value__c}" size="1">
+						<apex:selectOptions value="{!NewStatusValueOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="object_actions" title="Time to Action" columns="2" collapsible="false" rendered="{!AND(OR(Team.n2de__Object_name__c == 'Lead', Team.n2de__Object_name__c == 'Case'), NOT(Team.n2de__Is_distribute_to_queue__c))}">
+				<apex:pageBlockSectionItem />
+				<c:CommonInlineHelp help_page="action-tracking"/>
+				<apex:inputField value="{!Team.n2de__Is_action_tracking__c}">
+					<apex:actionSupport action="{!setDefaultActionTracking}" event="onchange" onsubmit="showMask();" reRender="object_actions, script_panel"/>
+				</apex:inputField>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_action_field_name__c.InlineHelpText}" rendered="{!Team.n2de__Is_action_tracking__c}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_action_field_name__c.Label}"/>
+					<apex:selectList value="{!Team.n2de__Object_action_field_name__c}" size="1">
+						<apex:selectOptions value="{!ObjectActionFieldOptionList}"/>
+						<apex:actionSupport event="onchange" action="{!changeActionTrackingObject}" onsubmit="showMask();" oncomplete="resetActionMultiSelect()" reRender="object_actions, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_action_tracked_value__c.InlineHelpText}" rendered="{!Team.n2de__Is_action_tracking__c}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_action_tracked_value__c.Label}"/>
+					<apex:outputPanel >
+					<apex:selectList rendered="{!HasMultipleActions}" value="{!ActionsTracked}" size="5" multiSelect="true" styleClass="multiselectAction requiredIndicator">
+						<apex:selectOptions value="{!ObjectActionValueOptionList}"/>
+					</apex:selectList>
+					<apex:selectList rendered="{!NOT(HasMultipleActions)}" value="{!team.n2de__Object_action_tracked_value__c}" size="1" multiSelect="false" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!ObjectActionValueOptionList}"/>
+					</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_auto_action_on_event__c.InlineHelpText}" rendered="{!Team.n2de__Is_action_tracking__c}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_auto_action_on_event__c.Label}"/>
+					<apex:inputField value="{!Team.n2de__Is_auto_action_on_event__c}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="object_actions, script_panel"/>
+					</apex:inputField>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Event_types_to_action__c.InlineHelpText}" rendered="{!AND(Team.n2de__Is_action_tracking__c, Team.n2de__Is_auto_action_on_event__c)}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Event_types_to_action__c.Label}"/>
+					<apex:selectList value="{!EventTypesToTriggerAction}" size="1" multiSelect="true" styleClass="multiselectEvent">
+						<apex:selectOptions value="{!EventTypeOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!AND(Team.n2de__Is_action_tracking__c, NOT(Team.n2de__Is_auto_action_on_event__c))}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_auto_action_on_task__c.InlineHelpText}" rendered="{!Team.n2de__Is_action_tracking__c}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_auto_action_on_task__c.Label}"/>
+					<apex:inputField value="{!Team.n2de__Is_auto_action_on_task__c}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="object_actions, script_panel"/>
+					</apex:inputField>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Task_types_to_action__c.InlineHelpText}" rendered="{!AND(Team.n2de__Is_action_tracking__c, Team.n2de__Is_auto_action_on_task__c)}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Task_types_to_action__c.Label}"/>
+					<apex:selectList value="{!TaskTypesToTriggerAction}" size="1" multiSelect="true" styleClass="multiselectTask">
+						<apex:selectOptions value="{!TaskTypeOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="object_alerts" title="Alerts" columns="2" collapsible="false" rendered="{!NOT(Team.n2de__Is_distribute_to_queue__c)}">
+				<apex:pageBlockSectionItem />
+				<c:CommonInlineHelp help_page="alerts"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_alert__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_alert__c.Label}"/>
+					<apex:outputPanel >
+						<apex:inputField value="{!Team.n2de__Is_alert__c}">
+							<apex:actionSupport action="{!switchEnableAlerts}" event="onchange" onsubmit="showMask();" reRender="object_alerts, object_alert_rows, script_panel"/>
+						</apex:inputField>
+						<apex:outputText value="Note: Distributors for this team have alerts enabled. On save, alerts & auto-reassign will be disabled for those distributors." rendered="{!HasAlertDistributorWarning}" styleClass="alertMsg"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:selectList value="{!Team.n2de__Alert_respect_distribution_hours__c}" size="1" rendered="{!Team.n2de__Is_alert__c}">
+					<apex:selectOptions value="{!RespectDistributionHoursOptionList}"/>
+				</apex:selectList>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection id="object_alert_rows" columns="1" collapsible="false" rendered="{!NOT(Team.n2de__Is_distribute_to_queue__c)}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_team_alert__c.Fields.n2de__Alert_sequence__c.InlineHelpText}" rendered="{!Team.n2de__Is_alert__c}">
+					<apex:outputLabel value="Alerts"/>
+					<apex:outputPanel id="alert_panel">
+						<apex:dataTable value="{!TeamAlertVOList}" var="alert" headerClass="tableHeader">
+							<apex:column styleClass="alertSeq">
+								<apex:outputText value="{!alert.AlertSeq}" styleClass="label"/>
+							</apex:column>
+							<apex:column styleClass="alertCol">
+								<apex:facet name="header">{!$ObjectType.n2de__Distribution_team_alert__c.Fields.n2de__Alert_period__c.Label}</apex:facet>
+								<apex:inputText value="{!alert.AlertPeriodText}" maxlength="5" size="2"/>
+								<apex:selectList value="{!alert.TeamAlert.n2de__Alert_unit__c}" size="1">
+									<apex:selectOptions value="{!alert.AlertUnitOptionList}"/>
+								</apex:selectList>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Condition Field</apex:facet>
+								<apex:selectList value="{!alert.TeamAlert.n2de__Alert_condition_field_name__c}" size="1">
+									<apex:selectOptions value="{!alert.AlertFieldOptionList}"/>
+									<apex:actionSupport action="{!alert.changeAlertCondition}" onsubmit="showMask();" event="onchange" reRender="alert_panel,script_panel"/>
+								</apex:selectList>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Operator</apex:facet>
+								<apex:selectList value="{!alert.TeamAlert.n2de__Alert_condition_operator__c}" size="1" styleClass="alertOperator" disabled="{!alert.TeamAlert.n2de__Alert_condition_field_name__c=null}">
+									<apex:selectOptions value="{!alert.AlertComparisonOperatorOptionList}"/>
+								</apex:selectList>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Value</apex:facet>
+								<apex:inputText value="{!alert.TeamAlert.n2de__Alert_condition_argument__c}" rendered="{!OR(alert.AlertFieldType=='', alert.AlertFieldType=='STRING', alert.AlertFieldType=='DOUBLE')}" disabled="{!alert.TeamAlert.n2de__Alert_condition_field_name__c=null}"/>
+								<apex:selectList value="{!alert.TeamAlert.n2de__Alert_condition_argument__c}" size="1" rendered="{!alert.AlertFieldType=='BOOLEAN'}">
+									<apex:selectOption itemValue="true" itemLabel="true"/>
+									<apex:selectOption itemValue="false" itemLabel="false"/>
+								</apex:selectList>
+								<apex:selectList value="{!alert.TeamAlert.n2de__Alert_condition_argument__c}" size="1" rendered="{!alert.AlertFieldType=='PICKLIST'}">
+									<apex:selectOptions value="{!alert.AlertFieldPicklistOptionList}"/>
+								</apex:selectList>
+								<apex:outputText value="{!alert.TeamAlert.n2de__Alert_condition_argument__c}" rendered="{!OR(alert.AlertFieldType=='DATE', alert.AlertFieldType=='DATETIME')}"/>
+							</apex:column>
+						</apex:dataTable>
+						<div class="addRowLink">
+							<apex:commandLink action="{!addAlertRow}" onclick="showMask()" value="Add Row" reRender="alert_panel,script_panel" rendered="{!TeamAlertVOListSize<MaxAlertRows}"/>&nbsp;&nbsp;<apex:commandLink action="{!removeAlertRow}" value="Remove Row" onclick="showMask()" reRender="alert_panel,script_panel" rendered="{!TeamAlertVOListSize>1}"/>
+						</div>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection columns="1" collapsible="false" title="Team-level caps">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Team_level_caps_enabled__c.InlineHelpText}">
+					<apex:outputLabel value="Enable team-level caps"/> 
+					<apex:inputCheckbox value="{!Team.n2de__Team_level_caps_enabled__c}"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="working_hours" title="Distribution hours" columns="1" collapsible="false">			
+				<apex:outputPanel layout="block" style="padding-left: 28px">
+					<table class="hours_table">
+						<tbody>
+							<tr>
+								<th><apex:outputLabel styleClass="labelCol vfLabelColTextWrap " value="Shift hours"/></th>
+								<td>
+									<apex:selectList value="{!shiftHoursId}" size="1" styleClass="shift_select">
+										<apex:selectOptions value="{!ShiftPatternsList}"/>
+										<apex:actionSupport event="onchange" action="{!loadDistributionHours}" onsubmit="showMask();" oncomplete="toggleHoursEnabled($(this).val())" reRender="script_panel, working_hours"/>
+									</apex:selectList>
+									<img src="/s.gif" alt="" class="helpIcon" title="Select an existing set of shift hours or enter custom hours. Create shift hours using 'Manage shift hours' on the detail view page."/>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<c:CommonHoursSelect shiftHours="{!DistributionHours}" timezones="{!TimezoneOptionList}" availability="{!DistributionHoursAvailabilityOptionList}" startHours="{!DistributionHoursStartHoursOptionList}" endHours="{!DistributionHoursEndHoursOptionList}"  minutes="{!DistributionHoursMinutesOptionList}" disableInputs="{!DistributionHours.n2de__Is_shift_hours__c}"/>
+				</apex:outputPanel>
+			</apex:pageBlockSection>
+
+			
+			<apex:pageBlockSection title="Holidays" columns="1" collapsible="false">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team__c.Fields.n2de__Holiday_Group__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Holiday_Group__c.Label}"/>
+					<apex:selectList value="{!Team.n2de__Holiday_Group__c}" size="1">
+						<apex:selectOptions value="{!HolidayGroupOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Advanced Settings" columns="2" collapsible="true" id="advanced_section">
+				<apex:inputField value="{!Team.n2de__Is_logging_disabled__c}"/>
+				<apex:inputField value="{!Team.n2de__Is_triggers_respect_distribution_hours__c}" rendered="{!AND(TriggersEnabled, OR(Team.n2de__Object_name__c=='Lead', Team.n2de__Object_name__c=='Case'))}"/>
+			</apex:pageBlockSection>
+			
+		</apex:pageBlock>
+		
+	</apex:form>
+	<c:StatusPanel />
+</apex:page>

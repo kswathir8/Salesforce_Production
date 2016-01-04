@@ -1,0 +1,16 @@
+<apex:page controller="FCRM.FCR_VFResponseListController" sidebar="false" showHeader="false" readOnly="true">
+    <apex:form id="idform" >
+        <apex:outputText rendered="{!NotInitialDisplay==false}" value="Loading...."  />
+        <apex:actionFunction name="AfterLoad" action="{!DoneFirstLoad}" reRender="idform"  />
+
+        <c:FCR_VFResponseList rendered="{!NotInitialDisplay==true}" conditionalterm="{!$CurrentPage.parameters.Q}" />
+
+
+    </apex:form>
+    <apex:outputPanel rendered="{!NotInitialDisplay==false}">
+        <script type="text/javascript">
+            AfterLoad();                
+        </script>
+    </apex:outputPanel>    
+
+</apex:page>

@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>FCI_Data_Loading</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Data Loading</shortDescription>
+        <value>Loading data...</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Deal_Explorer</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deal Explorer</shortDescription>
+        <value>Full Circle Deal Explorer</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Influence_tab</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Influence tab</shortDescription>
+        <value>Campaign Influence</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Name_Header</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Name Header</shortDescription>
+        <value>Opportunity Name:</value>
+    </labels>
+    <labels>
+        <fullName>FCI_No_Influence_Models</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Influence Models</shortDescription>
+        <value>No campaign influence models are enabled.</value>
+    </labels>
+    <labels>
+        <fullName>FCI_No_Opportunity</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Opportunity</shortDescription>
+        <value>No Opportunity specified</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Profile_tab</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Profile tab</shortDescription>
+        <value>Profile listing</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Return_to_Opportunity</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Return to Opportunity</shortDescription>
+        <value>Return to Opportunity</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Visualization_Caption</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Visualization Caption</shortDescription>
+        <value>Number of Engagements of Each Type by Stage</value>
+    </labels>
+    <labels>
+        <fullName>FCI_Visualization_tab</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Visualization tab</shortDescription>
+        <value>Visualization</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Active_Response</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Active Response</shortDescription>
+        <value>Active Response</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Active_Responses</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Active Responses</shortDescription>
+        <value>Active Responses</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Additional_Available</fullName>
+        <categories>Response List</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Additional Available</shortDescription>
+        <value>Additional Responses available - refine your filter conditions.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Additional_Sales_Campaigns</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Additional Sales Campaigns</shortDescription>
+        <value>Additional Sales Campaigns</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Aggregate_Campaigns</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Aggregate Campaigns</shortDescription>
+        <value>Aggregate child campaigns</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Aggregate_Repeats</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Aggregate Repeats</shortDescription>
+        <value>Aggregate repeat campaigns</value>
+    </labels>
+    <labels>
+        <fullName>FCR_App_Disabled</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>App Disabled</shortDescription>
+        <value>The Full Circle CRM Response Management Application is currently disabled</value>
+    </labels>
+    <labels>
+        <fullName>FCR_App_Disabled_2</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>App Disabled 2</shortDescription>
+        <value>The Full Circle CRM Response Management System is currently disabled.  You can enable the system using the</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Apply_Changes</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Apply Changes</shortDescription>
+        <value>Apply Changes</value>
+    </labels>
+    <labels>
+        <fullName>FCR_CI_Processing_States</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>CI Processing States</shortDescription>
+        <value>Idle,
+Preparing to process account related influence,
+Calculating account related influence,
+Preparing to process opportunity related influence,
+Calculating opportunity related influence,
+Preparing to update the response information database,
+Preparing to rebuild the response information database,
+Rebuilding the response information database,
+Preparing to finalize campaign influence calculations,
+Finalizing and assigning campaign influence data,
+Pending account related influence,
+Pending opportunity related influence,
+Pending response information database update,
+Pending response information database rebuild,
+Pending campaign influence calculations</value>
+    </labels>
+    <labels>
+        <fullName>FCR_CI_Processing_States2</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>CI Processing States2</shortDescription>
+        <value>Idle,
+Preparing to process account related influence,
+Calculating account related influence,
+Preparing to process opportunity related influence,
+Calculating opportunity related influence,
+Preparing to complete influence data capture,
+Completing influence data capture,
+Preparing to update the response information database,
+Preparing to rebuild the response information database,
+Rebuilding the response information database,
+Preparing to finalize campaign influence calculations,
+Finalizing and assigning campaign influence data</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Chart_Title</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Chart Title</shortDescription>
+        <value>Chart Title</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Comparison_Period_Title</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Comparison Period Title</shortDescription>
+        <value>The start date of the comparison period from the beginning of the date range. The comparison period length is the same as the date range.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Comparison_Start_Date</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Comparison Start Date</shortDescription>
+        <value>Comparison Start Date</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Comparison_period</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Comparison period</shortDescription>
+        <value>Comparison period</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Configuration_Page</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Configuration Page</shortDescription>
+        <value>Full Circle Response Information Configuration page</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Configure</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Configure</shortDescription>
+        <value>Configure</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Confirm_Unsaved</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Confirm Unsaved</shortDescription>
+        <value>You have unsaved changes - are you sure you want to leave this page?</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Data_Loading</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Data Loading</shortDescription>
+        <value>Loading data...</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Database_Administration</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Database Administration</shortDescription>
+        <value>Response Information Database Administration</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Database_Rebuilding</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Database Rebuilding</shortDescription>
+        <value>Your response information database is currently being rebuilt. Please check back in a few minutes to view the response data.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Database_not_built</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Database not built</shortDescription>
+        <value>Your Response Information database has not yet been built. You can rebuild your response information database on the</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Date_Range</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Date Range</shortDescription>
+        <value>Date Range</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Deal_Explorer</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deal Explorer</shortDescription>
+        <value>Full Circle Deal Explorer</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Description</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Description</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>FCR_DuplicateOpAssociation</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Duplicate Opportunity On Association</shortDescription>
+        <value>You may not associate multiple responses to the same opportunity</value>
+    </labels>
+    <labels>
+        <fullName>FCR_First_Responded_Date</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>First Responded Date</shortDescription>
+        <value>First Responded Date</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Follow_Up</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Follow Up</shortDescription>
+        <value>Recommended Follow Up</value>
+    </labels>
+    <labels>
+        <fullName>FCR_GatingAEngagedOpCreate</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gating - A - Engaged Op Create</shortDescription>
+        <value>This Contact is already engaged with an Opportunity - Please select a different Contact.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_GatingANoContactOpCreate</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gating - A - No Contact Op Create</shortDescription>
+        <value>Opportunities must be created from a Contact record. Contact your Salesforce administrator if you have any questions.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_GatingANoResponseConversion</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gating - A - No Response on Conversion</shortDescription>
+        <value>You must select a Sales Campaign to convert a lead.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_GatingANoResponseOpCreate</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gating - A - No Response Op Create</shortDescription>
+        <value>The Contact for this opportunity requires an active Sales Campaign.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Gating_Return_to_Previous</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Return to previous page</shortDescription>
+        <value>Return to previous page</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Influence_tab</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Influence tab</shortDescription>
+        <value>Campaign Influence</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Invalid_Opportunity_Swap</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Invalid Opportunity Swap</shortDescription>
+        <value>Invalid attempt to replace or overwrite an existing response to opportunity association, or create a new association.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Invalid_Parameters</fullName>
+        <categories>RI Charts</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Invalid Parameters</shortDescription>
+        <value>Invalid Parameters</value>
+    </labels>
+    <labels>
+        <fullName>FCR_LastInfluenceRun</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>LastInfluenceRun</shortDescription>
+        <value>Campaign influence data last refreshed</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Last_Updated</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Last Updated</shortDescription>
+        <value>Response Database last updated on</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Marketing_Header</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Marketing Header</shortDescription>
+        <value>Primary Marketing Touch Points</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Maximum_Records</fullName>
+        <categories>Response List</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Maximum Records</shortDescription>
+        <value>A maximum 500 records are displayed – Graphs reflect the complete data set.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Most_Recent_Response</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Most Recent Response</shortDescription>
+        <value>Most Recent Response</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Name_Header</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Name Header</shortDescription>
+        <value>Opportunity Name:</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Active_Response</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Active Response</shortDescription>
+        <value>No active response</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Active_Response_With_Picklist</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Active Response With Picklist</shortDescription>
+        <value>A Sales Campaign may be selected from the picklist below.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Chart_Available</fullName>
+        <categories>RI Charts</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Chart Available</shortDescription>
+        <value>No chart available - check your configuration</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Comparison_Period</fullName>
+        <categories>RI Charts</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Comparison Period</shortDescription>
+        <value>No comparison period specified</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Data_Available</fullName>
+        <categories>RI Charts</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Data Available</shortDescription>
+        <value>No data available - adjust your filter settings</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Influence_Models</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Influence Models</shortDescription>
+        <value>No campaign influence models are enabled.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Op_To_Lead</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Op Association To Lead</shortDescription>
+        <value>You may not associate an opportunity to a lead</value>
+    </labels>
+    <labels>
+        <fullName>FCR_No_Opportunity</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No Opportunity</shortDescription>
+        <value>No Opportunity specified</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Not_Applicable</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Not Applicable</shortDescription>
+        <value>N/A</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Number_of_Responses</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Number of Responses</shortDescription>
+        <value>Number of active responses</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Order</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Order</shortDescription>
+        <value>Order</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Other</fullName>
+        <categories>RI Charts</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Other</shortDescription>
+        <value>Other</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Person_Account_Only</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Person Account Only</shortDescription>
+        <value>This Visual Force page should only be used on page layouts used with person accounts.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Pre_Opportunity</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Pre-Opportunity</shortDescription>
+        <value>Pre-Opportunity</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Processing</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Processing</shortDescription>
+        <value>Processing...</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Processing_Status</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Processing Status</shortDescription>
+        <value>Campaign influence calculations in progress. Current status:</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Profile_tab</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Profile tab</shortDescription>
+        <value>Profile listing</value>
+    </labels>
+    <labels>
+        <fullName>FCR_RPL_AlreadyActive</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>RPL Already Active</shortDescription>
+        <value>This record already has an active response, an additional selection is not available.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_RPL_NoConfigured</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>RPL Not Configured</shortDescription>
+        <value>The value you selected is not configured. Please contact your system administrator.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_RPL_NoRepeat</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>RPL No Repeat</shortDescription>
+        <value>This selection cannot be added as a repeat response.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_RPL_NotPA</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>RPL Not Person Account</shortDescription>
+        <value>This feature is only valid on person accounts.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Rebuild_Response_Data</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Rebuild Response Data</shortDescription>
+        <value>Rebuild Response Data</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Refresh_Button</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh Button</shortDescription>
+        <value>Refresh charts and response List</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Refresh_CI_Data</fullName>
+        <categories>Campaign Influence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh CI Data</shortDescription>
+        <value>Refresh campaign influence data</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Refresh_For_Status</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh For Status</shortDescription>
+        <value>Please refresh the record</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Responded_Date</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Responded Date</shortDescription>
+        <value>Responded Date</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Comparisons</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Comparisons</shortDescription>
+        <value>Response Comparisons</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Details</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Details</shortDescription>
+        <value>Response Details</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Filters</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Filters</shortDescription>
+        <value>Response Filters</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Intel_Configuration</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Intel Configuration</shortDescription>
+        <value>Response Intelligence Configuration</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Intelligence</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Intelligence</shortDescription>
+        <value>Response Intelligence</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Results</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Results</shortDescription>
+        <value>Response Results</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Response_Status</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Response Status</shortDescription>
+        <value>Response Status</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Return_to_Opportunity</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Return to Opportunity</shortDescription>
+        <value>Return to Opportunity</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Return_to_RI</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Return to RI</shortDescription>
+        <value>Return to Response Intelligence</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Select_Campaign</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Campaign</shortDescription>
+        <value>Select Sales Campaign</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Select_Campaign2</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Campaign2</shortDescription>
+        <value>Select Campaign</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Select_Charts</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Charts</shortDescription>
+        <value>Select Charts for Response Results</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Select_Charts_2</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Charts 2</shortDescription>
+        <value>Select Charts for Response Comparisons</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Select_Valid_Filter</fullName>
+        <categories>Response List</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Valid Filter</shortDescription>
+        <value>Please select valid filter criteria</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Select_Value</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Select Value</shortDescription>
+        <value>Select Value</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Selected</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Selected</shortDescription>
+        <value>Selected</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Selection_Unavailable</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Selection Unavailable</shortDescription>
+        <value>Selection Unavailable</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Source_Filter</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source Filter</shortDescription>
+        <value>Source Filter</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Start_Date_Error_1</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Start Date Error 1</shortDescription>
+        <value>Start date must be smaller than today&apos;s date</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Start_Date_Error_2</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Start Date Error 2</shortDescription>
+        <value>Start date must be smaller or equal to the end date</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Start_Date_Error_3</fullName>
+        <categories>Response Intelligence</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Start Date Error 3</shortDescription>
+        <value>Comparison period start date must be smaller that the start date</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Status</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Total1</fullName>
+        <categories>Response List</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total1</shortDescription>
+        <value>Total of</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Total2</fullName>
+        <categories>Response List</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total2</shortDescription>
+        <value>records retrieved</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Unavailable</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unavailable</shortDescription>
+        <value>Unavailable</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Update_Message_1</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Update Message 1</shortDescription>
+        <value>To update this record’s status you must first add an active response.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Update_Message_2</fullName>
+        <categories>Response Information</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Update Message 2</shortDescription>
+        <value>To update this record’s status – Select a Sales Campaign from the picklist below.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Update_Response_Data</fullName>
+        <categories>RI Configuration</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Update Response Data</shortDescription>
+        <value>Update Response Data Now</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationAEngagedOpCreateError</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Validation - A - Engaged Op Create Error</shortDescription>
+        <value>This Contact is already engaged with an Opportunity - Please select a different Contact.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationANoResponseConversionError</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Validation - A - No Response Conversion Error</shortDescription>
+        <value>You must select a Sales Campaign to convert a lead.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationANoResponseErrorMessage</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Validation - A - No Response Error Message</shortDescription>
+        <value>You must select a sales campaign to perform a status change.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationANoResponseOpCreateError</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Validation - A - No Response Op Create Error</shortDescription>
+        <value>The Contact for this opportunity requires an active Sales Campaign.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationAOpNoControl</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Validation - A - Missing control on setting op</shortDescription>
+        <value>The Admin Response Control field must be populated when associating or switching an opportunity. Details: https://fullcirclecrm.com/acc</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationCampaignDelete</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Responses on Campaign Delete</shortDescription>
+        <value>You are attempting to delete one or more campaigns that total 400 or more active responses. Related active responses will need to be shut down (via lead/contact status update or active member deletion) before these campaigns can be deleted.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationDeleteOriginatingCampaign</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Delete Campaign With Originating Responses</shortDescription>
+        <value>Cannot delete a campaign with active responses associated to an opportunity, please use the admin response control to swap the responses before deleting.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_ValidationDeleteOriginatingResponse</fullName>
+        <categories>Validation Message</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Delete Originating Response</shortDescription>
+        <value>Cannot delete a campaign member associated to an opportunity, Please use the admin response control to swap the response before deleting.</value>
+    </labels>
+    <labels>
+        <fullName>FCR_View</fullName>
+        <categories>Response List</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View</shortDescription>
+        <value>View</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Visualization_Caption</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Visualization Caption</shortDescription>
+        <value>Number of Engagements of Each Type by Stage</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Visualization_tab</fullName>
+        <categories>Deal Explorer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Visualization tab</shortDescription>
+        <value>Visualization</value>
+    </labels>
+    <labels>
+        <fullName>FCR_Week_of</fullName>
+        <categories>RI Charts</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Week of</shortDescription>
+        <value>Week of</value>
+    </labels>
+</CustomLabels>

@@ -1,0 +1,76 @@
+<apex:page controller="n2de.ShiftHoursController" sidebar="false" tabStyle="n2de__Team__c">
+	
+	<style>
+	img.pageTitleIcon{
+		display: none;
+	}
+	.content{
+		background-image: url({!URLFOR($Resource.n2de__DEResources, 'images/shiftteam_40.png')});
+		background-repeat: no-repeat;
+		background-position-x: 2px;
+		background-position-y: 2px;
+		background-size: 32px;
+	}
+	</style>
+	<c:CommonHelp help_page="shift-hours"/>
+	<c:CommonHeader />
+	<c:CommonMask />
+	
+	<script>
+		function confirmDelete() {
+			if (!window.confirm('Are you sure?')) {
+				return false;
+			} else {
+				showMask();
+				return true;
+			}
+		}
+	</script>
+
+	<apex:form >
+		<apex:sectionHeader title="Shift Hours" subtitle="Home"/>
+		<apex:pageBlock title="Shift Hours" id="hours_list">
+			<apex:pageMessages />
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Back" action="{!backTo}"/>
+				<apex:commandButton value="New" action="{!newShiftPattern}"/>
+				<apex:commandButton value="Delete" action="{!deleteShiftPatterns}" reRender="hours_list, history_block" onclick="confirmDelete()" oncomplete="hideMask()"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockTable id="shift_table" value="{!shiftHoursList}" var="sh">
+				<apex:column >
+					<apex:inputCheckbox value="{!sh.checked}" disabled="{!sh.isInUse}" styleClass="selected_rows"/>
+				</apex:column>
+				<apex:column >
+					<apex:commandLink value="Clone" action="{!cloneShiftHours}" rendered="{!$ObjectType.n2de__Distribution_hours__c.Updateable}" onclick="showMask()" oncomplete="hideMask()" reRender="hours_list, history_block">
+						<apex:param name="actionrecordid" value="{!sh.hours.Id}" assignTo="{!cloneHoursId}"/>
+					</apex:commandLink>
+				</apex:column>
+				<apex:column headerValue="Shift name">
+					<a href="/apex/{!NamespacePrefix}ShiftHoursEdit?hoursId={!sh.hours.Id}&returnTo={!returnToPage}&obj={!returnToId}">{!sh.hours.n2de__Shift_name__c}</a>
+				</apex:column>
+				<apex:column headerValue="Created by" styleClass="modifier">
+					{!sh.hours.CreatedBy.Name}
+				</apex:column>
+				<apex:column headerValue="Created date" styleClass="modifier">
+					<apex:outputText value="{0,date,dd'/'MM'/'yyyy HH:mm}">
+    					<apex:param value="{!sh.hours.CreatedDate}" /> 
+					</apex:outputText>
+				</apex:column>
+				<apex:column headerValue="Last modified by" styleClass="date_col">
+					{!sh.hours.LastModifiedBy.Name}
+				</apex:column>
+				<apex:column headerValue="Last modified date" styleClass="date_col">
+					<apex:outputText value="{0,date,dd'/'MM'/'yyyy HH:mm}">
+    					<apex:param value="{!sh.hours.LastModifiedDate}" /> 
+					</apex:outputText>
+				</apex:column>
+				<apex:column headerValue="In use">
+					<img src="/img/checkbox_{!IF(sh.isInUse, '', 'un')}checked.gif" title="{!IF(sh.isInUse, 'This shift pattern is used by a team or team member. It cannot be deleted while it is in use', 'This shift pattern is not being used')}" />
+				</apex:column>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+		<c:HistoryTable historyList="{!shiftHoursHistory}" blockTitle="Shift Hours History" sectionTitle="Shift Hours Change History"/>
+	</apex:form>
+<c:StatusPanel />
+</apex:page>

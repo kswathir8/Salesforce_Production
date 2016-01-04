@@ -1,0 +1,886 @@
+<apex:page sidebar="false" controller="n2de.TeamController" tabstyle="n2de__Team__c" action="{!init}">
+
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery.jui_dropdown.min.js')}" type="text/javascript"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'iphone-style-checkboxes-small/scripts/iphone-style-checkboxes.js')}"></script>
+<link type="text/css" rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'iphone-style-checkboxes-small/style.css')}"/>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-smoothness.css')}" type="text/css" media="all"/>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.jui_dropdown.css')}" type="text/css" media="all"/>
+<c:CommonMask />
+<apex:form >
+<style>
+	#pagecontainer {
+		visibility: hidden;
+		min-width: 990px;
+		overflow-x: auto;
+	}
+	.actions-dropdown * {
+		font-family: Arial,Helvetica,sans-serif !important;
+		font-size: 1em;
+	}
+	.actions-dropdown .ui-button-text{
+		padding-top: 2px;
+		padding-right: 22px;
+		padding-bottom: 2px;
+		padding-left: 5px; 
+	}
+	.actions-dropdown .action-menu {
+		position: absolute;
+	  	width: 120px;
+	  	margin-top: 3px !important;
+	  	z-index: 999999;
+	}
+	h1.team_header{
+		background-color: #c0c0c0;
+		color: white;
+		font-size: 10pt;
+		margin-left: auto;
+		margin-right: auto;
+		display: block;
+		clear: both;
+		min-height: 25px;
+		padding: 5px;
+	}
+	.container {
+		float: left;
+		margin: 10px;
+		border: 1px solid gray;
+		border-radius: 5px;
+	}
+	.short {
+		overflow: auto;
+		height: 220px;
+	}
+	.tall {
+		overflow: auto;
+		height: 680px;
+	}
+	.wide {
+		width: 98%;
+	}
+	.detail-container{
+		display:inline-block;
+		vertical-align: top;
+		padding: 0;
+		overflow-x: auto;
+	}
+	.vertical-line {
+		position: relative;
+		top: 30px;
+		height: 130px;
+		border-left: 1px solid gray;
+		width: 1%;
+		margin-right: 10px;
+	}
+	.member-grid{
+		border: 1px solid gray;
+		background-color: #fafafa;
+		float: left;
+		margin: 5px;
+		width: 170px;
+		height: 55px;
+		padding: 10px;
+	}
+	.member-grid div{
+		float: left;
+		overflow: auto;
+	}
+	.member-grid img{
+		width: 35px;
+		margin: 5px;
+		margin-right:10px;
+	}
+	.member{
+		margin-top: 5px;
+		width: 100%;
+	}
+	.member td{
+		backgroundcolor: grey;
+		border-bottom: 1px solid lightgray;
+	}
+	.member img{
+		width: 35px;
+	}
+	.member .status img{
+		width: 25px;
+		margin: 5px;
+	}
+	::-webkit-scrollbar {
+		width: 10px;
+	}
+	::-webkit-scrollbar-track {
+		-webkit-box-shadow: inset 0 0 0 rgba(150, 150, 150, 1);
+		background: rgb(180,180,180);
+	}
+	
+	::-webkit-scrollbar-thumb {
+		border-radius: 10px;
+		background: rgba(100, 100, 100, 1);
+		-webkit-border-radius: 10px;
+		-webkit-box-shadow: inset 0 0 6px rgba(50, 50, 50, 1);
+	}
+	
+	::-webkit-scrollbar-thumb:window-inactive {
+		border-radius: 10px;
+		background: rgba(100, 100, 100, 0.5);
+		-webkit-border-radius: 10px;
+		-webkit-box-shadow: inset 0 0 6px rgba(50, 50, 50, 0.5);
+	}
+	.label{
+		margin-top: 5px;
+	}
+	.team_label{
+		font-weight: bold;
+		color: #4A4A56;
+	}
+	#clear{
+		clear: both;
+	}
+	.disabled{
+		background-color: #ededed !important; 
+		border: 1px solid LightGray !important;
+	}
+	.disabled img{
+		opacity : 0.4;
+	}
+	.out_office{
+		background-color: #ededed; 
+		background-image: url({!URLFOR($Resource.n2de__DEResources, 'images/outofoffice32.png')});
+		background-position: right bottom;
+		background-repeat: no-repeat;
+		opacity: 0.7;
+	}
+	.out_office img{
+		opacity : 0.4;
+	}
+	.offline{
+		background-color: #ededed; 
+		background-image: url({!URLFOR($Resource.DEResources, 'images/notavailable32.png')});
+		background-position: right bottom;
+		background-repeat: no-repeat;
+		opacity: 0.7;
+		background-size: 20px;
+	}
+	.offline img{
+		opacity : 0.7;
+	}
+	.list_icon{
+		width: 25px !important;
+		padding: 1px !important;
+	}
+	.de_help_icon{
+		position: absolute;
+		right: 10px;
+		top: 10px;
+	}
+	.edit_hours:hover {
+		cursor: pointer;
+	}
+	.dist-action-link:hover {
+		cursor: pointer;
+	}
+	.tab-area { 
+	    padding: 0px; 
+	    background: none; 
+	    border-width: 0px; 
+	    min-height: 716px;
+	}
+	.tab-area .ui-widget-header {
+		background: #c0c0c0;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+	.tab-area * {
+		font-family: Arial,Helvetica,sans-serif !important;
+	  	color: #222;
+	}
+	.tab-area a{ 
+		outline: 0;
+	} 
+	.dist_list{
+		min-height: 580px;
+		padding: 0;
+		margin: 0;
+		width: 100%;
+	} 
+	.distributor:hover{
+		background-color: beige;
+	}
+	.distributor{
+		border: 1px solid #A6A6A6;
+		border-radius: 4px;
+		background-color: #fafafa;
+		margin: 5px;
+		padding: 10px;
+		height: 55px;
+		list-style: none;
+		padding-left: 0;
+		margin-left: 5px;
+	}
+	.distributor .dist-item-container {
+		vertical-align: middle;
+		height: 55px;
+		display: table-cell;
+	}
+	.sortable .distributor{
+		cursor:move;
+	}
+	.distributor img{
+		width: 35px;
+		margin: 5px;
+		margin-left: 10px;
+		float: left;
+	}
+	.distributor-lbl {
+		margin: 15px;
+		float: left;
+		width: 250px;
+	}
+	.distributor div.img{
+		width: 50px;
+	}
+	.distributor .details{
+		clear: both;
+		color: gray;
+		width: 100%;
+	}
+	.sub-dist-container {
+		display: inline-block;
+		width: 47%;
+		height: 630px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+	.vertical-line-tall {
+		position: relative;
+		height: 630px;
+		border-left: 1px solid gray;
+		width: 1%;
+		margin-right: 10px;
+		margin-left: 10px;
+	}
+	.advanced-dist-container {
+		display: inline-block;
+		width: 98%;
+		height: 630px;
+		overflow: auto;
+	}
+	#add_adv_button {
+	  color: #333;
+	  margin: 1px;
+	  padding: 2px 3px;
+	  border: 1px solid #b5b5b5;
+	  border-bottom-color: #7f7f7f;
+	  background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top;
+	  font-weight: bold;
+	  font-size: .9em;
+	  -moz-border-radius: 3px;
+	  -webkit-border-radius: 3px;
+	  border-radius: 3px;
+	}
+	.new-help {
+		display: table; 
+		margin:0 auto;
+		font-size: 15px;	
+	}
+	.new-help a {
+		color: #56aa1c;
+	}
+	.new-help a:hover {
+		color: #bbdda4;
+	}
+	.tag-detail {
+		font-style: italic;
+	}
+</style>
+<script>
+var teamId = '{!JSENCODE(teamWrap.Id)}';
+$(document).ready(function() {
+	setSizes();
+	$('.tab-area').tabs();
+	var activeTabId = $('.tab-area .ui-tabs-active a').attr('id');
+	showAddButtons(activeTabId);
+	$( ".sortable" ).sortable({
+	 	update: function( event, ui ) {
+	 		onChangeDistributorList(ui);
+	 	}
+	});
+	$('.online_toggle').iphoneStyle({
+	    onChange: function(elem, isOn) {
+	       var userId = $(elem).parent().parent().parent().attr('user_id');
+	       toggleOnline(userId, isOn);
+	    }
+	});
+	 $("#team_actions").jui_dropdown({
+	    launcher_id: 'team_menu_button',
+	    containerClass: 'actions-dropdown',
+	    launcher_container_id: 'tm_container',
+	    menu_id: 'team_action_menu',
+	    launcherClass: 'btn',
+	    menuClass: 'action-menu',
+	    my_position: 'right top',
+		at_position: 'right bottom'
+	});
+	<apex:repeat value="{!distributorList}" var="d">
+		$('#dist_actions_{!d.Id}').jui_dropdown({
+		    launcher_id: 'dist_menu_button_{!d.Id}',
+		    containerClass: 'actions-dropdown',
+		    launcher_container_id: 'dm_container_{!d.Id}',
+		    menu_id: 'dist_action_menu_{!d.Id}',
+		    launcherClass: 'btn',
+		    menuClass: 'action-menu',
+		    my_position: 'right top',
+			at_position: 'right bottom'
+		});
+	</apex:repeat>
+	
+	if ('{!teamWrap.isDistributeToQueue}' == 'false') {
+		<apex:repeat value="{!pullDistributorList}" var="d">
+			$('#dist_actions_{!d.Id}').jui_dropdown({
+			    launcher_id: 'dist_menu_button_{!d.Id}',
+			    containerClass: 'actions-dropdown',
+			    launcher_container_id: 'dm_container_{!d.Id}',
+			    menu_id: 'dist_action_menu_{!d.Id}',
+			    launcherClass: 'btn',
+			    menuClass: 'action-menu',
+			    my_position: 'right top',
+				at_position: 'right bottom'
+			});
+		</apex:repeat>
+		if ('{!TriggersEnabled}' == 'true') {
+			<apex:repeat value="{!triggerList}" var="d">
+				$('#dist_actions_{!d.Id}').jui_dropdown({
+				    launcher_id: 'dist_menu_button_{!d.Id}',
+				    containerClass: 'actions-dropdown',
+				    launcher_container_id: 'dm_container_{!d.Id}',
+				    menu_id: 'dist_action_menu_{!d.Id}',
+				    launcherClass: 'btn',
+				    menuClass: 'action-menu',
+				    my_position: 'right top',
+					at_position: 'right bottom'
+				});
+			</apex:repeat>
+		}
+		$('#advanced_add_container').jui_dropdown({
+		    launcher_id: 'add_adv_button',
+		    containerClass: 'actions-dropdown',
+		    launcher_container_id: 'adv_dist_add',
+		    menu_id: 'advanced_add_list',
+		    launcherClass: 'btn',
+		    menuClass: 'action-menu',
+		    my_position: 'right top',
+			at_position: 'right bottom'
+		});
+	}
+	$('#member_action_container').jui_dropdown({
+	    launcher_id: 'tm_action_button',
+	    containerClass: 'actions-dropdown',
+	    launcher_container_id: 'team_member_actions',
+	    menu_id: 'tm_action_menu',
+	    launcherClass: 'btn',
+	    menuClass: 'action-menu',
+	    my_position: 'right top',
+		at_position: 'right bottom'
+	});
+	document.getElementById('pagecontainer').style.visibility = "visible";
+});
+$(window).resize(function() {
+	setSizes();
+});
+function setSizes(){
+	$(".distributor-container").css("min-height", $(".distributor-container").height());
+}
+function onChangeDistributorList(ui){
+	saveOrder(ui);
+}
+function saveOrder(ui){
+	var listElementId = ui.item[0].id;
+	showMask();
+	var distributorIdArray = new Array();
+	$("#" + listElementId).parent().find("li.distributor").each(function(){
+		var distributorId = $(this).attr('id');
+		if(distributorId != undefined){
+			distributorIdArray.push(distributorId);
+		}
+	});
+	Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamController.saveOrder}', distributorIdArray, teamId, 
+		function(result, event){
+			hideMask();
+			if (event.type === 'exception'){
+				alert(event.message);
+			}else{
+				//document.location.href = '/apex/TeamSummary?id=' + teamId;
+			}
+	});
+}
+function toggleOnline(userId, isOnline){
+	showMask();
+	Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamController.toggleOnline}', userId, isOnline, 
+		function(result, event){
+			hideMask();
+			if (event.type === 'exception'){
+				alert(event.message);
+			}else{
+				//document.location.href = '/apex/TeamSummary?id=' + teamId;
+			}
+			hideMask();
+	});
+}
+
+function changeMemberShiftHours(memberId) {
+	$('#' + memberId + '_edit_tm_hours').hide();
+	$('#' + memberId + '_cancel_tm_hours').show();
+	$('.' + memberId + '_distHoursDisplay').hide();
+	$('.' + memberId + '_shiftEdit').show();
+	$('.' + memberId + '_shiftEdit').attr('userid', memberId);
+	var sel = $('.' + memberId + '_shiftEdit').val();
+	$('.' + memberId + '_shiftEdit').attr('spid', sel);
+}
+function cancelMemberShiftHours(memberId) {
+	$('#' + memberId + '_edit_tm_hours').show();
+	$('#' + memberId + '_cancel_tm_hours').hide();
+	$('.' + memberId + '_distHoursDisplay').show();
+	$('.' + memberId + '_shiftEdit').hide();
+}
+
+function updateShiftHours(memberId) {
+	var sel = $('.' + memberId + '_shiftEdit').val();
+	Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamController.changeTeamMemberShiftHours}', memberId, sel, 
+		function(result, event){
+			if (event.type === 'exception'){
+				alert(event.message);
+				var oldVal = $('.' + memberId + '_shiftEdit').attr('spid');
+				$('.' + memberId + '_shiftEdit').val(oldVal);
+			} else {
+			}
+			hideMask();
+	});
+}
+
+</script>
+
+<apex:sectionHeader title="Distribution Team" subtitle="{!teamWrap.Name}"/>
+<c:CommonHelp help_page="team-summary"/>
+<apex:pageBlock >
+<apex:pageMessages />
+
+<div id="pagecontainer">
+
+<div class="container wide short">
+	<h1 class="team_header">Team Summary
+	<apex:outputPanel style="margin-left:3px; float: right">
+		<div id="team_actions">
+		  <div id="tm_container">
+		    <button id="team_menu_button">Actions</button>
+		  </div>
+		  <ul id="team_action_menu">
+		    <li><apex:commandLink value="Edit" action="{!gotoEditPage}"  rendered="{!$ObjectType.n2de__Team__c.Updateable}" /></li>
+		    <li><apex:commandLink value="View" action="{!gotoDetailPage}"/></li>
+		  </ul>
+		</div>
+	</apex:outputPanel>
+	</h1>
+
+		<div class="detail-container" style="width: 50%">
+			<table class="team-detail-tbl">
+				<tr>
+					<td width="140px;" ><apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_active__c.Label}:" styleClass="team_label"/></td>
+					<td ><apex:outputField value="{!teamWrap.team.n2de__Is_active__c}" /></td>
+				</tr>
+				<tr>
+					<td width="140px;" ><apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_name__c.Label}:" styleClass="team_label"/></td>
+					<td ><apex:outputText value="{!teamWrap.objectName}" /></td>
+				</tr> 
+				<tr>
+					<td><apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_active_status_field_name__c.Label}:" styleClass="team_label"/></td>
+					<td><apex:outputText value="{!teamWrap.activeStatusField}"/></td>
+				</tr>
+				<tr>
+					<td><apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_active_status_values_long__c.Label}:" styleClass="team_label" /></td>
+					<td><apex:outputText value="{!teamWrap.ObjectActiveStatusValues}"/></td>
+				</tr>
+				<tr><td height="5px;"></td></tr>
+				<tr>
+					<td><apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Is_action_tracking__c.Label}:" styleClass="team_label"/></td>
+					<td><apex:outputField value="{!teamWrap.team.n2de__Is_action_tracking__c}" /></td>
+				</tr>
+				<tr><td height="5px;"></td></tr>
+				<apex:outputPanel rendered="{!teamWrap.team.n2de__Team_level_caps_enabled__c}">
+					<tr>
+						<td><apex:outputLabel value="Team-level cap:" styleClass="team_label"/></td>
+						<td><span>Tag collection </span>&nbsp;<apex:outputText styleClass="tag-detail" value="{!teamWrap.team.Capping_pattern__r.Tag_collection__r.Name}"/></td>
+					</tr>
+					<tr>
+						<td></td><td><span>Cap type </span>&nbsp;
+						<apex:outputText styleClass="tag-detail" value="{!teamWrap.team.Capping_pattern__r.n2de__Type__c}"/></td>
+					</tr>
+				</apex:outputPanel>
+				<apex:outputPanel rendered="{!teamWrap.Team.n2de__Is_logging_disabled__c == true}">
+					<tr><td height="8px;"></td></tr>
+					<tr>
+						<td colspan="2"><span><i>Distribution logging disabled</i></span></td>
+					</tr>
+				</apex:outputPanel>
+			</table>
+		</div>
+		<div style="display: inline-block;">	
+			<div class="vertical-line"></div>	
+		</div>
+		<div class="detail-container" style="width: 48%">
+			<table class="team-detail-tbl">
+			<tr>
+				<td><apex:outputLabel value="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Shift_name__c.Label}:" styleClass="team_label"/></td>
+				<td><apex:outputText value="{!IF(DistributionHours.n2de__Is_shift_hours__c, DistributionHours.n2de__Shift_name__c, '-- Custom hours --')}"/>&nbsp;&nbsp;&nbsp;<apex:outputLink value="/apex/{!NamespacePrefix}ShiftHours?returnTo=TeamSummary&obj={!teamWrap.team.Id}">Manage shift hours</apex:outputLink></td>
+			</tr>
+			<apex:repeat value="{!teamDistributionHours}" var="twh">
+				<tr>
+					<td><span class="team_label">{!twh.day}:</span></td>
+					<td><apex:outputText value="{!twh.schedule}" rendered="{!NOT(twh.showHours)}"/><apex:outputText value="{!twh.hours}" rendered="{!twh.showHours}"/></td>
+				</tr>
+			</apex:repeat>
+			<tr>
+				<td><apex:outputLabel value="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Timezone__c.Label}:" styleClass="team_label"/></td>
+				<td><apex:outputText value="{!teamWrap.TimezoneDescription}"/></td>
+			</tr>
+			<tr>
+				<td><apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Holiday_Group__c.Label}:" styleClass="team_label"/></td>
+				<td><apex:outputLink value="/apex/{!NamespacePrefix}Holiday?id={!teamWrap.team.n2de__Holiday_Group__c}">{!teamWrap.team.Holiday_Group__r.Name}</apex:outputLink></td>
+			</tr>
+			</table>
+		</div>
+	</div>
+
+	<table class="wide" style="float: left; border-spacing: 0;">
+		<tr>
+		<td style="width: 49.5%">
+		<div id="members" class="container" style="width: 100%" >
+			<h1 class="team_header">
+				{!IF(teamWrap.team.Is_distribute_to_queue__c, 'Queues', 'Team Members')}
+					<apex:outputPanel style="margin-left:3px;float: right"> 
+						<div id="member_action_container">
+						  <div id="team_member_actions">
+						    <button id="tm_action_button">Actions</button>
+						  </div>
+						  <ul id="tm_action_menu">
+						    <apex:outputPanel layout="none"  rendered="{!$ObjectType.n2de__Team_member__c.Updateable && !teamWrap.team.n2de__Is_distribute_to_queue__c}"><li><apex:commandLink value="Add / Remove" action="{!gotoMultiMember}"/></li></apex:outputPanel>
+							<apex:outputPanel layout="none" rendered="{!$ObjectType.n2de__Team_member__c.Updateable && teamWrap.team.n2de__Is_distribute_to_queue__c}"><li><apex:commandLink value="Add" action="{!gotoNewMember}"/></li></apex:outputPanel>
+						    <li><apex:commandLink value="Weighting" action="{!gotoWeighting}" rendered="{!AND(RecordAccess.HasEditAccess, $ObjectType.n2de__Team_member__c.Updateable)}"/></li>
+						    <apex:outputPanel layout="none" rendered="{!teamWrap.team.n2de__Team_level_caps_enabled__c}"><li><apex:commandLink value="Team-level caps" action="{!goToTeamLevelCapping}"/></li></apex:outputPanel>
+						  </ul>
+						</div>
+					</apex:outputPanel>
+	
+					<apex:outputPanel style="margin-left:3px;float: right; padding-top: 3px; padding-right: 5px;"> 
+						<apex:commandLink rendered="{!viewMode != 'List'}" action="{!toggleView}">
+							<apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="Detail view" width="20" height="20" />
+						</apex:commandLink>
+				        <apex:image rendered="{!viewMode == 'List'}" url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="Detail view" width="20" height="20" />
+				        <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_verticalbaricon.png')}" width="10" height="20" />
+				         <apex:image rendered="{!viewMode != 'List'}" url="{!URLFOR($Resource.n2de__DEResources, 'images/grid-32.png')}" title="Grid view" width="20" height="20" />
+				        <apex:commandLink rendered="{!viewMode == 'List'}" action="{!toggleView}" style="margin-left:3px;float: right">
+				        	<apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/grid-32.png')}" title="Grid view" width="20" height="20" />
+				        </apex:commandLink>
+			       </apex:outputPanel>
+					
+				<div id="clear"/>
+			</h1>
+			<div class="tall">
+			
+			<apex:outputPanel rendered="{!viewMode == 'List'}" id="tm_detail_view">
+				<table class="member">
+				<tr>
+					<th></th>
+					<th>Name</th>
+					<th/>
+					<th>Distribution Hours</th>
+					<apex:outputPanel layout="none" rendered="{!teamWrap.team.n2de__Team_level_caps_enabled__c}">
+						<th>Team cap</th>					
+					</apex:outputPanel>
+					<th>Weighting</th>
+					<th>Today</th>
+					<apex:outputPanel rendered="{!NOT(LoadbalancedDisabled)}"><th>Active</th></apex:outputPanel>
+					<th>Status</th>
+				</tr>
+				
+				<apex:repeat value="{!teamMemberList}" var="t">
+					<tr class="{!IF(t.active==false, 'disabled', '')}">
+					<td>
+						<apex:image value="{!t.photoUrl}" rendered="{!LEN(t.photoUrl) > 0}" />
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/teammember32.png')}" rendered="{!LEN(t.photoUrl) == 0 && !teamWrap.team.n2de__Is_distribute_to_queue__c}" styleClass="list_icon"/>
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/queue32.png')}" rendered="{!LEN(t.photoUrl) == 0 && teamWrap.team.n2de__Is_distribute_to_queue__c}" styleClass="list_icon"/>
+					</td>
+					<td>
+						<a href="/{!t.id}">{!t.name}</a>
+					</td>
+					<td>
+						<apex:outputPanel rendered="{!t.active && t.distributionHours != 'Individual'}">
+							&nbsp;&nbsp;<a ondblclick="changeMemberShiftHours('{!t.Id}');" id="{!t.Id}_edit_tm_hours" class="edit_hours">
+								<img src="{!URLFOR($Resource.DEResources, 'images/pencil.png')}" style="width: 12px;" title="Change shift"/>
+							</a>
+							<a onclick="cancelMemberShiftHours('{!t.Id}');" style="display: none;" id="{!t.Id}_cancel_tm_hours" class="edit_hours">
+								<img src="{!URLFOR($Resource.DEResources, 'images/cross32.png')}" style="width: 12px;" title="Cancel"/>
+							</a>
+						</apex:outputPanel>
+					</td>
+					<td>
+						<apex:outputText styleClass="{!t.Id}_distHoursDisplay" value="{!t.distributionHours}" rendered="{!t.active}" title="{!IF(t.distributionHours != 'Team' && t.distributionHours != 'Individual', 'Individual shift hours', '')}"/>
+						<apex:selectList value="{!t.distributionHoursId}" size="1" styleClass="{!t.Id}_shiftEdit" style="display: none;">
+							<apex:selectOptions value="{!ShiftPatternsList}" />
+							<apex:actionSupport event="onchange"  action="{!reloadTeamMemberList}" onSubmit="showMask(); updateShiftHours('{!t.Id}')" oncomplete="hideMask()"/>
+						</apex:selectList>
+					</td>
+					<apex:outputPanel layout="none" rendered="{!teamWrap.team.n2de__Team_level_caps_enabled__c}">
+						<td>
+							<apex:outputPanel layout="none" rendered="{!t.active}">
+								<apex:outputText title="{!t.userCapVO.tagValueName} cap" value="{!t.userCapVO.capValue}" rendered="{!t.userCapVO.capValue != null}"/>
+								<apex:outputPanel layout="none" rendered="{!AND(t.userCapVO == null, teamWrap.team.Capping_pattern__r.n2de__Default_cap__c != null)}">
+									<apex:outputText title="Default cap" value="{!teamWrap.team.Capping_pattern__r.n2de__Default_cap__c}" style="color: #868686"/>
+								</apex:outputPanel>
+								<apex:outputPanel layout="none" rendered="{!AND(t.userCapVO == null, teamWrap.team.Capping_pattern__r.n2de__Default_cap__c == null)}">
+									<img src="{!URLFOR($Resource.n2de__DEResources, 'images/infinity_black.png')}" style="width: 15px;" title="Default cap"/>
+								</apex:outputPanel>
+								<apex:outputPanel layout="none" rendered="{!AND(t.userCapVO != null, t.userCapVO.capValue == null)}">
+									<img src="{!URLFOR($Resource.n2de__DEResources, 'images/infinity_black.png')}" style="width: 15px;" title="{!t.userCapVO.tagValueName} cap"/>
+								</apex:outputPanel>
+							</apex:outputPanel>
+						</td>
+					</apex:outputPanel>
+					<td>
+						<apex:outputText value="{!t.weighting}" rendered="{!t.active}" />
+					</td>
+					<td>
+						<apex:outputText value="{!t.dailyCount}" rendered="{!t.active}" />
+					</td>
+					<apex:outputPanel rendered="{!NOT(LoadbalancedDisabled)}">
+						<td>
+							<apex:outputText value="{!t.activeRecordCount}" rendered="{!t.active}" />
+						</td>
+					</apex:outputPanel>
+					<td class="status" user_id="{!t.userId}">
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/outofoffice32.png')}" rendered="{!t.active == true && (t.outOfOffice || t.outsideWorkingHours || teamWrap.currentlyOnHoliday)}" title="Not available - on holiday, out of office or outside working hours"/>
+						<apex:outputText value="Disabled" rendered="{!t.active == false}" />
+						<apex:outputPanel rendered="{!teamWrap.team.n2de__Is_distribute_to_queue__c == false && t.active == true && LoginModeEnabled && !t.outOfOffice && !t.outsideWorkingHours && !teamWrap.currentlyOnHoliday}" style="width: 70px;">
+							<apex:inputCheckbox value="{!t.online}" styleClass="online_toggle" style="width: 50px;"/>
+						</apex:outputPanel>
+					</td>
+					</tr>
+				</apex:repeat>
+				</table>
+			</apex:outputPanel>
+		
+			<apex:outputPanel rendered="{!viewMode == 'Grid'}" id="tm_grid_view">
+				<apex:repeat value="{!teamMemberList}" var="t">
+					<div class="member-grid {!IF(t.active == true && (t.outOfOffice || t.outsideWorkingHours || teamWrap.currentlyOnHoliday), 'out_office', '')} {!IF(t.active==false, 'disabled', '')} {!IF(teamWrap.team.n2de__Is_distribute_to_queue__c == false && t.active == true && LoginModeEnabled && t.online==false && !t.outOfOffice && !t.outsideWorkingHours && !teamWrap.currentlyOnHoliday, 'offline', '')}">
+					<div>
+						<apex:image value="{!t.photoUrl}" rendered="{!LEN(t.photoUrl) > 0}" />
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/teammember32.png')}" rendered="{!LEN(t.photoUrl) == 0 && !teamWrap.team.n2de__Is_distribute_to_queue__c}" />
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/queue32.png')}" rendered="{!LEN(t.photoUrl) == 0 && teamWrap.team.n2de__Is_distribute_to_queue__c}" />
+					</div>
+					<div class="label"><a href="/{!t.id}">{!t.name}</a></div>
+					</div>
+				</apex:repeat>
+			</apex:outputPanel>
+			
+			<apex:outputPanel layout="block" rendered="{!teamMemberList.size == 0}">
+				<br/>
+				<div style="width: 100%">
+					<span class="new-help">
+						You don't have any team members.
+					</span>
+					<apex:outputPanel layout="none" rendered="{!teamWrap.team.n2de__Is_distribute_to_queue__c == false}">
+						<span class="new-help">
+							Click <b><a target="_blank" href="http://help.nc-squared.com/adding-and-removing-team-members">here</a></b> to learn how to add team members.
+						</span>
+					</apex:outputPanel>
+					<apex:outputPanel layout="none" rendered="{!teamWrap.team.n2de__Is_distribute_to_queue__c == true}">
+						<span class="new-help">
+							Click <b><a target="_blank" href="http://help.nc-squared.com/distributing-to-queues">here</a></b> to learn about distributing to queues.
+						</span>
+					</apex:outputPanel>
+				</div>
+			</apex:outputPanel>
+			
+			</div>
+		</div>
+		</td>
+		<td style="width: 1%"></td>
+		<td style="width: 49.5%">
+
+		<div class="container" style="width: 100%">
+			<script>
+				function startDistributor(distId) {
+					Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamController.startDistributor}', distId,
+			            function(result, event){
+			                if (event.type === 'exception'){
+			                	hideMask();
+			                    alert(event.message);
+			                }else{
+			                    $('#' + distId).removeClass('disabled');
+			                    $('#stop_' + distId).show();
+			                    $('#start_' + distId).hide();
+			                    hideMask();
+			                }
+			        });
+				}
+				
+				function stopDistributor(distId) {
+					Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamController.stopDistributor}', distId,
+			            function(result, event){
+			                if (event.type === 'exception'){
+			                	hideMask();
+			                    alert(event.message);
+			                }else{
+			                    $('#' + distId).addClass('disabled');
+			                    $('#stop_' + distId).hide();
+			                    $('#start_' + distId).show();
+			                    hideMask();
+			                }
+			        });
+				}
+			
+				function showAddButtons(elementId) {
+					if (elementId == 'scheduled_tab') {
+						$('.add-scheduled-btn').show();
+						$('#advanced_add_container').hide();
+					} else {
+						$('.add-scheduled-btn').hide();
+						$('#advanced_add_container').show();
+					}
+				}
+			</script>
+			<div class="tab-area">
+				<ul>
+					<li><a id="scheduled_tab" onclick="showAddButtons($(this).attr('id'))" class="tab" href="#scheduled">Distributors</a></li>
+					<apex:outputPanel layout="none" rendered="{!NOT(teamWrap.isDistributeToQueue)}"><li><a id="advanced_tab" onclick="showAddButtons($(this).attr('id'))" class="tab" href="#advanced">Advanced distributors</a></li></apex:outputPanel>
+					
+					<apex:commandButton styleClass="add-scheduled-btn" value="Add distributor" action="{!gotoNewDistributor}" rendered="{!$ObjectType.n2de__Distributor__c.Createable}" style="margin-left:3px; float: right"/>
+					
+					<apex:outputPanel rendered="{!NOT(teamWrap.isDistributeToQueue)}" style="margin-left:3px; float: right">
+						<div id="advanced_add_container" style="display: none;">
+						  <div id="adv_dist_add">
+						    <button id="add_adv_button">Add...</button>
+						  </div>
+						  <ul id="advanced_add_list">
+						  	<li><apex:commandLink styleClass="dist-action-link" value="Pull distributor" action="{!gotoNewPullDistributor}" rendered="{!$ObjectType.n2de__Distributor__c.Createable}"/></li>
+						  	<apex:outputPanel layout="none" rendered="{!$ObjectType.n2de__Distributor__c.Createable && TriggersEnabled}"><li><apex:commandLink styleClass="dist-action-link" value="Trigger distributor" action="{!gotoNewTrigger}"/></li></apex:outputPanel>
+						  </ul>
+						</div>
+					</apex:outputPanel>
+				</ul>
+				
+				<div id="scheduled" class="distributor-container">
+				
+					<apex:outputPanel layout="block" rendered="{!distributorList.size == 0 && pullDistributorList.size == 0 && (NOT(TriggersEnabled) || (TriggersEnabled && triggerList.size == 0))}">
+						<div style="width: 100%">
+							<span class="new-help">
+								You don't have any distributors.
+							</span>
+							<span class="new-help">
+								Click <b><a target="_blank" href="http://help.nc-squared.com/adding-a-scheduled-distributor">here</a></b> to learn about distributors.
+							</span>
+						</div>
+					</apex:outputPanel>
+					
+					<ul id="scheduled_dist" class="sortable dist_list" style="max-height: 630px; overflow: auto;">
+						<apex:repeat value="{!distributorList}" var="d">
+							<li id="{!d.Id}" class="distributor {!IF(d.active==false, 'disabled', '')}">
+								<apex:image styleClass="img" title="Round robin distributor" value="{!URLFOR($Resource.n2de__DEResources, 'images/DistributorRR.png')}" rendered="{!d.algorithm == 'Round robin'}" />
+								<apex:image styleClass="img" title="Sticky assignment distributor" value="{!URLFOR($Resource.n2de__DEResources, 'images/DistributorSticky.png')}" rendered="{!d.algorithm == 'Round robin sticky assignment'}" />
+								<apex:image styleClass="img" title="Lookup owner distributor" value="{!URLFOR($Resource.n2de__DEResources, 'images/DistributorLookup.png')}" rendered="{!d.algorithm == 'Round robin lookup owner'}" />
+								<a class="distributor-lbl" href="/{!d.id}">{!d.name}</a>
+								
+								<apex:outputPanel style="margin-left:3px; float: right">
+								<div id="dist_actions_{!d.Id}">
+								  <div id="dm_container_{!d.Id}">
+								    <button id="dist_menu_button_{!d.Id}">Actions</button>
+								  </div>
+								  <ul id="dist_action_menu_{!d.Id}">
+								  	<li><a class="dist-action-link" href="/apex/{!NamespacePrefix}DistributorDetailEdit?id={!d.Id}">Edit</a></li>
+								  	<li><a class="dist-action-link" href="/{!d.id}">View</a></li>
+								    <li id="stop_{!d.Id}" style="{!IF(d.active==false, 'display: none;', '')}"><a class="dist-action-link" onclick="showMask(); stopDistributor('{!d.Id}')" >Stop distributor</a></li>
+								    <li id="start_{!d.Id}" style="{!IF(d.active==true, 'display: none;', '')}"><a class="dist-action-link" onclick="showMask(); startDistributor('{!d.Id}')">Start distributor</a></li>
+								  </ul>
+								</div>
+								</apex:outputPanel>
+							</li>
+						</apex:repeat>
+					</ul>
+				</div>
+			
+			<apex:outputPanel layout="none" rendered="{!NOT(teamWrap.isDistributeToQueue)}">
+				<div id="advanced" style="width: 98%">
+					<div class="{!IF(TriggersEnabled, 'sub-dist-container', 'advanced-dist-container')}">
+						<ul class="sortable dist_list">
+							<apex:repeat value="{!pullDistributorList}" var="d">
+							<li id="{!d.Id}" class="distributor {!IF(d.active==false, 'disabled', '')}">
+								<apex:image title="Pull distributor" styleClass="img pull" value="{!URLFOR($Resource.n2de__DEResources, 'images/DistributorPull5.png')}" rendered="{!d.algorithm == 'Pull from queue'}"/>	
+								<a href="/{!d.id}">{!d.name}</a>
+								<apex:outputPanel style="margin-left:3px; float: right">
+									<div id="dist_actions_{!d.Id}">
+									  <div id="dm_container_{!d.Id}">
+									    <button id="dist_menu_button_{!d.Id}">Actions</button>
+									  </div>
+									  <ul id="dist_action_menu_{!d.Id}">
+									  	<li><a class="dist-action-link" href="/apex/{!NamespacePrefix}DistributorDetailEdit?id={!d.Id}">Edit</a></li>
+									  	<li><a class="dist-action-link" href="/{!d.id}">View</a></li>
+									    <li id="stop_{!d.Id}" style="{!IF(d.active==false, 'display: none;', '')}"><a class="dist-action-link" onclick="showMask(); stopDistributor('{!d.Id}')" >Stop distributor</a></li>
+									    <li id="start_{!d.Id}" style="{!IF(d.active==true, 'display: none;', '')}"><a class="dist-action-link" onclick="showMask(); startDistributor('{!d.Id}')">Start distributor</a></li>
+									  </ul>
+									</div>
+								</apex:outputPanel>
+							</li>
+							</apex:repeat>
+						</ul>
+					</div>
+					
+					<apex:outputPanel layout="none" rendered="{!TriggersEnabled}">
+						<div style="display: inline-block;">	
+							<div class="vertical-line-tall"/>
+						</div>
+					</apex:outputPanel>
+				
+					<apex:outputPanel layout="none" rendered="{!TriggersEnabled}">
+						<div class="sub-dist-container">
+							<ul class="sortable dist_list">
+								<apex:repeat value="{!triggerList}" var="d">
+								<li id="{!d.Id}" class="distributor {!IF(d.active==false, 'disabled', '')}">
+									<apex:image title="Trigger distributor" styleClass="img" value="{!URLFOR($Resource.n2de__DEResources, 'images/DistributorTrigger3.png')}"  />
+									<a href="/{!d.id}">{!d.name}</a>
+									<apex:outputPanel style="margin-left:3px; float: right">
+										<div id="dist_actions_{!d.Id}">
+										  <div id="dm_container_{!d.Id}">
+										    <button id="dist_menu_button_{!d.Id}">Actions</button>
+										  </div>
+										  <ul id="dist_action_menu_{!d.Id}">
+										  	<li><a class="dist-action-link" href="/apex/{!NamespacePrefix}DistributorDetailEdit?id={!d.Id}">Edit</a></li>
+										  	<li><a class="dist-action-link" href="/{!d.id}">View</a></li>
+										    <li id="stop_{!d.Id}" style="{!IF(d.active==false, 'display: none;', '')}"><a class="dist-action-link" onclick="showMask(); stopDistributor('{!d.Id}')" >Stop distributor</a></li>
+										    <li id="start_{!d.Id}" style="{!IF(d.active==true, 'display: none;', '')}"><a class="dist-action-link" onclick="showMask(); startDistributor('{!d.Id}')">Start distributor</a></li>
+										  </ul>
+										</div>
+									</apex:outputPanel>
+								</li>
+								</apex:repeat>
+							</ul>
+						</div>
+					</apex:outputPanel>
+				</div>
+			</apex:outputPanel>	
+			
+			</div>
+				
+		</div>
+		</td>
+	</tr>
+</table>
+
+</div>
+
+
+<div id="clear"/>
+</apex:pageBlock>
+
+</apex:form>
+<c:StatusPanel />
+</apex:page>

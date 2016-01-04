@@ -1,0 +1,60 @@
+<apex:page title="About Full Circle CRM" >
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <link rel="icon" type="image/x-icon" href="{!$Resource.fcr_favicon}" />
+<div id="fccrmtab">
+
+<table width="100%%" border="0" cellspacing="0" cellpadding="6" id="fcrmtabmaintable">
+  <tr> 
+    <td colspan="3" id="fcrmtabtopsection">
+
+    <h1>Full Circle CRM Response Management</h1> <a href="http://www.fullcirclecrm.com" target="_blank"><img src="{!URLFOR($Resource.Full_Circle_CRM_Logo)}" alt="Full Circle CRM" width="164" height="59" border="0" id="fcrmlogo" /></a>
+      <br /><br />
+    </td>
+    </tr>
+  <tr>
+    <td colspan="3" id="fcrmspacerrow"><img src="{!URLFOR($Resource.FCR_spacer1000)}" width="1000" height="1" alt="" /></td>
+    </tr>  
+  <tr>
+    <td colspan="3" class="fcrmheadercell">Go Full Circle</td>
+
+    </tr>
+  <tr>
+    <td colspan="3" height="200px" class="fcrmtablecontentcell" >
+    <iframe src="https://www.fullcirclecrm.com/fcrm/app/getstarted/" height="200" width="98%" frameborder="0" scrolling="auto">You need a Frames Capable browser to view this content.</iframe> 
+    </td>
+    </tr>
+  <tr>
+    <td colspan="3" id="fcrmspacerrow"><img src="{!URLFOR($Resource.FCR_spacer1000)}" width="1000" height="1" alt="" /></td>
+    </tr>  
+    <tr >
+
+    <td width="48%" class="fcrmheadercell">Latest News<br /><img src="{!URLFOR($Resource.FCR_spacer480)}" width="480" height="1" alt="" /></td>
+    <td id="fcrmmiddlecell" width="24">&nbsp;</td>
+    <td width="48%" class="fcrmheadercell">Support<br /><img src="{!URLFOR($Resource.FCR_spacer480)}" width="480" height="1" alt="" /></td>
+  </tr>
+  <tr>
+    <td class="fcrmtablecontentcell" ><iframe src="https://www.fullcirclecrm.com/fcrm/app/news/" height="220" width="98%" frameborder="0" scrolling="auto">You need a Frames Capable browser to view this content.</iframe> </td>
+    <td>&nbsp;</td>
+
+    <td class="fcrmtablecontentcell"><p style="padding-left: 12px; padding-right: 12px;">The self service portal is available to Full Circle CRM Customers. Please login to search our Knowledgebase, log or view a case. If you are unable to login, please contact us at <a href="mailto:support@fullcirclecrm.com?subject=Request Customer Support Login&body=Please include your name, company name, and phone in the body of this email">support@fullcirclecrm.com</a>.</p>
+      <p>&nbsp;</p>
+      <p style="text-align:center;"><a href="https://support.fullcirclecrm.com" target="_blank"><img src="{!URLFOR($Resource.FCR_support_login)}" border="0" width="200" height="65" alt="Log Into the Self-Service Portal" /></a></p>
+      </td>
+  </tr>
+    <tr>
+    <td colspan="3" id="fcrmspacerrow"><img src="{!URLFOR($Resource.FCR_spacer1000)}" width="1000" height="1" alt="" /></td>
+
+    </tr> 
+  <tr>
+    <td colspan="3" id="fcrmtabfooter"><p>Full Circle CRM, Inc.<br />
+      Email: <a href="mailto:support@fullcirclecrm.com">support@fullcirclecrm.com</a> | Phone Support: 1 (650) 641-2766 ext. 2<br />
+      <a href="https://www.fullcirclecrm.com" target="_blank">www.fullcirclecrm.com</a><br />
+    </p></td>
+
+    </tr>
+</table>
+
+
+
+</div>
+</apex:page>

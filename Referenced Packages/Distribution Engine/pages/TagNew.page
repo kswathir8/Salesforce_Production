@@ -1,0 +1,87 @@
+<apex:page standardController="n2de__Tag_Category__c" extensions="n2de.TagController" sidebar="false" tabStyle="Distribution_Tags__tab">
+	
+	<c:CommonHeader />
+	<c:CommonMask /> 
+	<c:CommonHelp help_page="distributor-tags"/>
+	
+	<style>
+	#add_remove_buttons {
+		margin-top: 10px;
+	}
+	#add_remove_buttons * {
+		margin-left: 5px;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+	.panel{
+		max-height: 400px;
+		overflow: auto;
+	}
+	.alertMsg {
+		color: red;
+		font-weight: bold;
+		padding-left: 40px;
+	}
+	</style>
+	<apex:form >
+		<apex:actionFunction name="addTagRowAF" action="{!addTagRow}" reRender="newTagPanel" oncomplete="hideMask()"/>
+		<apex:actionFunction name="removeTagRowAF" action="{!removeTagRow}" reRender="newTagPanel" oncomplete="hideMask()"/>
+		<apex:actionFunction name="showGenerateFromPicklistAF" action="{!showGenerateFromPicklist}" />
+		<apex:sectionHeader title="Tag Collections" subtitle="{!n2de__Tag_Category__c.Name} "/>
+		<apex:pageMessages />
+		<c:TagsTabSelection activeTab="manage"/>
+		<apex:pageBlock title="Add Tags" id="main_block" rendered="{!generatePicklistVisible != true}">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Save" action="{!saveTags}" onClick="showMask()"/>
+				<apex:commandButton value="Cancel" action="{!cancel}" onClick="showMask()" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1">
+				<apex:outputPanel styleClass="panel" layout="block" id="newTagPanel">
+					<apex:pageBlockTable value="{!newTagList}" var="tv">
+						<apex:column >
+							<apex:facet name="header">Select</apex:facet>
+							<apex:inputCheckbox value="{!tv.selected}" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Tag value</apex:facet>
+							<apex:inputText value="{!tv.tagRecord.name}" maxlength="50"/>
+							<apex:outputText value="{!tv.validationMessage}" styleClass="alertMsg"/>
+						</apex:column>
+					</apex:pageBlockTable>
+				</apex:outputPanel>
+				<apex:outputPanel layout="block">
+					<div id="add_remove_buttons">
+						<a href="" onclick="showMask(); addTagRowAF()">Add row</a>
+						<a href="" onclick="showMask(); removeTagRowAF()">Remove row</a>&nbsp;
+						<apex:outputLink value="#" onclick="showGenerateFromPicklistAF()" rendered="{!tagValuesList.size == 0 && newTagList.size <= 1}">Generate from picklist</apex:outputLink>
+					</div>
+				</apex:outputPanel>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+		
+		<apex:pageBlock title="Generate Tags from Picklist" id="generate_block" rendered="{!generatePicklistVisible == true}">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Generate" action="{!generateTagsFromPicklist}" onClick="showMask()"/>
+				<apex:commandButton value="Cancel" action="{!cancel}" onClick="showMask()" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="2">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Object" />
+					<apex:selectList value="{!picklistObjectName}" size="1" >
+						<apex:selectOptions value="{!ObjectOptionList}"/>
+						<apex:actionSupport action="{!changeObject}" event="onchange" onsubmit="showMask();" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Picklist Field" />
+					<apex:selectList value="{!picklistFieldName}" size="1">
+						<apex:selectOptions value="{!FieldOptionList}"/>
+						<apex:actionSupport action="{!changeObject}" event="onchange" onsubmit="showMask();" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+		
+	</apex:form>
+	<c:StatusPanel />
+</apex:page>

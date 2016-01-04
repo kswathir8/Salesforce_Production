@@ -1,0 +1,199 @@
+<apex:page controller="ProjectListOverview" title="Project List">
+    
+    <apex:includeScript value="{!$Resource.JQuery}" />
+    <script>
+    
+    var userID = "{!userID}";
+    
+    $(document).ready(function(){
+    
+        $('div[id$="Footer"] td').each(function(){
+            $(this).css("width","18%");
+        });
+        
+        $('div[id$="ActiveBlock"] h2[class=mainTitle]').each(function(){
+            $(this).css("color","green");
+        });
+        
+        $('div[id$="QueuedBlock"] h2[class=mainTitle]').each(function(){
+            $(this).css("color","#EDC04E");
+            $(this).css("-webkit-text-stroke",".5px #AAA");
+        });
+        
+        $('div[id$="OnHoldBlock"] h2[class=mainTitle]').each(function(){
+            $(this).css("color","red");
+        });
+        
+        $('div[id$="OnHoldBlock"] tbody td[id$="OnHold-Days_since_status_change__c"] span').each(function(){
+             
+               if( parseInt($(this).text()) > 3 )    $(this).parent().css("background-color","#EDC04E");
+               if( parseInt($(this).text()) > 7 )    $(this).parent().css("background-color","red");
+           
+        });
+    
+        console.log(userID);
+    
+        $('select[id$="userSelect"]').change(function(){
+            console.log("changed User",$(this).val());
+            $('input[id$="updateOwnerShip"]').click(); 
+        });
+        
+        $('div[id$=sortDiv]').click(function(){
+            var idString = $(this).attr("id");
+            var idStringArray = idString.split(':');
+            console.log(idStringArray);
+            
+            var block = '';
+            var fieldName = '';
+            for(var i=0; i < idStringArray.length; i++){
+                if(idStringArray[i].search('OnHold-') == 0) block = 'OnHold';
+                if(idStringArray[i].search('Active-') == 0) block = 'Active';
+                if(idStringArray[i].search('Queue-') == 0) block = 'Queue';
+                if(idStringArray[i].search('Completed-') == 0) block = 'Completed';
+                
+                if(block != ''){
+                    var valueSplit  = idStringArray[i].split('-');
+                    console.log(valueSplit);
+                    fieldName =  valueSplit[1].split('header')[0];
+                    break;
+                }
+            }
+            console.log(block,fieldName);
+            updateSortField(block,fieldName);
+        });
+         
+    });
+    
+    function updateSortField(block,fieldName){
+            $('input[id$="Block"]').val(block)
+            $('input[id$="sortField"]').val(fieldName)
+            $('a[id$=changeSortOrder]').click();
+    }
+    </script>
+    
+    <style>
+        h1{
+            font-size:20px;
+        }
+        
+        #bodyCell div{
+            margin: 5px auto;
+        }
+        
+        .hidden{
+            display: hidden;
+        }
+        
+    </style>
+    
+    <div>
+        <h1>Project Snapshot</h1>
+    </div>
+    <br/>
+   
+
+<apex:form >
+
+    <apex:commandLink action="{!changeSortOrder}" value="Change Sort Order" id="changeSortOrder" styleclass="hidden"/>
+    <apex:inputText value="{!block}" id="Block" styleclass="hidden"/>
+    <apex:inputText value="{!sortField}" id="sortField" styleclass="hidden"/>
+
+    
+
+    <apex:selectlist value="{!UserID}" size="1" style="float:right;" id="userSelect">
+        <apex:selectOptions value="{!userOptions}"/>
+    </apex:selectlist>
+    
+    <apex:pageBlock title="NEXT RELEASE PROJECTS" id="QueuedBlock" >
+      <apex:pageBlockTable value="{!Queue_Milestone1_Project}" var="a" >
+            <apex:column headerValue="Project" id="Queue-Name">
+                <apex:outputLink value="/{!a.Id}" >{!a.name}</apex:outputLink>
+            </apex:column>
+             <apex:column value="{!a.Overall_Priority__c}" id="Queue-Overall_Priority__c"/>
+            <apex:column value="{!a.Type__c}" id="Queue-Type__c"/>
+            <apex:column value="{!a.Status__c}" id="Queue-Status__c"/>
+            <apex:column value="{!a.Active_Status__c}" id="Queue-Active_Status__c"/>
+            <apex:column value="{!a.This_Week_s_Activities__c}" id="Queue-This_Week_s_Activities__c"/>
+            <apex:column value="{!a.Release__c}" id="Queue-Release__c"/>
+            <apex:column value="{!a.Release_Date__c}" id="Queue-Release_Date__c"/>
+            <apex:column value="{!a.OwnerId}" id="Queue-OwnerId"/>
+            <apex:column value="{!a.Next_Step_Owner__c}" id="Queue-Next_Step_Owner__c"/>
+        </apex:pageBlockTable>
+        <apex:pageBlockSection columns="4" id="QueueFooter">
+            <apex:outputText value="Page {!QueuePageNumber} of  {!QueueResultPages}"/>
+            <apex:commandLink action="{!getQueuePrevious}" value="Previous" style="float:right;" rendered="{!QueueHasPrevious}"/>
+            <apex:outputText value="Previous" style="float:right;" rendered="{!(!QueueHasPrevious)}"/>
+            <apex:commandLink action="{!getQueueNext}" value="Next" rendered="{!QueueHasNext}"/>
+            <apex:outputText value="Next" rendered="{!(!QueueHasNext)}"/>
+            <apex:outputText value=" "/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <br/>
+    <br/>
+    <apex:commandButton action="{!changeOwnerShip}" style="display:none;" id="updateOwnerShip"/>
+    <br/>
+    <apex:pageBlock title="Open Projects" id="ActiveBlock" >
+      <apex:pageBlockTable value="{!Active_Milestone1_Project}" var="a" >
+            <apex:column headerValue="Project" id="Active-Name">
+                <apex:outputLink value="/{!a.Id}" >{!a.name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!a.Type__c}" id="Active-Type__c"/>
+            <apex:column value="{!a.Release__c}" id="Active-Release__c"/>
+            <apex:column value="{!a.Release_Date__c}" id="Active-Release_Date__c"/>
+            <apex:column value="{!a.OwnerId}" id="Active-OwnerId"/>
+        </apex:pageBlockTable>
+        <apex:pageBlockSection columns="4" id="ActiveFooter">
+            <apex:outputText value="Page {!ActivePageNumber} of  {!ActiveResultPages}"/>
+            <apex:commandLink action="{!getActivePrevious}" value="Previous" style="float:right;" rendered="{!ActiveHasPrevious}"/>
+            <apex:outputText value="Previous" style="float:right;" rendered="{!(!ActiveHasPrevious)}"/>
+            <apex:commandLink action="{!getActiveNext}" value="Next" rendered="{!ActiveHasNext}"/>
+            <apex:outputText value="Next" rendered="{!(!ActiveHasNext)}"/>
+            <apex:outputText value=" "/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <br/>
+    <br/>
+    
+    <apex:pageBlock title="On Hold Projects" id="OnHoldBlock">
+      <apex:pageBlockTable value="{!OnHold_Milestone1_Project}" var="o" > 
+            <apex:column headerValue="Project" id="OnHold-Name">
+                <apex:outputLink value="/{!o.Id}" >{!o.name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!o.Waiting_For__c}" id="OnHold-Waiting_For__c"/>
+            <apex:column value="{!o.Days_since_status_change__c}" id="OnHold-Days_since_status_change__c"/>
+            <apex:column value="{!o.OwnerId}" id="OnHold-OwnerId"/>
+            <apex:column value="{!o.Type__c}" id="OnHold-Type__c"/>
+            <apex:column value="{!o.Release__c}" id="OnHold-Release__c"/>
+        </apex:pageBlockTable>
+        <apex:pageBlockSection columns="4" id="OnHoldFooter">
+            <apex:outputText value="Page {!OnHoldPageNumber} of  {!OnHoldResultPages}"/>
+            <apex:commandLink action="{!getOnHoldPrevious}" value="Previous" style="float:right;" rendered="{!OnHoldHasPrevious}"/>
+            <apex:outputText value="Previous" style="float:right;" rendered="{!(!OnHoldHasPrevious)}"/>
+            <apex:commandLink action="{!getOnHoldNext}" value="Next" rendered="{!OnHoldHasNext}"/>
+            <apex:outputText value="Next" rendered="{!(!OnHoldHasNext)}"/>
+            <apex:outputText />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <br/>
+    <br/>
+    <apex:pageBlock title="Completed Projects to Date" >
+      <apex:pageBlockTable value="{!Completed_Milestone1_Project}" var="c" > 
+            <apex:column headerValue="Project" id="Completed-Name">
+                <apex:outputLink value="/{!c.Id}" >{!c.name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!c.Type__c}" id="Completed-Type__c"></apex:column>
+            <apex:column value="{!c.Release__c}" id="Completed-Release__c"/>
+            <apex:column value="{!c.Release_Date__c}" id="Completed-Release_Date__c"/>
+            <apex:column value="{!c.OwnerId}" id="Completed-OwnerId"/>
+        </apex:pageBlockTable>
+        <apex:pageBlockSection columns="4" id="CompletedFooter">
+            <apex:outputText value="Page {!CompletedPageNumber} of  {!CompletedResultPages}"/>
+            <apex:commandLink action="{!getCompletedPrevious}" value="Previous" style="float:right;" rendered="{!CompletedHasPrevious}"/>
+            <apex:outputText value="Previous" style="float:right;" rendered="{!(!CompletedHasPrevious)}"/>
+            <apex:commandLink action="{!getCompletedNext}" value="Next" rendered="{!CompletedHasNext}"/>
+            <apex:outputText value="Next" rendered="{!(!CompletedHasNext)}"/>
+            <apex:outputText />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+   </apex:form>
+</apex:page>

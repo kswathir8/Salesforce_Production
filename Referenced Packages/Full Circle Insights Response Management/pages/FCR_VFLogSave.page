@@ -1,0 +1,5 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" contentType="text/plain#{!DiagnosticLogName}" cache="true" >
+<apex:repeat value="{!DiagnosticLog}" var="line">
+{!line} 
+</apex:repeat>
+</apex:page>

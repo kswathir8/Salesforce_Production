@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Conga_Composer_O5e_oauth</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <modules>
+        <module>
+            <label>Conga_Composer_O5e_oauth</label>
+            <moduleType>connected</moduleType>
+            <name>Conga_Composer_O5e_oauth</name>
+            <types>
+                <members>Conga_Composer_O5e_oauth_devConfig</members>
+                <name>ConnectivityDevConfigMetadata</name>
+            </types>
+            <types>
+                <members>APXTConga4__Conga_Composer_O5e_oauth</members>
+                <name>Module</name>
+            </types>
+            <version>13.0</version>
+        </module>
+    </modules>
+    <namespacePrefix>APXTConga4</namespacePrefix>
+    <version>35.0</version>
+</Package>

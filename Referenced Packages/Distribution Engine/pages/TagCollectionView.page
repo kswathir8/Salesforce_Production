@@ -1,0 +1,88 @@
+<apex:page standardController="n2de__Tag_Category__c" extensions="n2de.TagController" sidebar="false" tabStyle="Distribution_Tags__tab">
+	
+	<c:CommonHeader />
+	<c:CommonMask /> 
+	<c:CommonHelp help_page="distributor-tags"/>
+	
+	<style>
+	.panel{
+		max-height: 400px;
+		overflow: auto;
+	}
+	.panel td:first-of-type{
+		width: 50px;
+	}
+	.panel td:nth-of-type(2){
+		width: 450px;
+	}
+	</style>
+	<script>
+	function selectAll(){
+		var isSelectAll = $("#select_all").prop('checked');
+		$(".selected_rows").prop('checked', isSelectAll);
+	}
+	function confirmDelete(){
+		var numberOfRowsSelected = $(".selected_rows:checked").length;
+		var confirmResult = true;
+		if(numberOfRowsSelected == 0){
+			alert('No tags selected');
+			confirmResult = false;
+		}
+		if(confirmResult){
+			showMask();
+		}
+		return confirmResult;
+	}
+	</script>
+	<apex:form >
+		<apex:sectionHeader title="Tag Collections" subtitle="{!IF(n2de__Tag_Category__c.Name != null, n2de__Tag_Category__c.Name, 'New')}"/>
+		<apex:pageMessages />
+		<c:TagsTabSelection activeTab="manage"/>
+		<apex:pageBlock title="Tags" mode="detail">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Add Tags" action="{!newTags}" />
+				<apex:commandButton value="Delete Tags" action="{!deleteTagValues}" onclick="return confirmDelete();" />
+				<apex:commandButton value="Back" action="{!toListPage}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1" collapsible="false">
+				<apex:outputPanel styleClass="panel" layout="block">
+					<apex:pageBlockTable value="{!tagValuesList}" var="tv">
+						<apex:column >
+							<apex:facet name="header"><input type="checkbox" value="Select All" id="select_all" onchange="selectAll()"/></apex:facet>
+							<apex:inputCheckbox value="{!tv.selected}" disabled="{!tv.inUse}" styleClass="selected_rows" title="{!IF(tv.InUse, 'This tag is used by one or more Distributor rules. It cannot be deleted while it is in use', '')}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Tag Name</apex:facet>
+							<apex:outputText value="{!tv.tagRecord.name}" rendered="{!tv.tagRecord.id != ''}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Created by</apex:facet>
+							<apex:outputText value="{!tv.tagRecord.CreatedBy.Name}" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Created date</apex:facet>
+							<apex:outputField value="{!tv.tagRecord.CreatedDate}" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Last modified by</apex:facet>
+							<apex:outputText value="{!tv.tagRecord.LastModifiedBy.Name}" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Last modified date</apex:facet>
+							<apex:outputField value="{!tv.tagRecord.LastModifiedDate}" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">In use by distributor</apex:facet>
+							<img src="/img/checkbox_{!IF(tv.InUse, '', 'un')}checked.gif" title="{!IF(tv.InUse, 'This tag is used by one or more Distributor rules. It cannot be deleted while it is in use', 'This tag is not being used')}" />
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Assigned to user</apex:facet>
+							<img src="/img/checkbox_{!IF(tv.assigned, '', 'un')}checked.gif" title="{!IF(tv.assigned, 'This tag is assigned to one or more users', 'This tag is not assigned to any users')}" />
+						</apex:column>
+					</apex:pageBlockTable>
+				</apex:outputPanel>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+	<c:StatusPanel />
+</apex:page>

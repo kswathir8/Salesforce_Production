@@ -1,0 +1,602 @@
+<apex:component controller="n2de.TagAssignController" >
+    <c:CommonMask />
+    <c:CommonSavedMask />
+    <c:CommonHelp help_page="distributor-tags"/>
+    <style>
+    .tag_values .tag{
+        border: 1px solid #56aa1c;
+        background-color: #56aa1c;
+        color: white;
+        margin-top: 3px;
+        padding: 5px;
+        float: left;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: move;
+        font-size: 10pt;
+        font-family: FontAwesome, Arial;
+     }
+    .panel{
+        height: 400px;
+        width: 100%;
+        overflow: auto;
+    }
+    .panel table{
+        height: 100%;
+    }
+    .search_box{
+        float: right;
+    }
+    .search_box input{
+        width: 150px;
+        margin-left: 10px;
+    }
+    .drag_hover_over div{
+        background-color: yellowgreen;
+    }
+    .delete_hover_over{
+        background: url('{!URLFOR($Resource.DEResources, 'images/cross32.png')}') right center no-repeat;
+        background-size: 20px;
+        padding: 10px;
+    }
+    .available{
+    }
+    .user_tag_val input{
+        display: none;
+    }
+    .highlight{
+        border: 1px solid lightgray !important;
+        color: yellow !important;
+    }
+    .selected{
+        border: 1px solid lightgray !important;
+        background-color: orange !important;
+    }
+    .tag_collection{
+        float: left;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        clear: both;
+        margin: 3px;
+        padding: 3px;
+        width: 95%;
+        background-color: #fafafa;
+    }
+    .tag_collection span{
+        float: left;
+        color: gray;
+        font-family: FontAwesome, Arial;
+        margin-left: 5px;
+    }
+    .tag_collection .tag:first-of-type{
+        clear: both;
+    }
+    .user_profile{
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        padding: 10px;
+        border-radius: 5px;
+        color: gray;
+        font-weight: bold;
+        margin: 3px;
+        display: block;
+        height: 97%;
+        text-align: center;
+        background-color: #fafafa;
+        vertical-align: middle;
+    }
+    .user_profile div{
+        margin-top: 5px;
+    }
+    .user_table td:first-of-type{
+        width: 150px;
+    }
+    .user_table td{
+        padding: 4px 2px 4px 5px;
+        color: #333;
+        border: none !important;
+        border-bottom: 1px solid lightgray !important;
+    }
+    .view_selection {
+        float: right;
+        margin: 10px;
+        height: 0;
+        top: -50px;
+        position: relative;
+        margin-top: 15px;
+    }
+    </style>
+    <script>
+    var tagScrollPosition;
+    var userScrollPosition;
+    var tagFilterMultiselect;
+    var tagCurrentCollection;
+    var lowestIndex = null;
+    var highestIndex = null;
+    var TEAM_MEMBER_ICON_URL = '{!URLFOR($Resource.DEResources, 'images/teammember32.png')}';
+    
+    //Show mask while page loads
+    showMask();
+    
+    function fidoCallback(status) { }
+     
+    // Update to jquery :selector, make case insensitive
+    jQuery.expr[':'].contains = function(a, i, m) {
+      return jQuery(a).text().toUpperCase()
+          .indexOf(m[3].toUpperCase()) >= 0;
+    };
+    
+    //Load available tag collections - javascript remote
+    function loadTagCollections(){
+        showMask();
+        var tagFilter = $(".tag_filter").val();
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TagAssignController.loadTagList}',tagFilter,
+            function(result, event){
+                if (event.type === 'exception'){
+                    alert(event.message);
+                    hideMask();
+                }else{
+                    buildTagCollectionPanel(result);
+                }
+        });
+    }
+    
+    //Load available users - javascript remote
+    function loadUsers(){
+        showMask();
+        var teamId = $(".team_filter").val();
+        if(teamId == undefined){
+            teamId = null;
+        }
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TagAssignController.loadUserList}', teamId,
+            function(result, event){
+                if (event.type === 'exception'){
+                    alert(event.message);
+                    hideMask();
+                }else{
+                    buildUserPanel(result);
+                }
+        });
+    }
+    
+    //Add a tag to a user - javascript remote
+    function multiTagUserRA(userId, tagIdList){
+        showMask();
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TagAssignController.tagUserRA}', userId, tagIdList,
+            function(result, event){
+                if (event.type === 'exception'){
+                    alert(event.message);
+                    hideMask();
+                }else{
+                    loadUsers();
+                    hideMask();
+                    showSavedMask();
+                }
+        });
+    }
+    
+    //Remove a tag from a user - javascript remote
+    function unTagUserRA(tagUserId){
+        showMask();
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TagAssignController.unTagUserRA}', tagUserId,
+            function(result, event){
+                if (event.type === 'exception'){
+                    alert(event.message);
+                    hideMask();
+                }else{
+                    loadUsers();
+                   	hideMask();
+                    showSavedMask();
+                }
+        });
+    }
+    
+    //Render the available tag collection panel html
+    function buildTagCollectionPanel(tagCollectionList){
+        var html = '';
+        for(var i=0; i < tagCollectionList.length; i++){
+            var tagCollection = tagCollectionList[i].tagCategorySObject;
+            html += '<div class="tag_collection" id="' + tagCollection.Id + '">';
+            html += '<span>' + tagCollection.Name + '</span>';
+            html += '<div style="clear:both"/>';
+            var tagList = tagCollection.Distributor_Tag_Values__r;
+            if(tagList == undefined){
+                tagList = tagCollection.n2de__Distributor_Tag_Values__r;
+            }
+            if(tagList != undefined){
+                for(var j=0; j < tagList.length; j++){
+                    var tag = tagList[j];
+                    html += '<div id="' + tag.Id + '" class="tag fa fa-tag fa-lg ">&nbsp;&nbsp;' + tag.Name + '</div>';
+                }
+            }
+            html += '</div>';
+        }
+        $("#tag_collection_list").html(html);
+        resetSearchFilters();
+        initTagPanel();
+    }
+    
+    //Render the user panel html
+    function buildUserPanel(userList){
+        var html = '';
+        
+        for(var i=0; i < userList.length; i++){
+            var thisUser = userList[i];
+            var u = thisUser.userRecord;
+            html += '<tr id="' + u.Id + '" class="user_row userpanel_droppable" team_ids="' + thisUser.teamIds + '">';
+            html += '<td id="' + u.Id + '" >';
+            html += '<div class="user_profile">';
+            var imgUrl = TEAM_MEMBER_ICON_URL;
+            if(u.photoUrl != undefined){
+                imgUrl += u.photoUrl;
+            }
+            html += '<img src="' + imgUrl + '" styleClass="profile_image" />';
+            html += '<div><a href="/apex/{!NamespacePrefix}TagAssignment?id=' + u.Id + '">' + u.Name + '</a></div>';
+            html += '</td>';
+            html += '<td id="' +  u.Id + '">';
+            html += '<div class="tag_values">';
+            
+            if(thisUser.tags != undefined){
+                for(var j=0; j < thisUser.tags.length; j++){
+                    var tagCollection = thisUser.tags[j];
+                    html += '<div class="tag_collection">';
+                    html += '<span>' + tagCollection.name + '</span>';
+                    html += '<div style="clear:both"/>';
+                    if(tagCollection.tagValues != undefined){
+                        for(var k=0; k < tagCollection.tagValues.length; k++){
+                            var tagVal = tagCollection.tagValues[k];
+                            html += '<div class="user_tag_val tag fa fa-tag fa-lg" id="' + tagVal.tagUserId + '">';
+                            html += '&nbsp;&nbsp;' + tagVal.tagRecord.Name + '</div>';
+                        }
+                    }
+                    html += '</div>';
+                }
+            }
+            html += '</div>';
+            html += '</td>';
+            html += '</tr>';
+        }
+        $("#user_list").html(html);
+        
+        resetSearchFilters();
+        initUserPanel();
+    }
+    
+    //Initialise on document ready
+    $(document).ready(function() {
+        loadTagCollections();
+        loadUsers();
+        initFilters();
+    });
+    
+    //Initialise the filters and enable drag drop on tags
+    function init(){
+        initDragDrop();
+        hideMask();
+    }
+    
+    //Initialise the filters multi-select
+    function initFilters(){
+        $(".team_filter").change(function(event, ui){
+            $('#user_search_box input').val('');
+            loadUsers();
+        });
+        $(".tag_filter").change(function(event, ui){
+            loadTagCollections();
+        });
+        $('#user_search_box input').keyup(function( event ) {
+            filterUsers();
+        });
+        $('#tag_search_box input').keyup(function( event ) {
+            filterTags();
+        });
+    }
+    
+    
+    //Initialise the drag drop
+    function initUserPanel(){
+        //Drag tags from users
+        $( ".user_tag_val" ).draggable({ 
+            revert: true, 
+            helper: function(event) {
+                if(!$(this).hasClass('selected')){
+                    $(".tag").removeClass('selected');
+                    $(this).addClass('selected');
+                }
+                var customHelper = $('<div/>');
+                var allSelected = $('.user_panel').find('.tag.selected');
+                if(allSelected.size() > 0){
+                    $.each(allSelected, function(){
+                        var clonedTag = $(this).clone();
+                        //$(clonedTag).css($(this).offset());
+                        $(customHelper).append(clonedTag);
+                    });
+                    $(customHelper).width($(this).parent().width());
+                }else{
+                    customHelper = $(this).clone();
+                }
+                return customHelper;
+            },
+            cursorAt: { top: 0, left: $(this).parent().width() / 2},
+            drag: function( event, ui ) {
+                
+            }       
+        });
+        //Drop tags onto users
+        $( ".userpanel_droppable").droppable({
+           accept: ".tagPanel .tag",
+           tolerance:"pointer",
+           over: function( event, ui ) {
+              $(this).addClass('drag_hover_over');
+           },
+           out: function( event, ui ) {
+              $(this).removeClass('drag_hover_over');
+           },
+           drop: function( event, ui ) {
+              $(this).removeClass('drag_hover_over');
+              var tagId = ui.draggable.context.id;
+              var helperTags = ui.helper.find('.tag');
+              var tagIdList = [];
+              for(var i=0; i<helperTags.length; i++){
+                var thisDroppedTag = helperTags[i];
+                tagIdList.push(thisDroppedTag.id);
+              }
+              var userId = $(this).attr("id"); //event.target.id;
+              tagScrollPosition = $(".tag_panel").scrollTop();
+              userScrollPosition = $(".user_panel").scrollTop();
+              multiTagUserRA(userId, tagIdList);
+           }
+        });
+        
+        $(".user_panel .tag").hover(
+            function() {
+                $( this ).addClass('highlight');
+            }, function() {
+                $( this ).removeClass('highlight');
+            }
+        );
+        $(".user_panel .tag").click(
+            function(e) {
+                if(tagCurrentCollection && tagCurrentCollection != $(this).parent().attr('id')){
+                    $(".tag").removeClass('selected');
+                    lowestIndex = null;
+                    highestIndex = null;
+                }
+                tagCurrentCollection = $(this).parent().attr('id');
+                
+                var isCntrlKey = e.ctrlKey || e.metaKey;
+                var isShiftKey = e.shiftKey;
+                
+                //If cntrl or shift pressed then make a note of indexes otherwise reset
+                if(!isCntrlKey && !isShiftKey){
+                    $(".tag").removeClass('selected');
+                    lowestIndex = null;
+                    highestIndex = null;
+                }
+                
+                //Keep a note of the selected indexes for multi-select
+                var thisIndex = $(this).index();
+                if(lowestIndex == null || thisIndex < lowestIndex){
+                    lowestIndex = thisIndex - 2;
+                }
+                if(highestIndex == null || thisIndex > highestIndex){
+                    highestIndex = thisIndex - 2;
+                }
+                    
+                if(isShiftKey && lowestIndex != null && highestIndex != null && lowestIndex < highestIndex){
+                    var allTags = $(this).parent().find('.tag');
+                    $.each(allTags, function(index){
+                        if(index >= lowestIndex && index <= highestIndex){
+                            $( this ).addClass('selected');
+                        }
+                    });
+                }
+                if(isCntrlKey && $(this).hasClass('selected')){
+                    $(this).removeClass('selected');
+                }else{
+                    $( this ).addClass('selected');
+                }
+            }
+        );
+        
+        hideMask();
+    }
+    
+    function initTagPanel(){
+        
+        //Drag tags from tag panel
+        $( ".tagPanel .tag" ).draggable({ 
+            revert: true, 
+            helper: function(event) {
+                if(!$(this).hasClass('selected')){
+                    $(".tag").removeClass('selected');
+                    $(this).addClass('selected');
+                }
+                var customHelper = $('<div/>');
+                var allSelected = $('.tagPanel').find('.tag.selected');
+                if(allSelected.size() > 0){
+                    $.each(allSelected, function(){
+                        var clonedTag = $(this).clone();
+                        //$(clonedTag).css($(this).offset());
+                        $(customHelper).append(clonedTag);
+                    });
+                    $(customHelper).width($(this).parent().width());
+                }else{
+                    customHelper = $(this).clone();
+                }
+                return customHelper;
+            },
+            cursorAt: { top: 0, left: $(this).parent().width() / 2},
+            drag: function( event, ui ) {
+                
+            }   
+        });
+        
+        //Drop user tags to remove
+        $( ".tagPanel").droppable({
+           accept: ".user_tag_val",
+           tolerance:"pointer",
+           over: function( event, ui ) {
+              $(this).addClass('drag_hover_over');
+           },
+           out: function( event, ui ) {
+              $(this).removeClass('drag_hover_over');
+           },
+           drop: function( event, ui ) {
+              $(this).removeClass('drag_hover_over');
+              var tagId = ui.draggable.context.id;
+              var helperTags = ui.helper.find('.tag');
+              var tagUserIdList = [];
+              for(var i=0; i<helperTags.length; i++){
+                var thisDroppedTag = helperTags[i];
+                tagUserIdList.push(thisDroppedTag.id);
+              }
+              tagScrollPosition = $(".tag_panel").scrollTop();
+              userScrollPosition = $(".user_panel").scrollTop();
+              unTagUserRA(tagUserIdList);
+           }
+        });
+        
+        //Click on tags for multiselect add
+        $(".tagPanel .tag").click(
+            function(e) {
+                if(tagCurrentCollection && tagCurrentCollection != $(this).parent().attr('id')){
+                    $(".tag").removeClass('selected');
+                    lowestIndex = null;
+                    highestIndex = null;
+                }
+                tagCurrentCollection = $(this).parent().attr('id');
+                
+                var isCntrlKey = e.ctrlKey || e.metaKey;
+                var isShiftKey = e.shiftKey;
+                
+                //If cntrl or shift pressed then make a note of indexes otherwise reset
+                if(!isCntrlKey && !isShiftKey){
+                    $(".tag").removeClass('selected');
+                    lowestIndex = null;
+                    highestIndex = null;
+                }
+                
+                //Keep a note of the selected indexes for multi-select
+                var thisIndex = $(this).index();
+                if(lowestIndex == null || thisIndex < lowestIndex){
+                    lowestIndex = thisIndex - 2;
+                }
+                if(highestIndex == null || thisIndex > highestIndex){
+                    highestIndex = thisIndex - 2;
+                }
+                    
+                if(isShiftKey && lowestIndex != null && highestIndex != null && lowestIndex < highestIndex){
+                    var allTags = $(this).parent().find('.tag');
+                    $.each(allTags, function(index){
+                        if(index >= lowestIndex && index <= highestIndex){
+                            $( this ).addClass('selected');
+                        }
+                    });
+                }
+                if(isCntrlKey && $(this).hasClass('selected')){
+                    $(this).removeClass('selected');
+                }else{
+                    $( this ).addClass('selected');
+                }
+            }
+        );
+        
+        $(".tagPanel .tag").hover(
+            function() {
+                $( this ).addClass('highlight');
+            }, function() {
+                $( this ).removeClass('highlight');
+            }
+        );
+        
+        hideMask();
+    }
+    
+    //Resest the scrollbars to the last position after tagging / untagging
+    function setScrollbars(){
+        $(".tag_panel").scrollTop(tagScrollPosition);
+        $(".user_panel").scrollTop(userScrollPosition);
+    }
+    
+    //Filter the list of users by name
+    function filterUsers(){
+        var userName = $('#user_search_box input').val();
+        userName = userName.toUpperCase();
+        $(".user_row").hide();
+        $(".user_row .user_profile:contains('" + userName + "')").each(function(){
+            $(this).parent().parent().show();
+        });  
+    }
+    
+    //Filter the list of tags
+    function filterTags(){
+        var tagName = $('#tag_search_box input').val();
+        tagName = tagName.toUpperCase();
+        $(".tag").hide();
+        $(".tag:contains('" + tagName + "')").each(function(){
+            $(this).show();
+        });  
+    }
+    
+    function resetSearchFilters(){
+        $('#user_search_box input').val('');
+         $('#tag_search_box input').val('');
+    }
+    
+    </script>   
+    <apex:form >
+        
+        <apex:sectionHeader title="Tag Collections" subtitle="Tag Users"/>
+        <apex:pageMessages id="pageMessages"/>
+        <c:TagsTabSelection activeTab="assign"/>
+        
+        <apex:pageBlock title="Tag Assignment">
+            <apex:outputPanel styleClass="view_selection" id="view_select">
+                <apex:outputLink value="/apex/{!NamespacePrefix}TagAssignment?view=list">
+                    <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="List view" width="20" height="20" />
+                </apex:outputLink>
+                <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_verticalbaricon.png')}" height="20" />
+                <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/grid-32.png')}" title="Grid view" width="20" height="20" />
+            </apex:outputPanel>
+            <apex:pageBlockSection columns="2">
+                <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:selectList value="{!tagFilter}" size="1" styleClass="tag_filter">
+                        <apex:selectOptions value="{!tagOptionList}" />
+                    </apex:selectList>
+                    <div id="tag_search_box" class="search_box">Tag <input type="text"/></div>
+                </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:selectList value="{!teamFilter}" size="1" styleClass="team_filter" >
+                        <apex:selectOptions value="{!teamOptionList}" />
+                    </apex:selectList>
+                    <div id="user_search_box" class="search_box">User <input type="text"/></div>
+                </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel id="tag_block" styleClass="tagPanel panel" layout="block">
+                        <table class="list team_table" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <div id="tag_collection_list" class="tag_values">
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="userPanel">
+                    <apex:outputPanel styleClass="panel user_panel" layout="block" id="userBlock">
+                        <table id="user_list" class="list user_table" border="0" cellpadding="0" cellspacing="0">
+                            
+                        </table>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:component>

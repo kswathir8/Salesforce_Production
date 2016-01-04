@@ -1,0 +1,45 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" extensions="FCRM.FCR_VFDealExplorerController" title="Data Explorer Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Data Explorer" help="https://www.fullcirclecrm.com/fcrm/app/data-explorer-config/">
+
+        <apex:form id="recproc">
+            <apex:pageblock title="Deal Explorer" mode="edit" >
+                <apex:pagemessages />
+                <apex:pageBlockSection columns="2">
+                    <apex:outputText >Select event types to exclude.  '{!LabelForEvent}' refers to events where no event type is specified.</apex:outputText>
+                    <apex:outputText >Select task types to exclude. '{!LabelForTask}' refers to tasks where no task type is specified.</apex:outputtext>
+                    <c:FCR_VFDualListSelect AvailableIDs="{!AvailableEventTypes}" AvailableStrings="{!AvailableEventTypeLabels}"
+                        SelectedIDs="{!SelectedEventTypes}" SelectedStrings="{!SelectedEventTypeLabels}" AllowReorder="false" MaxSelect="15" />
+                    <c:FCR_VFDualListSelect AvailableIDs="{!AvailableTaskTypes}" AvailableStrings="{!AvailableTaskTypeLabels}"
+                        SelectedIDs="{!SelectedTaskTypes}" SelectedStrings="{!SelectedTaskTypeLabels}" AllowReorder="false" MaxSelect="15" />
+                    <apex:pageBlockSectionItem > </apex:pageBlockSectionItem> <!-- Add some extra space -->                   
+                    <apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+                    <apex:inputField value="{!DataExplorerConfig.FCRM__Days_From_Create__c}"/>
+                    <apex:outputtext >Only responses and activities that take within this number of days prior to the opportunity create date, 
+                    or between opportunity create and close, will be displayed. Leave blank for no date limits.</apex:outputtext>
+                    <apex:selectList size="1" label="Left panel fieldset" value="{!DataExplorerConfig.FCRM__Left_Deal_Fieldset__c}">
+                        <apex:selectOptions value="{!OpportunityFieldsets}" />
+                    </apex:selectList>
+                    <apex:outputText >You can define Opportunity fieldsets that specify the fields to display in the upper left 
+                    and upper right panels of the Deal Explorer page. The list of available fieldsets will be blank if no Opportunity fieldsets are defined.
+                    </apex:outputText>
+                    <apex:selectList size="1" label="Right panel fieldset" value="{!DataExplorerConfig.FCRM__Right_Deal_Fieldset__c}">
+                        <apex:selectOptions value="{!OpportunityFieldsets}" />
+                    </apex:selectList>
+    
+                </apex:pageBlockSection>
+                <apex:pageBlockButtons location="bottom" >
+                    <apex:commandButton value="Save and return to main" action="{!DealExplorerPageSave}"/>
+                    <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+                </apex:pageBlockButtons>
+            
+            </apex:pageblock>
+            <apex:pageblock id="idDiagnostics" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on currently saved Data Explorer configuration.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!DataExplorerDiagnosticInfo}" />
+            </apex:pageblock>
+
+        </apex:form>
+    </apex:SectionHeader>
+</apex:page>

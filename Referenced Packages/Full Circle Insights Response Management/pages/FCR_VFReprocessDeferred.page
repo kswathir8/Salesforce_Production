@@ -1,0 +1,3 @@
+<apex:page standardController="FCRM__FCR_DeferredUpdateItem__c" recordSetVar="deferreditems" extensions="FCRM.FCR_VFDeferredUpdateController" action="{!VFReprocess}" >
+  <h1>Reprocessing...</h1>
+</apex:page>

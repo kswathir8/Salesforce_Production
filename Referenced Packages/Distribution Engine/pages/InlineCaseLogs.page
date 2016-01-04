@@ -1,0 +1,3 @@
+<apex:page standardController="Case">
+	<c:InlineLogs2 recordName="Case" recordId="{!case.Id}"/>
+</apex:page>

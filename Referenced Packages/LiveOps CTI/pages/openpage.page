@@ -1,0 +1,3 @@
+<apex:page standardController="Contact" extensions="LiveOpsTransfer.fetchRecordIDTest" action="{!getRedirectURL}" sidebar="true" showHeader="true">
+<b> No Match Found </b>
+</apex:page>

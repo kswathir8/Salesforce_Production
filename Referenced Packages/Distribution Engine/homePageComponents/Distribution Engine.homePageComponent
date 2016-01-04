@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HomePageComponent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <body>&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;Deprecated - Summer 15&lt;/font&gt;&lt;/b&gt;&lt;br style=&quot;&quot;&gt;
+&lt;br style=&quot;&quot;&gt;
+&lt;span style=&quot;&quot;&gt;Please switch to new component &amp;quot;&lt;/span&gt;&lt;b&gt;Distribution Engine Widget&lt;/b&gt;&lt;span style=&quot;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;br style=&quot;&quot;&gt;
+&lt;br style=&quot;&quot;&gt;
+&lt;a href=&quot;http://help.nc-squared.com/salesforce-summer-15-updating-the-widget&quot; style=&quot;&quot;&gt;Click here for upgrade steps&lt;/a&gt;</body>
+    <pageComponentType>htmlArea</pageComponentType>
+    <width>narrow</width>
+</HomePageComponent>

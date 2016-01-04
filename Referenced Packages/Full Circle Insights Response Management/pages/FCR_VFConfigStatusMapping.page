@@ -1,0 +1,285 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Status Mapping Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:SectionHeader title="Full Circle CRM Status Mapping Configuration"  help="https://www.fullcirclecrm.com/fcrm/app/status-mapping/">
+    <apex:form >
+    <apex:actionFunction name="updatestatus" reRender="idDiagnosticInfo"/>
+    <apex:actionFunction name="updatedefaults" reRender="idDefaultsSection,idDefaultsSection2,idConversionOverrides" />
+    <apex:actionFunction name="updateconversions" reRender="idConversionOverrides" />
+    <apex:actionFunction name="returnhomeaftersave" action="{!if(DiagnosticLevel<2,ConfigMainReference,null)}"/>
+    <apex:outputPanel lang="block" id="idTheWholeShebang">
+        <apex:pageBlock mode="edit">
+            <apex:outputPanel id="idDiagnosticInfo" layout="block" rendered="{!if(DiagnosticLevel>=1,true,false)}">
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!CurrentStatusMappingDiagnosticInfo}" />
+            </apex:outputPanel>
+
+            <apex:pageBlockSection columns="1" title="Status Mapping Table">
+                <apex:outputText >
+                    This Status Mapping Table maps the Lead and Contact status values to the Response status values on the Campaign Member object. 
+                    The purpose of this table is to provide a great deal of flexibility in how status values are defined and mapped. 
+                    Check the box under Contact or Lead to identify if the status value is on the lead, contact or both. 
+                    Then select a Full Circle CRM Response status value to map to your Lead or Contact status. 
+                    Check the Active box if the status is considered an Active Response. 
+                    Check the Sales Accepted box, if the status is considered to be mapped to the Sales Accepted funnel stage.<br /><br />
+                    The status value list on the far left is pre-populated on install with example values. 
+                    If you want to create a new status mapping, type in the lead or contact status value and click the Create button.
+                </apex:outputText>
+            </apex:pageBlockSection>
+            <apex:messages />
+            <table>
+                <tr>
+                    <td style="font-weight:bold">Status</td>
+                    <td style="font-weight:bold">Contact</td>
+                    <td style="font-weight:bold">Lead</td>
+                    <td style="font-weight:bold">Response Status</td>
+                    <td style="font-weight:bold">Active</td>
+                    <td style="font-weight:bold">Sales Accepted</td>
+                    <td></td>
+                </tr>
+                <apex:repeat value="{!StatusMappings}" var="mapping" >
+                    <tr>
+                    <td >{!mapping.FCRM__FullName__c}</td>
+                    <td style="text-align:center"><apex:inputCheckbox value="{!mapping.FCRM__OnContact__c}" onchange="updatedefaults()" /></td>
+                    <td style="text-align:center"><apex:inputCheckbox value="{!mapping.FCRM__OnLead__c}"  onchange="updatedefaults()" /></td>
+                    <td ><apex:selectList size="0" value="{!mapping.FCRM__Response_Status__c}">
+                            <apex:selectOptions value="{!ResponseStatusOptions}" />
+                        </apex:selectList>
+                    </td>
+                    <!--<td ><apex:inputtext value="{!mapping.FCRM__Response_Status__c}" size="30"/></td> -->
+                    <td style="text-align:center"><apex:inputCheckbox value="{!mapping.FCRM__IsActive__c}" onchange="updateconversions()"/></td>
+                    <td style="text-align:center"><apex:inputCheckbox value="{!mapping.FCRM__SalesAcceptedResponse__c}"/></td>
+                    <td><apex:commandButton oncomplete="updatestatus()" action="{!DeleteMapping}" value="Delete" reRender="idTheWholeShebang">
+                            <apex:param name="MappingName" value="{!mapping.FCRM__FullName__c}" />
+                        </apex:CommandButton>
+                     </td>
+                    </tr>
+                </apex:repeat>
+            
+            
+            </table>
+            <apex:pageBlockSection columns="2">
+                <apex:pageblockSectionItem >
+                    <apex:commandButton oncomplete="updatestatus()" action="{!NewStatusMapping}" value="Create"  reRender="idTheWholeShebang"/>
+                    <apex:pageblockSectionItem >
+                        <apex:inputtext MaxLength="40" value="{!NewStatusMappingName}"/>
+                        <apex:pagemessage severity="Error" rendered="{!Not(ISBlank(CreateStatusMappingError))}" summary="{!CreateStatusMappingError}" />
+                    </apex:pageblockSectionItem>
+                </apex:pageblockSectionItem>
+                <apex:outputText rendered="false" value="Specify the status of the new mapping entry. You'll then be able to set the remaining fields." />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" title="Lead/Contact Default Status" id="idDefaultsSection">
+                <apex:outputText >
+                    Specify the initial status values under certain conditions or after certain 
+                    activities in Full Circle CRM Response Management.<br /><br />
+                </apex:outputText>
+                <apex:outputText ></apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idForceLead" value="Initial Lead status" />
+                    <apex:selectList id="idForceLead" size="0" value="{!ForceLeadStatusOnCreate}">
+                        <apex:selectOptions value="{!StatusMappingOptionsLeads}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Lead status (and related response status) for newly created Lead.</apex:outputText>                
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idForceContact" value="Initial Contact status" />
+                    <apex:selectList id="idForceContact" size="0" value="{!ForceContactStatusOnCreate}">
+                        <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Contact status for newly created Contact.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idLeadResponseCreate" value="Lead status after response" />
+                    <apex:selectList id="idLeadResponseCreate" size="0" value="{!DefaultLeadResponseStatusOnCreate}">
+                        <apex:selectOptions value="{!StatusMappingOptionsLeads}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Lead status (and related response status) for new active response.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idCreateContact" value="Contact status after response" />
+                    <apex:selectList id="idCreateContact" size="0" value="{!DefaultContactStatusOnCreate}">
+                        <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText > Default Contact status after new active response.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idOpportunityClose" value="Contact status after Opportunity won" />
+                    <apex:selectList id="idOpportunityClose" size="0" value="{!DefaultContactStatusOnOpportunityClose}">
+                        <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Contact status after Opportunity won.</apex:outputText>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idOpportunityLost" value="Contact status after Opportunity lost" />
+                    <apex:selectList id="idOpportunityLost" size="0" value="{!DefaultContactStatusOnOpportunityLost}">
+                        <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Contact status after Opportunity lost. If not set, the contact status after Opportunity won will be used.</apex:outputText>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="2" title="Conversion Default Status" id="idDefaultsSection2">
+                <apex:outputText >
+                    Specify the initial status values under certain conditions or after certain 
+                    activities in Full Circle CRM Response Management.<br /><br />
+                </apex:outputText>
+                <apex:outputText ></apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idConversionNoOp" value="Contact status when converted with no Opportunity (default)" />
+                    <apex:selectList id="idConversionNoOp" size="0" value="{!DefaultContactStatusOnConversionNoOp}">
+                        <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Contact status after conversion with no Opportunity 
+                (default value if not overridden in the Conversion Overrides section below).</apex:outputText>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idConversionOp" value="Contact status when converted with opportunity" />
+                    <apex:selectList id="idConversionOp" size="0" value="{!DefaultContactStatusOnConversionOpenOp}">
+                        <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default Contact status after conversion with open Opportunity.</apex:outputText>
+
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idConversionROp" value="Response status after conversion with opportunity" />
+                    <apex:selectList id="idConversionROp" size="0" value="{!DefaultResponseOnConversionWithOp}">
+                        <apex:selectOptions value="{!ResponseStatusOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default response status after conversion with an Opportunity.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idConversionRNoOp" value="Response status after conversion without opportunity" />
+                    <apex:selectList id="idConversionRNoOp" size="0" value="{!DefaultResponseOnConversionNoOp}">
+                        <apex:selectOptions value="{!ResponseStatusOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Default response status after conversion without an Opportunity.</apex:outputText>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection rendered="true" columns="1" title="Conversion Overrides" id="idConversionOverrides">
+                <apex:outputText >You can override the default status of a contact when converted without an opportunity 
+                based on the lead status selected during conversion. The lead status must be configured as converted in the Lead Status Picklist.
+                <br /><br />When "--- Use Default --" is selected - the contact will be set to the value configured for 
+                "Contact status when converted with no Opportunity" (default above) or overrides by record type (below).<br />
+                </apex:outputText>
+                <apex:outputPanel layout="block">
+                <apex:outputText ><p style="font-weight:bold;text-decoration: underline" >Active Status Overrides</p></apex:outputText>
+                <apex:outputText ><p>The configuration below applies to status values configured as active 
+                (Active Checkbox is selected) in the status mapping section of this page.</p></apex:outputText>
+                </apex:outputPanel>
+                
+                <apex:outputPanel layout="block"> <!-- This div is essential for the Apex:Repeat below to work. It's not clear why -->
+                    <table>
+                    <tr>
+                        <td style="font-weight:bold">Lead Active Conversion Status &nbsp;&nbsp;</td>
+                        <td style="font-weight:bold">Contact Status After Conversion</td>
+                    </tr>
+    
+                    <apex:repeat value="{!NoOpConversionNames}" var="mapname" >
+                        <tr>
+                        <td>{!mapname}</td>
+                        <td>
+                            <apex:selectList value="{!MapStatusMappings[mapname].ContactStatusOnConversionNoOp__c}" size="1">
+                                <apex:selectOptions value="{!ContactConversionNoOpOptions}" />
+                            </apex:selectList>
+                        </td>
+                        </tr>
+                    </apex:repeat>            
+                
+                    </table>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block">
+                <apex:outputText ><p style="font-weight:bold;text-decoration: underline" >Inactive Status Overrides</p></apex:outputText>
+                <apex:outputText ><p>The configuration below applies to status values configured as inactive 
+                (Active checkbox is NOT selected) in the status mapping section of this page. 
+                The ‘Overwrite on Merge’ checkbox, if selected, will overwrite the contact status when a lead is merged into an existing contact, 
+                if the contact has an inactive status. This selection is not available when using the default contact status on conversion 
+                without opportunity.<br />
+                In configuring this section be sure to consider any required picklist values after conversion and how they will affect the user 
+                if not populated.</p></apex:outputText>
+                </apex:outputPanel>
+                
+                <apex:outputPanel layout="block"> <!-- This div is essential for the Apex:Repeat below to work. It's not clear why -->
+                    <table>
+                    <tr>
+                        <td style="font-weight:bold">Lead Inactive Conversion Status &nbsp;&nbsp;</td>
+                        <td style="font-weight:bold">Contact Status After Conversion &nbsp;&nbsp;</td>
+                        <td style="font-weight:bold">Overwrite on Merge</td>
+                    </tr>
+    
+                    <apex:repeat value="{!NoOpConversionNamesInactive}" var="mapname" >
+                        <tr>
+                        <td>{!mapname}</td>
+                        <td>
+                            <apex:selectList onchange="updateconversions()" value="{!MapStatusMappings[mapname].ContactStatusOnConversionNoOp__c}" size="1">
+                                <apex:selectOptions value="{!ContactConversionNoOpOptionsInactive}" />
+                            </apex:selectList>
+                        </td>
+                        <td style="text-align:center"><apex:inputCheckbox disabled="{!IF(ISBLANK(MapStatusMappings[mapname].ContactStatusOnConversionNoOp__c),true, false)}" value="{!MapStatusMappings[mapname].OverwriteInactiveStatusOnMergeNoOp__c}"/></td>
+                        </tr>
+                    </apex:repeat>            
+                
+                    </table>
+                </apex:outputPanel>                
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="1" title="Status Mapping Overrides" id="idMappingOverrides">
+                <apex:outputText >
+                    Status mapping overrides allows you to override the default status mapping values based on record type.<br />
+                    {!IF(DiagnosticLevel==2,'You must resolve existing errors to configure overrides.','')}                    
+                    <br />
+                </apex:outputText>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Override defaults by record type" />
+                    <apex:commandButton disabled="{!DiagnosticLevel=2}"  value="Override" action="{!getConfigStatusMappingOverrides}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText Rendered="{! Not(LeadMappingOverridden) }" style="font-weight:bold" value="No lead record types are currently overridden" />
+                <apex:outputText Rendered="{! LeadMappingOverridden }" style="font-weight:bold" value="The following lead record types are currently overridden (blank indicates status is not overridden):" />
+                <apex:datatable Rendered="{! LeadMappingOverridden }" cellspacing="6px" value="{!OverriddenRecordTypesForLeads}" var="obj">
+                    <apex:column width="200px" headerValue="Record type" value="{!obj}" />
+                    <apex:column headerValue="Initial lead status" value="{!OverrideMappingObjectsLeads[obj].ForceLeadStatusOnCreate__c}" />
+                    <apex:column headerValue="Lead status after response" value="{!OverrideMappingObjectsLeads[obj].DefaultLeadResponseStatusOnCreate__c}" />
+
+                </apex:datatable>
+                <apex:outputText Rendered="{! Not(ContactMappingOverridden) }" style="font-weight:bold" value="No contact record types are currently overridden" />
+                <apex:outputText Rendered="{! ContactMappingOverridden }"  style="font-weight:bold" value="The following contact record types are currently overridden (blank indicates status is not overridden):" />
+                <apex:datatable Rendered="{! ContactMappingOverridden }" cellspacing="6px" value="{!OverriddenRecordTypesForContacts}" var="obj">
+                    <apex:column width="200px" headerValue="Record Type" value="{!obj}" />
+                    <apex:column headerValue="Initial status" value="{!OverrideMappingObjectsContacts[obj].ForceContactStatusOnCreate__c}" />
+                    <apex:column headerValue="After response" value="{!OverrideMappingObjectsContacts[obj].DefaultContactStatusOnCreate__c}" />
+                    <apex:column headerValue="Converted no opp" value="{!OverrideMappingObjectsContacts[obj].DefaultContactStatusOnConversionNoOp__c}" />
+                    <apex:column headerValue="Converted with opp" value="{!OverrideMappingObjectsContacts[obj].DefaultContactStatusOnConversionOpenOp__c}" />
+                    <apex:column headerValue="After opp close" value="{!OverrideMappingObjectsContacts[obj].DefaultContactStatusOnOpportunityClose__c}" />
+
+                </apex:datatable>
+
+                <apex:outputText Rendered="{! AND(IsPersonAccountOrg ,Not(PersonAccountMappingOverridden)) }" style="font-weight:bold" value="No person account record types are currently overridden" />
+                <apex:outputText Rendered="{! PersonAccountMappingOverridden }"  style="font-weight:bold" value="The following person account record types are currently overridden (blank indicates status is not overridden):" />
+                <apex:datatable Rendered="{! PersonAccountMappingOverridden }" cellspacing="6px" value="{!OverriddenRecordTypesForPersonAccounts}" var="obj">
+                    <apex:column width="200px" headerValue="Record Type" value="{!obj}" />
+                    <apex:column headerValue="Initial status" value="{!OverrideMappingObjectsAccounts[obj].ForceContactStatusOnCreate__c}" />
+                    <apex:column headerValue="After response" value="{!OverrideMappingObjectsAccounts[obj].DefaultContactStatusOnCreate__c}" />
+                    <apex:column headerValue="Converted no opp" value="{!OverrideMappingObjectsAccounts[obj].DefaultContactStatusOnConversionNoOp__c}" />
+                    <apex:column headerValue="Converted with opp" value="{!OverrideMappingObjectsAccounts[obj].DefaultContactStatusOnConversionOpenOp__c}" />
+                    <apex:column headerValue="After opp close" value="{!OverrideMappingObjectsAccounts[obj].DefaultContactStatusOnOpportunityClose__c}" />
+
+                </apex:datatable>
+
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons >
+                <apex:commandButton oncomplete="returnhomeaftersave();" value="Save and return to main" action="{!StatusMappingSave}" reRender="idTheWholeShebang"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+    </apex:SectionHeader>
+
+</apex:page>

@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <externalSharingModel>ControlledByParent</externalSharingModel>
+    <fields>
+        <fullName>Action__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Action</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Local Automation</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Case Created</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Case Closed</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Set Flag Button</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Clear Flag Button</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>External Comment Added</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Internal Comment Added</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Email Received</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Email Sent</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Customer Attachment Added</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Task Completed</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Business_Hours_Elapsed__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total business hours elapsed during this Tracking record.</description>
+        <externalId>false</externalId>
+        <label>Business Hours Elapsed</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Business_Hours_Offset__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Number of business hours on the Case at the time this record was created.</description>
+        <externalId>false</externalId>
+        <label>Business Hours Offset</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Business_Hours_in_Age_1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of business hours spent with flag 1</inlineHelpText>
+        <label>Business Hours in Age 1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Business_Hours_in_Age_2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of business hours spent with flag 2</inlineHelpText>
+        <label>Business Hours in Age 2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Business_Hours_in_Age_3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of business hours spent with flag 3</inlineHelpText>
+        <label>Business Hours in Age 3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Business_Hours_in_Age_4__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of business hours spent with flag 4</inlineHelpText>
+        <label>Business Hours in Age 4</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset1__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 1</inlineHelpText>
+        <label>Case Flags Age 1 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset2__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 2</inlineHelpText>
+        <label>Case Flags Age 2 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset3__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 3</inlineHelpText>
+        <label>Case Flags Age 3 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset4__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 4</inlineHelpText>
+        <label>Case Flags Age 4 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_History_Number__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Custom autonumber that increments on a Case by Case basis.</inlineHelpText>
+        <label>Case Flag History Number</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flags_Business_Hours__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>A reference to the Case Flags Business Hours record used to calculate the Case Flag Business Age. This is set automatically and should not be manipulated.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Business Hours</label>
+        <referenceTo>CaseFlagsBusinessHours__c</referenceTo>
+        <relationshipLabel>Case Flags History Tracking</relationshipLabel>
+        <relationshipName>Case_Flags_History</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Case_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Status of the case at the time this History Tracking record was created.</description>
+        <externalId>false</externalId>
+        <label>Case Status</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Case</label>
+        <referenceTo>Case</referenceTo>
+        <relationshipName>Case_Flags_History</relationshipName>
+        <relationshipOrder>0</relationshipOrder>
+        <reparentableMasterDetail>false</reparentableMasterDetail>
+        <trackTrending>false</trackTrending>
+        <type>MasterDetail</type>
+        <writeRequiresMasterRead>false</writeRequiresMasterRead>
+    </fields>
+    <fields>
+        <fullName>End__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Datetime marking the ending of tracking for this history record.</inlineHelpText>
+        <label>End</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Event__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Event that triggered this History Tracking record to be created.</description>
+        <externalId>false</externalId>
+        <label>Event</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Flag Cleared</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Case Owner Changed</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Case Status Changed</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Flag Set</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Flag_Business__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This should be used to display the Case Flag if your organization is using business hours.</description>
+        <externalId>false</externalId>
+        <formula>IF(NOT(Flag_Set__c),null,IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset4__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset4Image__c, &quot;L4&quot;, 16, 16), 
+IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset3__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset3Image__c, &quot;L3&quot;, 16, 16), 
+IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset2__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset2Image__c, &quot;L2&quot;, 16, 16),
+IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset1__c,
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset1Image__c, &quot;L1&quot;,16,16),
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.BlankOffsetImage__c, &quot;L0&quot;,16,16))
+))))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Flag (BH)</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Flag_Level_BH__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Flag level in text (L0 - L4), useful for analytics.</description>
+        <externalId>false</externalId>
+        <formula>IF(NOT(Flag_Set__c),null,IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset4__c, 
+&quot;L4&quot;, 
+IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset3__c, 
+&quot;L3&quot;, 
+IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset2__c, 
+&quot;L2&quot;, 
+IF(Business_Hours_Offset__c+Business_Hours_Elapsed__c &gt;= CaseTimeOffset1__c, 
+&quot;L1&quot;, 
+&quot;L0&quot;) 
+))))</formula>
+        <inlineHelpText>Flag level in text (L0 - L4), useful for analytics.</inlineHelpText>
+        <label>Flag Level (BH)</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Flag_Level__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Flag level in text (L0 - L4), useful for analytics.</description>
+        <externalId>false</externalId>
+        <formula>IF(NOT(Flag_Set__c),null,IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset4__c, 
+&quot;L4&quot;, 
+IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset3__c, 
+&quot;L3&quot;, 
+IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset2__c, 
+&quot;L2&quot;, 
+IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset1__c, 
+&quot;L1&quot;, 
+&quot;L0&quot;) 
+))))</formula>
+        <inlineHelpText>Flag level in text (L0 - L4), useful for analytics.</inlineHelpText>
+        <label>Flag Level</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Flag_Set__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Flag Set</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Flag__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This should be used to display the Case Flag if your organization is not using business hours.</description>
+        <externalId>false</externalId>
+        <formula>IF(NOT(Flag_Set__c),null,IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset4__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset4Image__c, &quot;L4&quot;, 16, 16), 
+IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset3__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset3Image__c, &quot;L3&quot;, 16, 16), 
+IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset2__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset2Image__c, &quot;L2&quot;, 16, 16),
+IF(Hours_Offset__c+Hours_Elapsed__c &gt;= CaseTimeOffset1__c,
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset1Image__c, &quot;L1&quot;,16,16),
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case__r.Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.BlankOffsetImage__c, &quot;L0&quot;,16,16))
+))))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Flag</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Hours_Elapsed__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Number of hours on the Case at the time this record was created.</description>
+        <externalId>false</externalId>
+        <label>Hours Elapsed</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Hours_Offset__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Total hours elapsed during this Tracking record.</description>
+        <externalId>false</externalId>
+        <label>Hours Offset</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Hours_in_Age_1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 1</inlineHelpText>
+        <label>Hours in Age 1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Hours_in_Age_2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 2</inlineHelpText>
+        <label>Hours in Age 2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Hours_in_Age_3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 3</inlineHelpText>
+        <label>Hours in Age 3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Hours_in_Age_4__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of hours spent with flag 4</inlineHelpText>
+        <label>Hours in Age 4</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Owner_Is_Active__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>Owner__r.IsActive</formula>
+        <label>Owner Is Active</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Owner_License_Type__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>Text( Owner__r.UserType)</formula>
+        <label>Owner License Type</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Owner_Name__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Case Owner full name</description>
+        <externalId>false</externalId>
+        <label>Owner Name</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Owner__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Owner of the Case at the time the history record was created unless assigned to a Queue.</description>
+        <externalId>false</externalId>
+        <label>Owner</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>Case_Flags_History</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Queue_Id__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Id of the Queue the Case was assigned to when this record was created if assigned to a Queue.</description>
+        <externalId>false</externalId>
+        <label>Queue Id</label>
+        <length>18</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Start__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Datetime marking the beginning of tracking for this history record.</inlineHelpText>
+        <label>Start</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <label>Case Flags History Tracking</label>
+    <nameField>
+        <displayFormat>{000000}</displayFormat>
+        <label>Case Flag History Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Case Flags History Tracking</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ControlledByParent</sharingModel>
+</CustomObject>

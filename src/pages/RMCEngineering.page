@@ -1,0 +1,143 @@
+<apex:page standardController="Asset" extensions="RMCApplianceCreation" tabStyle="Asset" sidebar="true"  showChat="false" >
+<apex:pageMessages />
+  <apex:sectionHeader title="" subtitle="Create Appliance"/>
+  <apex:form id="theForm" > 
+  
+      <apex:pageBlock id="theSearchBlock" title=""  mode="edit" >
+      
+          <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!confirm}" value="Confirm Appliance" >
+           </apex:commandButton>
+           
+          </apex:pageBlockButtons>
+
+
+
+      <apex:pageBlock >
+      <apex:pageBlockSection id="A1" columns="1"  collapsible="false" >
+           <apex:pageBlockSectionItem >
+            <apex:outputLabel >Serial Number</apex:outputLabel>
+            <apex:inputField value="{!Asset.RMC_Serial_Number__c}" required="true">
+            </apex:inputField>
+           </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+     
+      
+ 
+    
+          <apex:pageBlockSection id="A2" columns="1"  collapsible="false" >
+           <apex:pageBlockSectionItem >
+            <apex:outputLabel >Model Number</apex:outputLabel>
+            <apex:inputField value="{!Asset.RMC_Model_Number__c}" required="true" >
+         </apex:inputField>
+           </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+   
+    
+    
+    
+      <apex:pageBlockSection id="A3" columns="1"  collapsible="false" >
+           <apex:pageBlockSectionItem >
+            <apex:outputLabel >Package</apex:outputLabel>
+            <apex:inputField value="{!Asset.RMC_Package__c}" required="true" >
+         </apex:inputField>
+           </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+   
+    
+
+   
+      <apex:pageBlockSection id="A4" columns="1"  collapsible="false" >
+           <apex:pageBlockSectionItem >
+            <apex:outputLabel >Offsite Capacity in GB</apex:outputLabel>
+            <apex:inputField value="{!Asset.RMC_Offsite_Capacity__c}" required="true" >
+            </apex:inputField>
+           </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+    
+
+ 
+ <apex:pageBlockSection columns="1" id="A5" collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Server Entitlements</apex:outputLabel>
+      <apex:inputField value="{!Asset.RMC_Server_Entitlements__c}" >
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+ </apex:pageBlockSection>
+
+ 
+ 
+ <apex:pageBlockSection columns="1" id="A6" collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Non Server Entitlements</apex:outputLabel>
+       <apex:inputField value="{!Asset.RMC_Non_Server_Entitlement__c}" >
+        </apex:inputField>
+        </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+     
+
+
+   
+<apex:pageBlockSection id="A7" columns="1"  collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Alias</apex:outputLabel>
+      <apex:inputField value="{!Asset.RMC_Alias__c}" >
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+      
+<apex:pageBlockSection id="A10" columns="1"  collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Data Center</apex:outputLabel>
+      <apex:inputField value="{!Asset.Data_Center__c}" required="true">
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+</apex:pageBlockSection>
+
+
+<apex:pageBlockSection id="A11" columns="1"  collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >Active</apex:outputLabel>
+      <apex:inputField value="{!Asset.RMC_Checkbox__c}" >
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+</apex:pageBlockSection>
+ 
+<apex:pageBlockSection id="A12" columns="1"  collapsible="false" >
+      <apex:pageBlockSectionItem >
+       <apex:outputLabel >NOC Support</apex:outputLabel>
+      <apex:inputField value="{!Asset.RMC_NOC_Support__c}" >
+      </apex:inputField>
+      </apex:pageBlockSectionItem>
+</apex:pageBlockSection>
+      
+      
+</apex:pageBlock>      
+
+<apex:pageBlock >
+<apex:pageBlockSection id="A8" columns="13"  collapsible="false" >
+<apex:inputField value="{!Asset.RMC_Partner__c}" required="true" />
+<apex:commandButton value="Create New Partner" onclick="window.open('/001/e?retURL=%2F001%2Fo&RecordType=01280000000UIG4&ent=Account' )"/>
+</apex:pageBlockSection>
+</apex:pageBlock>
+
+
+<apex:pageBlock >
+<apex:pageBlockSection id="A9" columns="23"  collapsible="false">
+<apex:inputField value="{!Asset.RMC_Client__c}" required="true" />
+<apex:commandButton value="Create New Client" onclick="window.open('/001/e?retURL=%2F001%2Fo&RecordType=01280000000UIFz&ent=Account')"/>
+</apex:pageBlockSection>
+</apex:pageBlock>
+
+<apex:pageBlock >
+</apex:pageBlock>
+
+
+
+</apex:pageBlock>
+
+
+      
+
+  </apex:form>
+</apex:page>

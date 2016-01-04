@@ -1,0 +1,42 @@
+<apex:page title="Response Configuration" tabStyle="Full_Circle_CRM__tab" >
+    <apex:SectionHeader title="Full Circle CRM Additional Diagnostics" help="https://www.fullcirclecrm.com/fcrm/app/additional-diagnostics/">
+            <p><apex:outputText >The diagnostic tests available on this page should be run at any time after installation in order to validate
+                the configuration and operation of the Full Circle CRM Response management system.
+                </apex:outputText>
+            </p>
+        
+        <apex:form >
+            <table width="100%" cellpadding="4px">
+                <tr>
+                    <td style="font-weight:bold" width="20%"></td>
+                    <td style="font-weight:bold" width="40%">Current status</td>
+                    <td style="font-weight:bold" width = "40%">Description</td>
+                </tr>
+                <c:FCR_VFNITestComp Test="FCR_NI_TestLeadMapping" 
+                TestDescription="Validates mapping of FCCRM lead fields to contact fields during conversion."
+                TestName="Test Field Mappings" />
+                <c:FCR_VFNITestComp Test="FCR_NI_TestAsync" 
+                TestDescription="Test async operations. For use when async operations were disabled on install."
+                TestName="Test Async Operations" />
+                <c:FCR_VFNITestComp Test="FCR_NI_TestLeadConvert" 
+                TestDescription="Test lead conversion operations. For use when lead conversion tests were disabled on install. 
+                    If errors occur, use the Advanced Configuration page to specify individual tests (thus avoiding a known SFDC
+                    bug with Apex Text Execution on older orgs)."
+                TestName="Test Lead Conversion" />
+                <c:FCR_VFNITestComp Test="FCR_NI_TestMerge" 
+                TestDescription="Test merge operations. For use when merge tests were disabled or bad response counts were ignored on install."
+                TestName="Test Merges" />
+                <c:FCR_VFNITestComp Test="FCR_NI_TestMisc" 
+                TestDescription="Additional tests. For use when tests were disabled that are not specified above."
+                TestName="Other Tests" />
+                
+                <c:FCR_VFNITestComp DisplayMode="RunAll" />
+                <tr>
+                    <td>
+                        <apex:commandButton style="width:160px" value="Return to configuration" action="{!URLFOR($Page.FCR_VFConfigMain)}"/>
+                    </td>
+                </tr>
+            </table>
+        </apex:form>
+    </apex:SectionHeader>
+</apex:page>

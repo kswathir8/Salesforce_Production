@@ -1,0 +1,53 @@
+<apex:component >
+<apex:attribute name="alwaysOn" type="String" required="false" description="Is this mask always displayed"/>
+<script>
+var alwaysOn = '{!alwaysOn}';
+function showMask(){
+	$("#mask").show();
+}
+function hideMask(){
+	$("#mask").hide();
+}
+$(document).ready(function () {
+	if(alwaysOn == 'true'){
+		showMask();
+	}
+});
+</script>
+<style>
+#mask{
+	z-index: 999;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: black;
+	opacity: 0.5;
+	margin: 0;
+	padding: 0;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: alpha(opacity=30);
+	display: none;
+}
+#spinner_block{
+	border-radius: 5px; 
+	background-color: white; 
+	padding: 10px; 
+	position: absolute; 
+	left: 50%; 
+	top: 50%;
+}
+#mask img{
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+</style>
+<!-- loading mask -->
+<div id="mask">
+	<div id="spinner_block">
+		<img alt="loading" src="/img/loading.gif"/>
+	</div>
+</div>
+</apex:component>

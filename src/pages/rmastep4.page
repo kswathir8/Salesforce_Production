@@ -1,0 +1,18 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case"  >
+ 
+  <apex:sectionHeader title="RMA Wizard" subtitle="Step 5 of 6"/>
+  <apex:form id="theForm" > 
+      
+      
+      <apex:pageBlock id="theSearchBlock" title="Where and Who will this be shipped to?" mode="edit" >
+          <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!step3}" value="Previous" />          
+           <apex:commandButton action="{!step5}" value="Next" />
+          </apex:pageBlockButtons>
+          
+        </apex:pageBlock>
+        
+       
+       
+  </apex:form>
+</apex:page>

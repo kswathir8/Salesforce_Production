@@ -1,0 +1,215 @@
+<apex:component controller="n2de.ConsoleQueueController">
+    <script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/magnific_popup.js')}"></script>
+    <script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+    <link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/magnific_popup.css')}"/> 
+    <style>
+    	#queue_count_table td{
+    		padding-bottom: 2px;
+    	}
+        #object_table_header {
+            width: 548px;
+        }
+        .object_list_panel {
+            max-height: 240px;
+            overflow: auto;
+        }
+        .object_name {
+            width: 150px;
+            padding-bottom: 4px;
+        }
+        .status_value {
+            width: 100px;
+        }
+        .date_value {
+            width: 140px;
+        }
+        .last_col {
+            width: 160px;
+        }
+        .open-popup-link {
+            color: #808080 !important;
+        }
+        span, th {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .filter_result_table {
+            table-layout: fixed;
+            width: 530px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        #filter_table {
+            overflow: auto;
+            max-height: 245px;
+        }
+        .match_icons {
+            width: 20px;
+        }
+        .criteria_col {
+            width: 290px;
+            word-wrap: break-word;
+        }
+        .value_col {
+            width: 180px;
+            word-wrap: break-word;
+        }
+        .match_col {
+            width: 40px;
+        }
+        .team{
+        	background-color: lightgrey;
+			margin: 20px;
+			border: 1px solid lightgray;
+			border-radius: 5px;
+			padding: 10px;
+        }
+        .team h1, .team h2{
+        	margin-bottom: 10px;
+        	font-size: 14pt;
+        	color: gray !important;
+        }
+        img.team_icon{
+        	width: 25px;
+        	margin-right: 15px;
+        }
+        .active_status{
+        	border: 1px solid lightgrey;
+        	margin-bottom: 10px;
+        }
+        .active_status td{
+        	border: 1px solid lightgrey;
+        }
+        .test_title a{
+        	color: gray !important;
+        }
+        .team_detail{
+        	padding: 10px;
+        }
+    </style>
+
+<script type="text/javascript">
+	var teamIcon = '{!URLFOR($Resource.DEResources, 'images/teams32.png')}';
+	var distributorIcon = '{!URLFOR($Resource.DEResources, 'images/distributor32.png')}';
+    function testTeamsRA(){
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.getQueueCountsRemote}', '0',
+            function(result, event){
+                hideMask();
+                if (event.type === 'exception'){
+                    alert(event.message);
+                }else{
+                   testDistributors(result);
+                }
+        });
+    }
+    
+    function testObject(){
+    	$('#dist_console').hide();
+		$('#team_console').hide();
+		$('#queue_console').show();
+		$(".console_selection a.active").removeClass("active");
+		$("#queue_tab").addClass("active");
+    	$("#queuecounts").html('<img alt="loading" src="/img/loading.gif"/>');
+    	try{
+    		testTeamsRA();
+    	}catch(ex){
+		}
+    }
+    
+    function testDistributors(teamQueueCountVOList){
+    	var html = '<h1 class="test_title">Testing ' + testObjectName + ' Id: <a href="/' + testOjectId + '">' + testOjectId + '</a></h1>';
+    	for(var i=0; i<teamQueueCountVOList.teamVos.length; i++){
+    		var thisTeam = teamQueueCountVOList.teamVos[i].team;
+    		var objectName = thisTeam.Object_name__c;
+    		if(objectName == undefined){
+    			objectName = thisTeam.n2de__Object_name__c
+    		}
+    		if(objectName != testObjectName){
+    			continue;
+    		}
+    		var thisTeamDistributors = thisTeam.Distributors__r;
+    		if(thisTeamDistributors == undefined){
+    			thisTeamDistributors = thisTeam.n2de__Distributors__r;
+    		}
+    		html += '<div class="team"><h1><img class="team_icon" src="' + teamIcon + '" />' + thisTeam.Name + '</h1><br/><div class="team_detail"><div id="' + thisTeam.Id + '" class="active_status"/>';
+    		for(var j=0; j<thisTeamDistributors.length; j++){
+    			var thisDistributor = thisTeamDistributors[j];
+    			if(thisDistributor.Is_advanced_filter__c != true){
+    				html += '<h2><img src="' + distributorIcon + '" class="team_icon"/>' + thisDistributor.Name + '</h2><div id="' + thisDistributor.Id + '" ><img alt="loading" src="/img/loading.gif"/></div>'; 
+    				try{
+    					testDistributorRA(testObjectName, thisDistributor.Id, testOjectId, '#' + thisTeam.Id, '#' + thisDistributor.Id);
+    				}catch(ex){
+    				}
+    			}
+    		}
+    		html += '</div></div>';
+    	}
+    	$("#queuecounts").html(html);
+    }
+    
+    function testDistributorRA(objectName, distributorId, objectId, activeStatusSelector, distributorResultsSelector) {
+        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleQueueController.testRecordRemote}', 
+            objectName, objectId, distributorId,
+            function(result, event){
+                if (event.type === 'exception'){
+                    var html = '<img src="{!URLFOR($Resource.DEResources, 'images/redwarning32.png')}" style="width: 15px"/>&nbsp;<span>Exception: ' + event.message + '</span><br/>';
+                    $(distributorResultsSelector).html(html);
+                }else{
+                    showTestResults(objectName, result, activeStatusSelector, distributorResultsSelector);
+                }
+        	}
+        );
+    }
+
+    function showTestResults(objectName, resultVO, activeStatusSelector, distributorResultsSelector) {
+        var matchIcon = '{!URLFOR($Resource.DEResources, 'images/green_tick.png')}';
+        var noMatchIcon = '{!URLFOR($Resource.DEResources, 'images/red_cross.png')}';
+        var html = '';
+        
+        var activeStatusFilter;     
+        var filterMatchTable = '<div id="filter_table">' + 
+                '<table class="filter_result_table"><tr>' +
+                '<th class="criteria_col">Filters</th>' +
+                '<th class="value_col">Actual value</th>' +
+                '<th class="match_col">Match</th>' +
+                '</tr>';        
+        for (var i = 0; i < resultVO.filterResults.length; i++) {
+            var filter = resultVO.filterResults[i];
+            if (filter.filterType == 'Active status') {
+                activeStatusFilter = filter;
+            } else {
+                var actualValue = filter.actualValue ? filter.actualValue : 'null';
+                filterMatchTable += '<tr>' +
+                        '<td class="criteria_col">' + filter.filterSoql + '</td>' +
+                        '<td class="value_col">' + actualValue + '</td>';
+                if (filter.matches) {
+                    filterMatchTable += '<td class="match_col"><img title="true" class="match_icons" src="' + matchIcon + '"/></td>';
+                } else {
+                    filterMatchTable += '<td class="match_col"><img title="false" class="match_icons" src="' + noMatchIcon + '"/></td>';
+                }   
+                filterMatchTable += '</tr>';
+            }
+        }
+        filterMatchTable += '</table></div>';
+        
+        if (activeStatusFilter) {
+           var activeStatusHtml = '<table class="filter_result_table"><tr>' +
+                    '<th class="criteria_col">Active status</th>' +
+                    '<th class="value_col">Actual value</th>' +
+                    '<th class="match_col">Match</th>' +
+                    '</tr>' +
+                    '<tr><td class="criteria_col">' + activeStatusFilter.filterSoql + '</td>' +
+                    '<td class="value_col">' + activeStatusFilter.actualValue + '</td>';
+            if (activeStatusFilter.matches) {
+                activeStatusHtml += '<td class="match_col"><img title="true" class="match_icons" src="' + matchIcon + '"/></td>';
+            } else {
+                activeStatusHtml += '<td class="match_col"><img title="false" class="match_icons" src="' + noMatchIcon + '"/></td>';
+            }
+            activeStatusHtml += '</tr></table>';
+            $(activeStatusSelector).html(activeStatusHtml);
+        }
+        $(distributorResultsSelector).html(filterMatchTable);
+    }
+    
+    </script>
+</apex:component>

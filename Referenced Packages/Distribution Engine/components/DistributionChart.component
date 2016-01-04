@@ -1,0 +1,125 @@
+<apex:component controller="n2de.ChartDistributionController">
+<script>
+function Chart(chartTypeParam, chartDivIdParam){
+	
+	var chartType = chartTypeParam;
+	var chartDivId = chartDivIdParam;
+	var visualization = new google.visualization.AreaChart(document.getElementById(chartDivId));
+	var data;
+	var period = 60;
+	var groupByFn = 'DAY_IN_YEAR';
+	
+	this.load = function(){
+		drawChart();
+	}
+	
+	var selectHandler = function(){
+		var selection = visualization.getSelection();
+	   	var row = selection[0].row;
+      	daySelected = data.getValue(row, 0);
+      	if(daySelected.indexOf('/') != -1){
+      		period = daySelected;
+      		groupByFn = 'HOUR_IN_DAY';
+      		drawChart();
+      	}else{
+      		alert('You are already in the hourly view. You can\'t drill down any further from here.');
+      	}
+  	};
+  	
+  	google.visualization.events.addListener(visualization, 'select', selectHandler);
+  	
+  	var drawChart = function(){
+		var selectedIds = 'All';
+		var distributorId = 'All';
+		var teamId = 'All';
+		var userId = 'All';
+		var trendType = 'Time';
+		
+		if(chartType == 'User'){
+			Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartDistributionController.loadDistributionTrendByUserRO}',
+				trendType, period, groupByFn, selectedIds, distributorId, teamId, 
+        	function(result, event){  
+        		loadChartData(result);
+        	}, {escape:true});
+		} else {
+			Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartDistributionController.loadDistributionTrendBySourceRO}', 
+				trendType, period, groupByFn, selectedIds, userId, teamId, 
+        		function(result, event){  
+        			loadChartData(result);
+        	}, {escape:true});
+        }
+        
+        //setTitle();
+  	};
+	
+	var loadChartData = function(dataSourceList){  
+		var dataTableColCount = dataSourceList.length + 1;
+		var dataTableRowCount = dataSourceList[0].DistributionData.length;
+		
+		// load Column chart
+		// Prepare table model for chart with columns
+		data = new google.visualization.DataTable();
+		data.addColumn('string', 'dayOfYear');
+		// add rows from the remoting dataSourceLists
+		for(var sourceIndex=0; sourceIndex<dataSourceList.length; sourceIndex++){
+		   data.addColumn('number',  dataSourceList[sourceIndex].sourceName);
+		}
+		
+		data.addRows(dataTableRowCount);
+		
+		for(var rowIndex=0; rowIndex<dataTableRowCount; rowIndex++){
+			var dayOfYear = dataSourceList[0].DistributionData[rowIndex].dayOfYear;
+			data.setCell(rowIndex, 0, dayOfYear);
+			for(var colIndex=0; colIndex<dataTableColCount-1; colIndex++){
+				var recordCount = dataSourceList[colIndex].DistributionData[rowIndex].recordCount;
+				data.setCell(rowIndex, colIndex+1, recordCount);
+			}
+		}
+		// all done, lets draw the chart with some options to make it look nice.
+		visualization.draw(data, chartOptions);
+	};
+	
+	var chartOptions = {
+     	animation:{
+     		duration: 1000,
+     		easing: 'Out'
+     	},
+     	titleTextStyle:{
+     		color: 'gray'
+     	}, 
+     	chartArea:{left:60,top:20,width:"75%",height:"75%"},
+     	pointSize: 6, 
+     	interpolateNulls: true,  
+     	curveType: 'none', 
+     	legend : {
+     		position: 'right', 
+     		alignment: 'center', 
+     		textStyle: {
+     			color: 'blue', 
+     			fontSize: 12
+     		}
+     	}, 
+     	width:viewportWidth, 
+     	height: viewportHeight,
+     	vAxis:{
+     		title: 'Records distributed', 
+     		textStyle:{
+     			fontSize: 10
+     		},
+     		viewWindow: {
+     			min: 0
+     		}
+     	},
+     	hAxis:{
+     		title: 'Date (' + timezone + ')', 
+     		textStyle:{
+     			fontSize: 10
+     		},
+     		showTextEvery:7,
+     		slantedText:true
+     	}
+     };
+
+}
+</script>
+</apex:component>

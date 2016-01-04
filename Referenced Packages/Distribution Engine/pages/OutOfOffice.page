@@ -1,0 +1,324 @@
+<apex:page controller="n2de.OutOfOfficeController" tabStyle="Out_of_office__tab" sidebar="false">
+	<c:CommonHeader />
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/moment.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/fullcalendar.2.1.1.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/select2.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/randomColor.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/select2.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/fullcalendar.2.1.1.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/fullcalendar.print.2.1.1.css')}" type="text/css" media="print"/>
+	<c:CommonMask />
+	<style>
+	.active_row {
+		background-color: #E5F1D6;
+	}
+	.hover_help {
+		cursor: help;
+	}
+	.event_link {
+		font-size: 110%;
+		cursor: pointer;
+	}
+	.event_link:hover {
+		text-decoration: underline;
+	}
+	.event_time {
+		font-size: 110%;
+	}
+	.view_selection {
+		float: right;
+	}
+	.date_col {
+		white-space: pre !important;
+	}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function() { 
+			setSelect2();
+			if(navigator.appVersion.indexOf("MSIE 8.")!=-1 || navigator.appVersion.indexOf("MSIE 7.")!=-1){
+	    		$(".view_selection").hide();
+		    }else{
+				loadCalendar();
+			}
+			if ('{!JSENCODE(viewStyle)}' == 'calendar') {
+				$('.year_panel').hide();
+			}
+		});
+		function setSelect2() {
+			$('select.member_list').select2({dropdownAutoWidth : true}); 
+			$('select.no_search').select2({
+				minimumResultsForSearch: -1,
+				dropdownAutoWidth : true			
+			}); 
+		}
+		
+		function showHideYear(show) {
+			if (show) {
+				$('.year_panel').show();
+			} else {
+				$('.year_panel').hide();
+			}
+		}
+		function fidoCallback(status) { }
+	</script>
+	<c:CommonHelp help_page="distribution-ooo"/>
+	<apex:form id="ooo_form">
+	
+		<apex:sectionHeader title="Distribution Out of Office" subtitle="{!IF(IsManager, 'Home', UserName)}"/>
+		
+		<apex:outputPanel rendered="{!isManager && hasQueueTeams}">
+			<apex:outputLabel value="Type: " styleClass="listViewLabel" />
+			<apex:selectList value="{!selectedType}" size="1" styleClass="no_search type">
+				<apex:selectOptions value="{!OutOfOfficeTypeList}"/>
+				<apex:actionSupport event="onchange" action="{!changeType}" reRender="teamPanel, typeSelectPanel, record_list, history_panel" onSubmit="showMask()" onComplete="hideMask(); setSelect2();"/>
+			</apex:selectList>
+		</apex:outputPanel>
+		
+		<apex:outputPanel rendered="{!IsManager}" id="teamPanel">	
+			<apex:outputLabel value="Team: " styleClass="listViewLabel"/>
+			<apex:selectList value="{!selectedTeam}" size="1" id="teamList" styleClass="no_search team">
+				<apex:selectOptions value="{!teamList}"/>
+				<apex:actionSupport event="onchange" action="{!changeTeam}" reRender="typeSelectPanel, record_list, history_panel" onSubmit="showMask()" onComplete="loadCalendar(); hideMask(); setSelect2();"/>
+			</apex:selectList>
+		</apex:outputPanel>
+		
+		<apex:outputPanel id="typeSelectPanel">
+			<apex:outputPanel rendered="{!IsManager && selectedType == 'User'}">
+				<apex:outputLabel value="User: " styleClass="listViewLabel"/>
+				<apex:selectList value="{!UserId}" size="1" id="userList" styleClass="member_list">
+					<apex:selectOptions value="{!UserOptionList}"/>
+					<apex:actionSupport event="onchange" action="{!changeUser}" reRender="record_list, history_panel" onSubmit="showMask()" onComplete="loadCalendar(); hideMask()"/>
+				</apex:selectList>
+			</apex:outputPanel>
+			
+			<apex:outputPanel rendered="{!IsManager && selectedType == 'Queue'}">	
+				<apex:outputLabel value="Queue: " styleClass="listViewLabel"/>
+				<apex:selectList value="{!selectedQueue}" size="1" id="queueList" styleClass="member_list">
+					<apex:selectOptions value="{!QueueList}"/>
+					<apex:actionSupport event="onchange" action="{!changeQueue}" reRender="record_list, history_panel" onSubmit="showMask()" onComplete="loadCalendar(); hideMask()"/>
+				</apex:selectList>
+			</apex:outputPanel>
+		</apex:outputPanel>
+		
+		&nbsp;
+		<apex:outputPanel styleClass="year_panel">
+			<apex:outputLabel value="Year: " styleClass="listViewLabel"/>
+			<apex:selectList value="{!YearLiteral}" size="1" styleClass="no_search year">
+				<apex:selectOptions value="{!YearOptionList}"/>
+				<apex:actionSupport event="onchange" reRender="record_list" onSubmit="showMask()" onComplete="hideMask()"/>
+			</apex:selectList>
+		</apex:outputPanel>
+		
+		<apex:outputPanel styleClass="view_selection" id="view_select">
+	        <apex:commandLink rendered="{!viewStyle != 'list'}" reRender="view_select, record_list" onclick="showMask()" oncomplete="hideMask(); showHideYear(true)">
+	        	<apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="List view" width="20" height="20" />
+	        	<apex:param name="viewStyle" value="list" assignTo="{!viewStyle}"/>
+	        </apex:commandLink>
+	        <apex:image rendered="{!viewStyle == 'list'}" url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="List view" width="20" height="20" />
+	        <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_verticalbaricon.png')}" height="20" />
+	        <apex:commandLink rendered="{!viewStyle == 'list'}" reRender="view_select, record_list" onclick="showMask()" oncomplete="loadCalendar(); hideMask(); showHideYear(false)" >
+	        	<apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_calicon.png')}" title="Calendar view" width="20" height="20" />
+	        	<apex:param name="viewStyle" value="calendar" assignTo="{!viewStyle}"/>
+	        </apex:commandLink>
+	        <apex:image rendered="{!viewStyle != 'list'}" url="{!URLFOR($Resource.n2de__DEResources, 'images/test_calicon.png')}" title="Calendar view" width="20" height="20" />
+        </apex:outputPanel>
+		<br/><br/>
+		
+		<apex:pageBlock id="record_list" title="Out of Office">
+			<apex:outputPanel id="script_panel">
+			<apex:actionFunction action="{!setRecordId}" name="editEventAF" rerender="empty_panel" oncomplete="editOutOfOfficeAF()">
+				<apex:param name="recordId" assignTo="{!ActionRecordId}" value=""/>
+				<apex:param name="userId" assignTo="{!editUserId}" value=""/>
+			</apex:actionFunction>
+			<apex:actionFunction action="{!editOutOfOffice}" name="editOutOfOfficeAF"/>
+			<apex:actionFunction action="{!setStartEndDates}" name="setStartEndDatesAF" rerender="empty_panel">
+				<apex:param name="startDate" assignTo="{!StartDateTime}" value=""/>
+				<apex:param name="endDate" assignTo="{!EndDateTime}" value=""/>
+			</apex:actionFunction>
+				<script type="text/javascript">	
+					function getEventArray() {
+						var eventArray = [];
+						var userColourMap = [];
+						var i = 0;
+						<apex:repeat value="{!OutOfOfficeWrapperList}" var="oo">
+							var userId = '{!oo.userId}';
+							if (!userColourMap[userId]) {
+								userColourMap[userId] = randomColor({luminosity: 'light'}); 
+							}
+							eventArray[i] =  {
+								      title: '{!oo.escapedTitle}',
+								      start: '{!oo.localStartDateTime}',
+								      end: '{!oo.localEndDateTime}',
+								      allDay: {!oo.OutOfOffice.Start_is_all_day__c} || {!oo.OutOfOffice.End_is_all_day__c},
+								      className: '{!oo.userId}',
+								      id: '{!oo.OutOfOffice.Id}',
+								      owner: '{!oo.username}',
+								      userid: '{!oo.userId}',
+								      color: {!isMultiUserView} ? userColourMap[userId] : '#9bc866'
+								     };
+							i++;
+			    		</apex:repeat>
+			    		return eventArray;
+					}
+					
+					function loadCalendar() {
+						var events = getEventArray();
+						var userColourMap = new Object();
+						$('#calendar_view').fullCalendar({	
+						   	header: {
+							    left: 'prev,next today',
+							    center: 'title',
+							    right: 'month,agendaWeek,agendaDay'
+						   	},
+						   	editable: false,
+						   	selectable: true,
+						   	select: function(start, end, jsEvent, view) {
+						   		setStartEndDatesAF(start.format('YYYY-MM-DD HH:mm:ss'), end.format('YYYY-MM-DD HH:mm:ss'));
+						   	},
+						   	events: events,
+		    				eventTextColor: 'black',
+		    				timeFormat: 'HH:mm',
+		    				height: 550,
+		    				eventRender: function (event, element) { 
+								styleEvent(event, element);
+								var evEl = element.find('.' + event.userid);
+								evEl.css('height', '17px');
+								if (event.allDay && !{!isMultiUserView}) {
+									var eventDate = event.start.clone();
+									while (eventDate.isBefore(event.end)) {
+										var dateString = eventDate.format('YYYY-MM-DD');
+	        							$('.fc-day[data-date="' + dateString + '"]').css('background-color', '#CCE3B1');
+								        eventDate.add('days', 1);
+        							}
+       							}
+    						},
+    						eventClick: function(event) {
+    								editEventAF(event.id, event.userid);
+    								return false;
+    						},
+    						eventLimit: {
+								'agenda': 12,
+								'month': 4
+							},
+							eventLimitClick: {
+								'agenda': 'popover',
+								'month': 'agendaDay'
+							}
+				  		});
+				  	}
+			  		
+			  		function styleEvent(event, element) {
+			  			var el = element[0].getElementsByClassName('fc-title');
+						var title = el[0];
+						if ({!isMultiUserView}) {
+							title.innerHTML = event.owner;
+							title.title = event.title;
+						}
+						title.className  += ' event_link';
+						var timeList = [];
+						if (document.getElementsByClassName) {
+							timeList = element[0].getElementsByClassName('fc-time');
+						}
+						var view = $('#calendar_view').fullCalendar('getView');
+						if (!event.allDay && timeList.length == 1) {
+							var time = timeList[0];
+							if (view.name == 'month') {
+								var hour = event.end.hour();
+								var mins = event.end.minute();
+								if (/^\d$/.test(mins)) {
+									mins = '0' + mins;
+								}
+								if (/^\d$/.test(hour)) {
+									hour = '0' + hour;
+								}
+								time.innerHTML += ' - ' + hour + ':' + mins;
+							}
+							time.className += ' event_time';
+						}
+			  		}
+				</script>
+			</apex:outputPanel>
+			<apex:pageMessages />
+		
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton action="{!newOutOfOffice}" value="New" rendered="{!$ObjectType.n2de__Out_of_office__c.Createable}" disabled="{!NOT(newOutOfOfficeEnabled)}"/>
+			</apex:pageBlockButtons>
+			<apex:outputPanel id="list_view" rendered="{!IF(viewStyle == 'list', true, false)}">
+			<apex:pageBlockTable value="{!OutOfOfficeWrapperList}" var="OO">
+				<apex:column headerValue="Action" styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:commandLink action="{!editOutOfOffice}" rendered="{!$ObjectType.n2de__Out_of_office__c.Updateable}">
+						<b>Edit</b>
+						<apex:param name="actionrecordid" value="{!OO.OutOfOffice.Id}" assignTo="{!ActionRecordId}"/>
+					</apex:commandLink>
+					<apex:outputLabel value=" | " rendered="{!$ObjectType.n2de__Out_of_office__c.Deletable}"/>
+					<apex:commandLink action="{!deleteOutOfOffice}" reRender="record_list" rendered="{!$ObjectType.n2de__Out_of_office__c.Deletable}" onclick="if (!window.confirm('Are you sure?')) return false;">
+						<b>Del</b>
+						<apex:param name="actionrecordid" value="{!OO.OutOfOffice.Id}" assignTo="{!ActionRecordId}"/>
+					</apex:commandLink>
+				</apex:column>
+				<apex:column headerValue="{!$ObjectType.n2de__Out_of_office__c.Fields.Name.Label}" styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:outputfield value="{!OO.OutOfOffice.Name}"/>
+				</apex:column>
+				<apex:column styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Out_of_office__c.Fields.n2de__Start_date__c.Label} {!IF(SortField=='Start_datetime__c',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" reRender="record_list">
+                        	<apex:param name="sortField" value="Start_datetime__c" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputText value="{!OO.OutOfOffice.n2de__Start_date__c}    {!OO.OutOfOffice.n2de__Start_hour__c} : {!OO.OutOfOffice.n2de__Start_min__c}" style="white-space: pre" rendered="{!NOT(OO.OutOfOffice.n2de__Start_is_all_day__c)}"/>
+                    <apex:outputText value="{!OO.OutOfOffice.n2de__Start_date__c}    All day" rendered="{!OO.OutOfOffice.n2de__Start_is_all_day__c}" style="white-space: pre"/>
+                </apex:column>
+				<apex:column styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Out_of_office__c.Fields.n2de__End_date__c.Label} {!IF(SortField=='End_datetime__c',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" reRender="record_list">
+                        	<apex:param name="sortField" value="End_datetime__c" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+					<apex:outputText value="{!OO.OutOfOffice.n2de__End_date__c}    {!OO.OutOfOffice.n2de__End_hour__c} : {!OO.OutOfOffice.n2de__End_min__c}" style="white-space: pre" rendered="{!NOT(OO.OutOfOffice.n2de__End_is_all_day__c)}"/>
+                    <apex:outputText value="{!OO.OutOfOffice.n2de__End_date__c}    All day" rendered="{!OO.OutOfOffice.n2de__End_is_all_day__c}" style="white-space: pre"/>
+                </apex:column>
+				<apex:column headerValue="{!$ObjectType.n2de__Out_of_office__c.Fields.n2de__Timezone__c.Label}" styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:outputText value="{!OO.OutOfOffice.n2de__Timezone__c}" />
+				</apex:column>
+				<apex:column styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Out_of_office__c.Fields.LastModifiedDate.Label} {!IF(SortField=='LastModifiedDate',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" reRender="record_list">
+                        	<apex:param name="sortField" value="LastModifiedDate" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+					<apex:outputText value="{0,date,dd'/'MM'/'yyyy HH:mm}" title="Last modified by {!OO.OutOfOffice.LastModifiedBy.Name}" styleClass="hover_help">
+    					<apex:param value="{!OO.OutOfOffice.LastModifiedDate}" /> 
+					</apex:outputText>
+				</apex:column>
+				<apex:column styleClass="{!IF(OO.isActive,'active_row','')}">
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Out_of_office__c.Fields.CreatedDate.Label} {!IF(SortField=='CreatedDate',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" reRender="record_list">
+                        	<apex:param name="sortField" value="CreatedDate" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+					<apex:outputText value="{0,date,dd'/'MM'/'yyyy HH:mm}" title="Created by {!OO.OutOfOffice.CreatedBy.Name}" styleClass="hover_help">
+    					<apex:param value="{!OO.OutOfOffice.CreatedDate}" /> 
+					</apex:outputText>
+				</apex:column>
+			</apex:pageBlockTable>
+			</apex:outputPanel>
+			
+			<apex:outputPanel rendered="{!IF(viewStyle == 'calendar', true, false)}">
+				<div id="calendar_view"></div>
+			</apex:outputPanel>
+			<apex:outputPanel id="empty_panel" rendered="false"/>
+		</apex:pageBlock>
+		
+		<apex:outputPanel id="history_panel">
+			<c:HistoryTable historyList="{!latestHistory}" blockTitle="Out of Office History" sectionTitle="Out of Office Change History"/>
+		</apex:outputPanel>
+	</apex:form>
+	
+	<style>
+		.listViewLabel {
+			font-weight: bold;
+			margin-left: 20px;
+		}
+	</style>
+<c:StatusPanel />
+</apex:page>

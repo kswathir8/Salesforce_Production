@@ -1,0 +1,119 @@
+<apex:page sidebar="false" standardController="n2de__Team__c" recordSetVar="Team__c" extensions="n2de.TeamListController" tabstyle="n2de__Team__c" action="{!init}">
+<c:CommonHeader />
+<c:CommonMask />
+<apex:form >
+<style>
+.team_table tr{
+	cursor:move;
+}
+.team_table td:first-of-type{
+	width: 50px;
+}
+.team_table td:nth-of-type(2){
+	width: 450px;
+}
+.team_table td:last-of-type{
+	width: 30px;
+}
+.team_table td{
+	width: 200px;
+}
+.new-help {
+	display: table; 
+	margin:0 auto;
+	font-size: 15px;	
+}
+.new-help a {
+	color: #56aa1c;
+}
+.new-help a:hover {
+	color: #bbdda4;
+}
+</style>
+<script>
+var fixHelper = function(e, ui) {
+	ui.children().each(function() {
+		$(this).width($(this).width());
+	});
+	return ui;
+};
+$(document).ready(function() {
+	 $( ".team_table tbody" ).sortable({
+	 	items: 'tr',
+	 	update: function( event, ui ) {
+	 		saveOrder(ui);
+	 	},
+	 	helper: fixHelper
+	 });
+});
+function saveOrder(ui){
+	//var listElementId = ui.item[0].id;
+	showMask();
+	var teamIdArray = new Array();
+	$(".team_table .team_id").each(function(){
+		var teamId = $(this).attr('team_id');
+		if(teamId != undefined){
+			teamIdArray.push(teamId);
+		}
+	});
+	Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.TeamListController.saveOrder}', teamIdArray, 
+		function(result, event){
+			hideMask();
+			if (event.type === 'exception'){
+				alert(event.message);
+			}
+	});
+}
+</script>
+<apex:sectionHeader title="Distribution Teams" subtitle="Home"/>
+<c:CommonHelp help_page="distribution-teams"/>
+<apex:pageBlock title="Teams">
+	<apex:pageBlockButtons >
+		<apex:commandButton value="New" action="{!newTeam}" rendered="{!$ObjectType.n2de__Team__c.Createable}"/>
+		<apex:commandButton value="Delete" action="{!deleteTeams}" rendered="{!$ObjectType.n2de__Team__c.Deletable}" onclick="return confirm('Are you sure?');"/>
+	</apex:pageBlockButtons>
+	<apex:pageBlockTable value="{!teamList}" var="t" styleClass="team_table">
+		<apex:column >
+			<apex:inputCheckbox value="{!t.checked}" disabled="{!NOT(t.RecordAccess.HasDeleteAccess)}" title="{!IF(NOT(t.RecordAccess.HasDeleteAccess), 'You do not have permissions to delete this record.', '')}"/>
+		</apex:column>
+		<apex:column headerValue="Team name">
+			<a href="/apex/{!NamespacePrefix}TeamSummary?id={!t.teamSObject.id}" class="team_id" team_id="{!t.teamSObject.id}">{!t.teamSObject.name}</a>
+		</apex:column>
+		<apex:column headerValue="Distributed object">
+			{!t.objectLabel}
+		</apex:column>
+		<apex:column headerValue="Distributing to" rendered="{!queueTeamExists}">
+			<apex:image url="{!IF(t.teamSObject.n2de__Is_distribute_to_queue__c != true, URLFOR($Resource.n2de__DEResources, 'images/teammember32.png'), URLFOR($Resource.n2de__DEResources, 'images/queue32_3.png'))}" title="{!IF(t.teamSObject.n2de__Is_distribute_to_queue__c != true, 'Distributing to team members', 'Distributing to queues')}" width="16px" height="16px"/>
+		</apex:column>
+		<apex:column headerValue="Created by" styleClass="modifier">
+			{!t.teamSObject.CreatedBy.Name}
+		</apex:column>
+		<apex:column headerValue="Created date" styleClass="date_col">
+			<apex:outputField value="{!t.teamSObject.CreatedDate}" />
+		</apex:column>
+		<apex:column headerValue="Last modified by" styleClass="modifier">
+			{!t.teamSObject.LastModifiedBy.Name}
+		</apex:column>
+		<apex:column headerValue="Last modified date" styleClass="date_col">
+			<apex:outputField value="{!t.teamSObject.LastModifiedDate}" />
+		</apex:column>
+		<apex:column headerValue="Active">
+			<apex:image url="{!IF(t.teamSObject.n2de__Is_active__c, URLFOR($Resource.n2de__DEResources, 'images/tick32.png'), URLFOR($Resource.n2de__DEResources, 'images/cross32.png'))}" width="16px" height="16px"/>
+		</apex:column>
+	</apex:pageBlockTable>
+	<apex:outputPanel layout="block" rendered="{!teamList.size == 0}">
+		<br/><br/>
+		<div style="width: 100%">
+			<span class="new-help">
+				Looks like you don't have any teams yet!
+			</span>
+			<span class="new-help">
+				Click <b><a target="_blank" href="http://help.nc-squared.com/team-detail">here</a></b> to learn about creating a team.
+			</span>
+		</div>
+		<br/>
+	</apex:outputPanel>
+</apex:pageBlock>
+</apex:form>
+<c:StatusPanel />
+</apex:page>

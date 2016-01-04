@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>FCR_Admin_Update_Counter__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>This counter is changed any time this object is updated by the response management system.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This counter is changed any time this object is updated by the response management system.</inlineHelpText>
+        <label>Admin Update Counter</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Created_By_Lead_Conversion__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set to true by default this field maps to contact on conversion.</description>
+        <externalId>false</externalId>
+        <label>Created By Lead Conversion</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Defer_Assignment__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Administrative field that indicates that this lead assignment should be deferred until receipt of a response</description>
+        <externalId>false</externalId>
+        <label>Defer Assignment</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Name_Created_Date__c</fullName>
+        <defaultValue>Today()</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates the create date of the name.</description>
+        <externalId>false</externalId>
+        <label>Name Created Date</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Nurture_Timeout__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Nurture timeout for the lead.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If populated, this field indicates the next possible date this lead could promote out of nurture and be sent back to sales for follow up.</inlineHelpText>
+        <label>Nurture Timeout</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_PostAssignNotificationPending__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set to true if reassignment has been requested for this lead/contact based on receipt of a qualified response.</description>
+        <externalId>false</externalId>
+        <label>Post Assign Notification Pending</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Prior_Lead_Score__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The Lead Score prior to the most recent update.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The Lead Score prior to the most recent update.</inlineHelpText>
+        <label>Prior Lead Score</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Response_Score__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Response score on this lead.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The score of the lead at the time the most recent response was processed.</inlineHelpText>
+        <label>Response Score</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Status_Synced_From_Response__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Administrative field that is set when lead status is active and tied to an active response</description>
+        <externalId>false</externalId>
+        <label>Status Synced From Response</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Superpower_Field__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This field will always be cleared after being set. Please see Full Circle CRM Documentation for use of this field.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This field will always be cleared after being set. Please see Full Circle CRM Documentation for use of this field.</inlineHelpText>
+        <label>FCCRM Superpower Field</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Take_Scoring_Snapshot__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Administrative field that can be used to trigger scoring.</description>
+        <externalId>false</externalId>
+        <label>Do Pending Scoring</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+</CustomObject>

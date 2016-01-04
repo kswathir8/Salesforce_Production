@@ -1,0 +1,178 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Advanced Processing Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Advanced Configuration" help="https://www.fullcirclecrm.com/fcrm/app/advanced-configuration/">
+        <apex:form id="recproc">
+            <apex:pageblock mode="edit">
+                <apex:pagemessages />
+                <apex:pageBlockSection columns="2" title="Advanced Response Configuration">
+                    <apex:inputCheckbox label="Enable New Campaign Attribution System" value="{!AdvancedEnableNewCampaignAttribution}" />
+                    <apex:outputText >
+                        This option enables the new (version 1.18) Campaign Attribution system. Unchecking this option will activate the old system.
+                    </apex:outputText>                                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Disable_QR_Setting__c}" />
+                    <apex:outputText >
+                        This option disables automatic setting of The MQR/QT and MQR/QT Date fields.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Disable_QR_on_Progression__c}" />
+                    <apex:outputText >
+                       Applies only when Disable QR Setting is on. 
+                       If the MQR/QT and MQR/QT fields are blank, this option will prevent setting those fields to the date the funnel progresses 
+                       (To SAR, SQR or to SQR Won). When not selected these fields will be set with stage progression.
+                    </apex:outputText>                
+
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Disable_SQR_Setting__c}" />
+                    <apex:outputText >
+                        Click this box to disable the automatic setting of the SQR and SQR Date fields. 
+                        You may want to do this if your SQR definition does not map to the Full Circle CRM 
+                        definition of SQR and you wish to set the SQR stage and date manually or through custom code.  
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Enable_Async_Responses__c}" />
+                    <apex:outputText >
+                        This option causes CampaignMember status updates by the repeat response user to be considered new responses even during future calls.
+                        Normally updates during future (async) calls are considered regular updates, not new responses.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Block_Archive_Updates__c}" />
+                    <apex:outputText >
+                        This option prevents updates to existing CampaignMember archives on opportunity objects. Selecting this option will prevent
+                        updates to opportunity objects due to synchronization events (such as contact updates) and will reduce the number of
+                        opportunity object updates. However, CampaignMembers restored during a merge operation may not have the latest data.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Block_Originating_Response_Deletion__c}" />
+                    <apex:outputText >
+                        This option prevents deletion of CampaignMember objects that are the originating response on an opportunity.
+                    </apex:outputText>                
+                    <apex:inputField label="Block Deletion of Campaigns with Originating Responses" value="{!AdvancedConfigObject.FCRM__Block_Orig_Response_Campaign_Delete__c}" />
+                    <apex:outputText >
+                        This option prevents deletion of Campaign objects when any of their associated CampaignMember objects are the originating response on an opportunity.
+                        This option only takes effect if the Block Originating Response Deletion option is also selected.
+                    </apex:outputText>                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" title="Lead Conversion Handling">
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Apply_Field_Defaults_After_Conversion__c}"/>
+                    <apex:outputText >
+                        This option uses field initalization data to initialize blank fields after conversion. This may be required in orgs with 
+                        validation rules on CampaignMember, Contact or Opportunity objects where a lead conversion creates objects that do not comply with
+                        the validation rules.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Lead_Conversion_Test_Control__c}"/>
+                    <apex:outputText >
+                        Set this value to specify individual lead conversion diagnostic tests to run on the additional diagnostics
+                        page. Leave blank or set to zero to perform all tests. Specify a number from 1 to 6 to perform individual tests. 
+                        This is used to avoid a known SFDC bug on older orgs that can occur when running multiple lead conversion tests 
+                        in a single test class.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Active_Mode_Conversion_Override__c}"/>
+                    <apex:outputText >
+                        When enabled, an active user may convert a lead without an active response in cases where they are not creating an opportunity
+                        and the configured contact status is not an active status. 
+                        Make sure they have a clear choice in conversion status values in order to select a contact status that indicates no further action.
+                    </apex:outputText>                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" title="Asynchronous System">
+                    <apex:selectRadio value="{!AsyncSystemSelection}" layout="pageDirection">
+                        <apex:selectOption itemValue="2" itemLabel="2015 Async System" />
+                        <apex:selectOption itemValue="1" itemLabel="Email service based async system" />
+                        <apex:selectOption itemValue="0" itemLabel="Original Async System" />
+                    </apex:selectRadio>
+                    <apex:outputText >
+                        This option allows selection of the asynchronous processing system. Defaults to the 2015 on new installs (strongly recommended). Contact Full Circle support for additional options.
+                        <b>Warning - switching from the 2015 to an earlier version may require manual data adjustment to avoid data loss!</b>
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Maximum_Queueable_Chains__c}"/>
+                    <apex:outputText >
+                        (Only applies to the 2015 async system) - Specifies the maximum number of async jobs that will be chained. -1 for no limits.
+                        Recommendation: -1 for production and 4 for developer orgs. Choose 0 for better performance at the cost of higher batch/future usage.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Scheduler_Reset_Window__c}"/>
+                    <apex:outputText >
+                        (Only applies to Email service based async system) - Specifies the scheduler reset window on the new async system. This represents the target maximum time between an asynchronous request
+                        and the asynchronous operation (the actual time may be 30-60 seconds longer). Allowed range is 120 to 600.
+                    </apex:outputText>                
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Disable_Fast_Async__c}"/>
+                    <apex:outputText >
+                        (Only applies to Email service based async system) - Disables the fast async feature on the new async system. Normally, the system will attempt to perform an immediate future
+                        call if certain criteria are met. Disable this feature only if instructed to do so by Full Circle CRM technical support.
+                    </apex:outputText>
+                    <apex:commandButton value="Disable Scheduler for Update" action="{!DisableSchedulerForInstall}"/>
+                    <apex:outputText >
+                        Temporarily disables the asynchronous scheduler to allow package updates. Use this feature if instructed to by Full Circle technical support.
+                        Current scheduler status is: {!IF(OR(ISNULL(AdvancedConfigObject.FCRM__Disable_Scheduler__c), AdvancedConfigObject.FCRM__Disable_Scheduler__c<=NOW()),"normal","Disabled until " & TEXT(AdvancedConfigObject.FCRM__Disable_Scheduler__c) )}
+                    </apex:outputText>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" title="Other Configuration">
+                    <apex:inputField value="{!AdvancedConfigObject.FCRM__Custom_Features__c}"/>
+                    <apex:outputText >
+                        Org specific custom feature control. Only enter values here when instructed to by Full Circle CRM technical support.
+                    </apex:outputText>                
+                    <apex:inputField label="First & Last Touch Delay" value="{!AdvancedConfigObject.FCRM__First_Last_Touch_Async_Delay__c}"/>
+                    <apex:outputText >
+                        Normally the opportunity first and last touch fields are set in a future context. 
+                        This global setting allows you to specify the number of minutes to wait before these fields are set. 
+                        Use this setting when you know your users immediatly edit newly created opportunties and set this value to the time they would need to complete typical edits. 
+                        This will prevent code update conflicts. Note: Only applies if the 2015 Async System is Enabled.
+                    </apex:outputText>                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" title="Bulk Test Control">
+                    <apex:inputfield value="{!AdvancedConfigObject.FCRM__Bulk_Test_Number__c}"/>
+                    <apex:outputText escape="false" value="Bulk test classes contain multiple tests which are designed to run one at a time. 
+                                        This option specifies the test number to run. A blank or zero value causes no tests to run.
+                                        Generally you would only run bulk tests to verify application limits under worst-case conditions. These tests can be run
+                                        using Apex Test Execution.<br />
+                                        Bulk enabled test classes that use these settings include:<br /><ul>
+                                        <li>FCR_TestCascadingBulk2</li>
+                                        <li>FCR_TestSyncUpdateBulk1</li>
+                                        <li>FCR_TestLeadConverionBulk1</li>
+                                        </ul>" />
+                    <apex:inputfield value="{!AdvancedConfigObject.FCRM__Bulk_Test_Batch_Size__c}"/>
+                    <apex:outputText value="This option specifies the size of the batch to use with the bulk test specified above. 
+                                        Valid values are 1 to 200." />
+                </apex:pageBlockSection>                
+                <apex:pageBlockSection columns="2" title="Extensibility API">
+                    <apex:outputtext style="color:red" value="Warning: Use of the extensibility API can interfere with the correct operation of the 
+                    Response Management application. It may also void your Full Circle CRM warranty and result in additional support charges.
+                    This functionality is intended for advanced APEX developers only and should not be used without first consulting with
+                    Full Circle CRM." />
+                    <apex:outputtext value="" />
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="idEnableAPI" value="Enable API" />
+                        <apex:inputCheckbox value="{!AdvancedEnableAPI}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputText >
+                        This option enables the application extensibility model API. Refer to the Full Circle CRM Extensibility API
+                        documentation for further information.
+                    </apex:outputText>
+                    <apex:dataTable cellpadding="4px" value="{!ExtensibilityPluginIDs}" var="extensibilityid">
+                        <apex:facet name="header">
+                            <apex:outputText value="List of plugin classes" />
+                        </apex:facet>
+                        <apex:column value="{!ExtensibilityPlugins[extensibilityid].ClassName__c}" />
+                        <apex:column >
+                            <apex:commandLink value="Remove" action="{!RemoveExtensibilityClass}">
+                                <apex:param name="delplugin" value="{!extensibilityid}" />
+                            </apex:commandLink>
+                        </apex:column>
+                    </apex:dataTable>
+                    <apex:outputText value="List of currently enabled plugin classes" />
+                    <apex:inputtext label="Enter name of new class" value="{!NewExtensibilityName}" />
+                    <apex:outputText value="Class must implement an FCR_ExtensibilityAPI interface." />
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value=" " />
+                        <apex:commandButton value="Add Plugin Class" action="{!AddExtensibilityClass}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:outputText value="Changes to plugin classes take effect immediately." />
+                    <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(NewExtensibilityError))}">
+                        <apex:outputLabel value=" " />
+                        <apex:outputText style="color:red;font-weight:bold" value="{!NewExtensibilityError}" />
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Save and return to main" action="{!AdvancedPageSave}"/>
+                    <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+                </apex:pageBlockButtons>
+                    
+            </apex:pageblock>
+        </apex:form>
+    </apex:SectionHeader>
+</apex:page>

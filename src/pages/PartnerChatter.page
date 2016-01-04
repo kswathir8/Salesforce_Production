@@ -1,0 +1,21 @@
+<apex:page controller="PartnerChatter" showHeader="false" sidebar="false" standardStylesheets="true">
+	<script type='text/javascript' src='https://portal.axcient.com/wp-includes/js/jquery/jquery.js?ver=1.11.1'></script>
+    <script type='text/javascript' src='https://portal.axcient.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+
+    <script>
+    	// Capture all user clicks on <a> elements, if it is a URL then change the URL for the whole window, not just the iframe
+    	jQuery(document).ready(function($) {
+    		$('#chatter-container').contents().on('click', 'a', function(e) {
+    			if($(this).attr('href').charAt(0) == '/') {
+    				e.preventDefault();
+	    			top.window.location.href = $(this).attr('href');
+	    		}
+			});
+    	});
+    </script>
+
+	<div id="chatter-container">
+		<chatter:feed entityId="{!user.AccountId}" />
+	</div>
+	
+</apex:page>

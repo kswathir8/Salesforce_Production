@@ -1,0 +1,79 @@
+<apex:page id="myPage" controller="DealRegistrationController" sidebar="false" title="Deal Registration" showHeader="false" standardStylesheets="false">
+    <apex:composition template="PartnerTemplate">
+        <apex:define name="page-title">Axcient Partner Deal Registration</apex:define>
+        <apex:define name="main-content">
+            <apex:form id="myForm"> 
+                <apex:pageMessages />
+                <apex:outputPanel id="afterPanel" rendered="{!isDealRegistered}">
+                    <div>
+                       <h4>Thanks for registering this Deal with us!</h4><br></br> 
+                      <p>Please&nbsp;<apex:outputLink value="{!$Page.DealRegistration}" style="Color:#3dbde7"><b>Click Here</b></apex:outputLink>&nbsp;to register another deal.</p>
+                    </div>
+                </apex:outputPanel>
+                <apex:pageBlock rendered="{!NOT(isDealRegistered)}" title="Deal Registration"> 
+                    <apex:pageBlockButtons location="both">
+                        <apex:commandButton title="Register Deal" value="Register Deal" action="{!registerDeal}" style="border:2px solid #4D4D5B"/>
+                        <apex:commandButton title="Cancel" value="Cancel" action="{!cancel}" immediate="true" style="border:2px solid #4D4D5B"/>
+                    </apex:pageBlockButtons>
+                    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+                    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+                    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $('[id$=datepicker]').datepicker({dateFormat: 'mm/dd/yy'});
+                        });
+                    </script>
+                    <style type="text/css">
+                    .LeadContactInformation{
+                        color: #0785B5;
+                        text-align: left;
+                    }
+                    .data2Col{
+                        padding: 10px;
+                    }
+                    .DealInformation{
+                        color:#0785B5;
+                        text-align: left;
+                    }
+                    </style>
+                    <div class="LeadContactInformation">
+                    <apex:pageBlockSection collapsible="false" title="Lead Contact Information" columns="1">
+                        <apex:inputfield label="End Customer Company Name" value="{!newLead.Company}" required="true" />
+                        <apex:inputfield label="End User Company Street Address" value="{!newLead.Street}" required="true" />
+                        <apex:inputfield label="End User Company City" value="{!newLead.City}" required="true" />
+                        <apex:inputfield label="End User Company State" value="{!newLead.End_User_State__c}" required="true" />
+                        <apex:inputfield label="End User Company Zipcode" value="{!newLead.PostalCode}" required="true" />
+                        <apex:inputfield label="End User Contact Name - First" value="{!newLead.FirstName}" required="true" />
+                        <apex:inputfield label="End User Contact Name - Last" value="{!newLead.LastName}" required="true" />
+                        <apex:inputfield label="End User Contact Phone" value="{!newLead.Phone}" required="true" />
+                        <apex:inputfield label="End User Contact Email" value="{!newLead.Email}" required="true" />
+                        <apex:inputfield label="End User Contact Title" value="{!newLead.End_User_Job_Title__c}" required="true" />
+                    </apex:pageBlockSection>
+                    </div>
+
+                    <div class="DealInformation">
+                    <apex:pageBlockSection collapsible="false" title="Deal Information" columns="1">
+                        <apex:inputfield label="New or Current Customer" value="{!newLead.Is_this_a_new_customer_or_a_Current_cust__c}" required="true" />
+                        <apex:inputfield value="{!newLead.of_Physical_Servers__c}" required="true" />
+                        <apex:inputfield value="{!newLead.of_Virtual_Hosts__c}" required="true" />
+                        <apex:inputfield value="{!newLead.Total_GB_of_Server_Storage__c}" required="true" />
+                        <apex:pageBlockSectionItem helpText="{!$ObjectType.Lead.fields.Estimated_Monthly_Service_Fees__c.InlineHelpText}">
+                            <apex:outputLabel value="Estimated Monthly Service Fees: $"/>
+                            <apex:inputfield label="Estimated Monthly Service Fees: $" value="{!newLead.Estimated_Monthly_Service_Fees__c}" required="true" />
+                        </apex:pageBlockSectionItem>
+                        <apex:inputtext size="10" id="datepicker" label="Estimated Close Date" value="{!dateString}" required="true" />
+                        <apex:inputfield label="Opportunity Description" value="{!newLead.Opportunity_Description__c}" required="true"/>
+                        <apex:inputfield label="Which Competitor did Axcient Replace?" value="{!newLead.Competitor_Replaced__c}"/>
+                    </apex:pageBlockSection>
+                    </div>
+
+                    <div style="Padding-top:15px;">
+                        <apex:outputpanel >
+                           <i> For more information, please call 800-715-2339</i>
+                        </apex:outputpanel>
+                    </div>
+                </apex:pageBlock>
+            </apex:form>
+        </apex:define>
+    </apex:composition>
+</apex:page>

@@ -1,0 +1,20 @@
+<apex:page standardController="Opportunity" showHeader="false" renderAs="pdf">
+    <apex:panelGrid columns="0" width="100%">
+    <center>
+        <h1> AXCIENT, INC. <br/>
+ AXCIENT SERVICE AGREEMENT </h1>
+ <br/>
+ </center> 
+ <apex:outputText style="arial">This Axcient Service Agreement (the “Agreement”) is made by and between 
+ Axcient, Inc. (“AXCIENT”) a Delaware Corporation with offices at 2761 Marine Way, Mountain View, CA 94943 
+ and {!Opportunity.Account.Name}, with offices at {!Opportunity.Account.BillingStreet}{!Opportunity.Account.BillingCity}
+ {!Opportunity.Account.BillingState}, {!Opportunity.Account.BillingPostalCode}, (“Customer”):</apex:outputText>
+ <br/>
+ <apex:outputText > This Agreement covers provision by AXCIENT of data protection, backup and recovery services to the Customer as defined below and incorporates the terms and conditions attached hereto.
+ </apex:outputText> 
+ <br/>
+ DATE OF AGREEMENT: {Date()}<p/>
+ Unless this Agreement is executed and returned to Axcient within thirty (30) days of the above date, this offer for services will expire.
+ </apex:panelGrid>
+
+ </apex:page>

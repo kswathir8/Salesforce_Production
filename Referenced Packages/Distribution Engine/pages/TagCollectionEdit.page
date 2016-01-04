@@ -1,0 +1,23 @@
+<apex:page standardController="n2de__Tag_Category__c" extensions="n2de.TagController" sidebar="false" tabStyle="Distribution_Tags__tab">
+	
+	<c:CommonHeader />
+	<c:CommonMask /> 
+	<c:CommonHelp help_page="distributor-tags"/>
+	
+	<style>
+	</style>
+	<apex:form >
+		<apex:sectionHeader title="Tag Collections" subtitle="{!IF(n2de__Tag_Category__c.Name != null, n2de__Tag_Category__c.Name, 'New')}"/>
+		<apex:pageMessages />
+		<apex:pageBlock title="Tag Collection">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Save" action="{!saveCollection}" />
+				<apex:commandButton value="Cancel" action="{!toListPage}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1">
+				<apex:InputText value="{!n2de__Tag_Category__c.Name}" maxlength="30"/>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+	<c:StatusPanel />
+</apex:page>

@@ -1,0 +1,406 @@
+<apex:page sidebar="false" controller="n2de.TeamMemberAddRemoveController" tabstyle="n2de__Team__c" >
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.8.21.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-nc2.css')}" type="text/css" />
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+<c:CommonMask />
+<c:CommonHelp help_page="adding-and-removing-team-members" />
+<style>
+.member_image{
+	width: 25px;
+	margin-left: 15px;
+	margin-bottom: 5px;
+}
+.users{
+	float: left;
+	width: 47%;
+}
+#control{
+	float: left;
+	width: 5%;
+	margin-top: 200px;
+}
+#control .add_remove_buttons{
+	width: 34px;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+#control input{
+	vertical-align: middle;
+	text-align: center;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+#clear{
+	clear: both;
+}
+.table_wrapper{
+	height: 500px;
+	border: 1px solid black !important;
+	clear: both;
+	overflow: auto;
+}
+.user_row td{
+	border-bottom: 1px solid lightgray !important;
+	border-collapse: collapse;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.user_row td:first-child{
+	width: 20px;
+}
+.user_row td:nth-child(2){
+	width: 60px;
+}
+#add_remove_container{
+	width: 100%;
+	float: left;
+}
+.users h1{
+	float: left;
+	width: 100%;
+	text-align: center;
+	margin-bottom: 10px;
+}
+.profile_filter{
+	float: left;
+}
+#user_search_box{
+	float: right;
+}
+.users table{
+	clear: both;
+	border-collapse: collapse;
+	width: 100%;
+}
+.users .table_heading th{
+	background-color: #c0c0c0;
+	color: white;
+	font-size: 10pt;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.user_row{
+	cursor: move;
+}
+.filters{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	float: left;
+	min-height: 25px;
+}
+.dragging{
+	border: 1px solid gray;
+	background-color: lightgray; //#F8F8F8;
+}
+.dragging td:nth-child(4){
+	display: none;
+}
+.drag_hover_over .table_wrapper{
+	background-color: beige;
+}
+.filter_panel th{
+	vertical-align: middle !important;
+	height: 35px;
+}
+.panel_heading th{
+	font-weight: bold;
+	text-align: center;
+}
+.alphabet{
+	margin-bottom: 10px;
+	margin-top: 5px;
+	float: left;
+	height: 26px;
+}
+.alphabet a{
+	margin-right: 2px;
+	border: 1px solid gray;
+	padding: 5px;
+	float: left;
+}
+.highlight{
+	background-color: palegoldenrod;
+}
+.pages{
+	float: right;
+	margin: 10px;
+}
+.disabled {
+	background-color:#ededed;
+}
+.disabled img {
+	opacity: 0.4;
+}
+</style>
+<script>
+var keyUpCount = 0;
+showMask();
+
+var typingTimer;                //timer identifier
+var doneTypingInterval = 500;  //time in ms, 5 second for example
+
+// Update to jquery :selector, make case insensitive
+jQuery.expr[':'].contains = function(a, i, m) {
+  return jQuery(a).text().toUpperCase()
+      .indexOf(m[3].toUpperCase()) >= 0;
+};
+//user is "finished typing," do something
+function doneTyping () {
+   filterKeyUp();
+}
+$(document).ready(function() {
+	init();
+	
+	$("#available_count").html($("#available_users .user_row").size());
+});
+function init(){
+	$('.profile_filter').multiselect({
+		minWidth: 300,
+		noneSelectedText: 'All profiles',
+		selectedList: 2
+	});
+	$('.all_rows_select').click(function() {
+		var checkBoxState = false;
+		if($(this).is(':checked')){
+			checkBoxState = true;
+		}
+		
+		$(this).closest('table').find('.select_user').filter(":visible").each(function(){
+          	$(this).attr("checked", checkBoxState);
+		});
+	});
+	//on keyup, start the countdown
+	$('.filter_text').keyup(function(){
+	    clearTimeout(typingTimer);
+	    typingTimer = setTimeout(doneTyping, doneTypingInterval);
+	});
+	
+	//on keydown, clear the countdown 
+	$('.filter_text').keydown(function(){
+	    clearTimeout(typingTimer);
+	});
+	initDragDrop();
+	hideMask();
+}
+function filterUsers(){
+	var userName = escape($('#user_search_box input').val()).toUpperCase();
+	$("#available_users .user_row").hide();
+	$(".user_row td:contains('" + userName + "')").each(function(){
+		$(this).parent().show();
+	});  
+}
+function selectUsers(){
+	showMask();
+	selectUsersAF();
+}
+function removeUsers(){
+	showMask();
+	removeUsersAF();
+}
+/**
+* Drag and drop add / remove users
+**/
+function initDragDrop(){
+	var rowWidth = $("user_row").width();
+	$( ".available" ).draggable({ 
+		revert: false, 
+		helper: "clone",
+		drag: function( event, ui ) {
+			$(ui.helper).width($(".user_row").width());
+			$(ui.helper).addClass('dragging');
+			$('.select_user').attr("checked", false);
+			$(this).find('.select_user').filter(":visible").each(function(){
+				$(this).attr("checked", true);
+			});
+		}
+	});
+	$( ".selected" ).draggable({ 
+		revert: true, 
+		helper: "clone",
+		drag: function( event, ui ) {
+			$(ui.helper).width($(".user_row").width());
+			$(ui.helper).addClass('dragging');
+			$('.select_user').attr("checked", false);
+			$(this).find('.select_user').filter(":visible").each(function(){
+				$(this).attr("checked", true);
+			});
+		}
+	});
+	$( "#available_users").droppable({
+       accept: ".selected",
+       over: function( event, ui ) {
+          $(this).addClass('drag_hover_over');
+       },
+       out: function( event, ui ) {
+          $(this).removeClass('drag_hover_over');
+       },
+       drop: function( event, ui ) {
+       	  $(this).removeClass('drag_hover_over');
+          var id = ui.draggable.context.id;
+          var userId = $(this).attr("id"); 
+          showMask();
+          removeUsers();
+       }
+    });
+    $( ".selected_users").droppable({
+       accept: ".available",
+       over: function( event, ui ) {
+          $(this).addClass('drag_hover_over');
+       },
+       out: function( event, ui ) {
+          $(this).removeClass('drag_hover_over');
+       },
+       drop: function( event, ui ) {
+       	  $(this).removeClass('drag_hover_over');
+          var id = ui.draggable.context.id;
+          var userId = $(this).attr("id"); 
+          showMask();
+          selectUsers();
+       }
+    });
+}
+function filterKeyUp(){
+	showMask();
+	updateUserFilterAF();
+}
+</script>
+<apex:form >
+
+<apex:actionFunction name="selectUsersAF" action="{!selectUsers}" oncomplete="init()" reRender="msgs, available_users_panel, selected_users_panel, page_navigation_panel, filter_text, license_count"/>
+<apex:actionFunction name="removeUsersAF" action="{!removeUsers}" oncomplete="init()" reRender="msgs, available_users_panel, selected_users_panel, page_navigation_panel, filter_text, license_count"/>
+<apex:actionFunction name="updateUserFilterAF" action="{!updateUserFilter}" oncomplete="init()" reRender="msgs, available_users_panel, page_navigation_panel" />
+
+<apex:sectionHeader title="Add / Remove Team Members" subtitle="{!team.Name}"/>
+<apex:pageMessages id="msgs" escape="false"/>
+<apex:pageBlock id="team_member" title="Add / Remove Team Members" mode="edit" >
+	
+	<apex:pageBlockButtons >
+		<apex:commandButton value="Save" action="{!save}" />
+		<apex:commandButton value="Cancel" action="{!cancel}" />
+	</apex:pageBlockButtons>
+			
+	<apex:pageBlockSection columns="1">
+	<apex:pageBlockSectionItem >
+	<apex:outputPanel id="main_panel">
+	
+	<apex:outputPanel layout="none" rendered="{!NOT(IsSandbox)}">
+		<apex:outputText id="license_count" style="float: right;" value="Used {!UsedLicenseCount} of {!availableLicenses} licenses"/>
+	</apex:outputPanel>
+	<div id="add_remove_container">
+		<div id="available_users" class="users">
+			
+			<div class="member">
+			
+			<table>
+			<tr class="panel_heading">
+				<th colspan="4" >
+					Available Users
+				</th>
+			</tr>
+			<tr class="filter_panel">
+				<th colspan="4">
+				
+				<apex:selectList value="{!profileFilter}" multiselect="true" size="5" styleClass="profile_filter">
+					<apex:selectOptions value="{!profiles}" />
+					<apex:actionSupport event="onchange" action="{!updateUserFilter}" onsubmit="showMask()" oncomplete="init()" reRender="available_users_panel, page_navigation_panel"/> 
+				</apex:selectList>
+				<div id="user_search_box">
+					Filter: &nbsp;&nbsp;<apex:inputText value="{!filterText}" id="filter_text" styleClass="filter_text" onKeyUp=""/>
+				</div>
+				</th>
+			</tr>
+			</table>
+			<apex:outputPanel id="available_users_panel" layout="block" styleClass="table_wrapper">
+			<table>
+			<tr class="table_heading">
+				<th><input type="checkbox" class="all_rows_select"/></th>
+				<th></th>
+				<th>Name</th>
+				<th>Profile</th>
+			</tr>
+			<apex:repeat value="{!availableUsers}" var="availableUserList">
+				<apex:repeat value="{!availableUserList}" var="thisUser">
+					<tr class="user_row available">
+					<td><apex:inputCheckbox value="{!thisUser.checked}" styleClass="select_user"/></td>
+					<td>
+						<apex:image value="{!thisUser.photoUrl}" rendered="{!LEN(thisUser.photoUrl) > 0}" styleClass="member_image"/>
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/teammember32.png')}" rendered="{!LEN(thisUser.photoUrl) == 0}" styleClass="member_image"/>
+					</td>
+					<td>
+						{!thisUser.name}
+					</td>
+					<td>{!thisUser.user.Profile.Name}</td>
+					</tr>
+				</apex:repeat>
+			</apex:repeat>
+			</table>
+			<div id="clear"/>
+			</apex:outputPanel>
+			<apex:outputPanel id="page_navigation_panel" styleClass="pages">
+			    <!-- Page {!currentPage} of {!totalPages} &nbsp;&nbsp;-->
+				<apex:commandLink value="Previous" action="{!previousPage}" rendered="{!currentPage > 1}"/>&nbsp;&nbsp;
+				<apex:commandLink value="Next" action="{!nextPage}" rendered="{!AND(hasNextPage, NOT(MaximumPageLimit))}"/>
+			</apex:outputPanel>
+			</div>
+			
+		</div>
+	
+		<div id="control">
+			<div class="add_remove_buttons">
+				<input type="button" value=">>" onclick="selectUsers()"/>
+				<input type="button" value="<<" onclick="removeUsers()"/>
+			</div>
+		</div>
+		
+		<apex:outputPanel id="selected_users_panel" layout="block" styleClass="users selected_users">
+			
+			<div class="member">
+			
+			<table>
+			<tr class="panel_heading">
+				<th colspan="4" >
+					Selected Users
+				</th>
+			</tr>
+			</table>
+			<div class="alphabet" >&nbsp;</div>
+			<div class="table_wrapper">
+			<table>
+			<tr class="table_heading">
+				<th><input type="checkbox" class="all_rows_select"/></th>
+				<th></th>
+				<th>Name</th>
+			</tr>
+			<apex:repeat value="{!selectedUsers}" var="thisUser">
+				<tr class="{!IF(thisUser.user.IsActive, '', 'disabled ')}user_row selected">
+				<td><apex:inputCheckbox value="{!thisUser.checked}" styleClass="select_user"/></td>
+				<td>
+					<apex:image value="{!thisUser.photoUrl}" rendered="{!LEN(thisUser.photoUrl) > 0}" styleClass="member_image"/>
+					<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/teammember32.png')}" rendered="{!LEN(thisUser.photoUrl) == 0}" styleClass="member_image"/>
+				</td>
+				<td>
+					{!thisUser.name}
+				</td>
+				</tr>
+			</apex:repeat>
+			</table>
+			<div id="clear"/>
+			</div>
+			</div>
+		</apex:outputPanel>
+		
+	</div>
+	<div id="clear"/>
+	
+	</apex:outputPanel>
+	</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+	
+</apex:pageBlock>
+</apex:form>
+<c:StatusPanel />
+</apex:page>

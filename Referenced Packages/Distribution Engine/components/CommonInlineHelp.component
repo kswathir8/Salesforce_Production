@@ -1,0 +1,15 @@
+<apex:component >
+<apex:attribute name="help_page" type="String" required="false" description="unique help page name"/>
+	<style>
+		.mini_help_icon {
+			width: 20px !important;
+			height: 20px !important;
+			margin-left: 8px;
+			position: relative;
+			float: right;
+		}
+	</style>
+	<a href="http://help.nc-squared.com/#{!help_page}" target="new">
+		<img src="{!URLFOR($Resource.DEResources, 'images/help40_3.png')}" class="mini_help_icon"/>
+	</a>
+</apex:component>

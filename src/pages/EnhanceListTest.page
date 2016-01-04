@@ -1,0 +1,6 @@
+<apex:page showHeader="true" sidebar="true">
+    <apex:enhancedList customizable="false" type="Opportunity" height="300" rowsPerPage="10" listId="{!$Label.Partner_My_Opportunities}" />
+    <apex:enhancedList customizable="false" type="Opportunity" height="300" rowsPerPage="10" listId="{!$Label.Partner_Team_Opportunities}" rendered="{!OR(CONTAINS($UserRole.Name, 'Exec'), CONTAINS($UserRole.Name, 'Manage') )}"/>
+	<apex:enhancedList customizable="false" type="Account" height="300" rowsPerPage="10" listId="{!$Label.Partner_My_Accounts}" />
+	<apex:enhancedList customizable="false" type="Account" height="300" rowsPerPage="10" listId="{!$Label.Partner_Team_Accounts}" rendered="{!OR(CONTAINS($UserRole.Name, 'Exec'), CONTAINS($UserRole.Name, 'Manage') )}"/>
+</apex:page>

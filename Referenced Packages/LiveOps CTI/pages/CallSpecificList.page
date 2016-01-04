@@ -1,0 +1,41 @@
+<apex:page controller="LiveOpsTransfer.CCallSpecificList" language="{!$CurrentPage.parameters.lang}">
+<apex:form >
+    <apex:PageBlock id="page">
+        <apex:outputLabel style="font-family:Arial;font-size:14pt;font-weight:bold;">{!$Label.liveopstransfer__CallSpecific}</apex:outputLabel>
+        <p><apex:OutputLabel rendered="{!m_boolShowError}" style="font-family:Arial;font-size:18pt;color:red;font-weight:bold;">{!$Label.liveopstransfer__ErrorLabel}</apex:OutputLabel></p>
+        <apex:actionFunction name="SearchAction" action="{!Search}" reRender="Table"/>
+        <apex:InputText value="{!m_strAlias}" onkeyup="methodcall();" onkeypress="return handleEnter(this, event)"/>&nbsp;&nbsp;
+        <apex:commandButton value="{!$Label.liveopstransfer__Search}" action="{!Search}" reRender="Table"/>&nbsp;&nbsp;
+        <apex:commandButton value="{!$Label.liveopstransfer__Showall}" action="{!ShowAll}" reRender="Table"/>&nbsp;&nbsp;
+        <apex:commandButton value="{!$Label.liveopstransfer__Back}" onclick="javascript:window.history.go(-1)" reRender="Table"/><p></p>
+        <apex:PageBlockTable id="Table" value="{!m_lstParameters}" var="parameter" cellpadding="5" rows="{!m_intPageSize}" rendered="{!m_boolShowTable}" >
+            <apex:column >
+                <apex:facet name="header">{!$Label.liveopstransfer__Action}</apex:facet>
+                <apex:commandLink value="{!$Label.liveopstransfer__Call}" onclick="javascript:sendCTIMessage('/TRANSFER_CALL?TRANSFER_ID={!parameter[0]}&LINE_NUMBER=1')" reRender="Table"/>    
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.liveopstransfer__Alias}</apex:facet>
+                <apex:outputText value="{!parameter[1]}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.liveopstransfer__Type}</apex:facet>
+                <apex:outputLabel >{!$Label.liveopstransfer__Campaign}</apex:outputLabel>
+            </apex:column>
+        </apex:PageBlockTable>
+        <apex:commandLink value="{!$Label.liveopstransfer__Showmore}" action="{!pageSizeIncrement}" rendered="{!m_boolEnabled}" reRender="page"/>
+    </apex:PageBlock>
+    </apex:form>
+    
+    <script type="text/javascript">
+        function stopRKey(evt) { 
+            var evt = (evt) ? evt : ((event) ? event : null); 
+            var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+            if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+            } 
+            document.onkeypress = stopRKey;
+        function methodcall()
+        {
+            SearchAction();
+        }
+    </script>
+</apex:page>

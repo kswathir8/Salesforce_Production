@@ -1,0 +1,135 @@
+<apex:page controller="DealRegistrationListController" sidebar="false" title="Deal Registration List" showHeader="false" standardStylesheets="false">
+    <apex:composition template="PartnerTemplate">
+        <apex:define name="page-title">
+        Axcient Partner Deal Registration List
+        </apex:define>
+        <apex:define name="main-content">
+		    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"/>
+		    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"/>
+		    <script type="text/javascript" src="{!URLFOR($Resource.TableSorter, 'jquery.tablesorter.min.js')}"/>
+<!--		    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+		    <link rel="stylesheet" value="{!URLFOR($Resource.TableSorter, 'themes/blue/style.css')}" type="text/css" media="all" />-->
+		    <script type="text/javascript">
+		        $j = jQuery.noConflict();    
+		        $j(document).ready(function () {
+			        $j("[id$=dealTable]").tablesorter();
+			        $j("[id$=oppsTable]").tablesorter();
+//			        $jq("table").tablesorter();
+		        });    
+		    </script>
+		    <style type="text/css">
+				th, td {
+				    padding: 5px;
+				    text-align: center;
+				}
+		    </style>
+            <apex:form >
+                <apex:pageMessages />
+                <apex:outputPanel id="beforePanel">
+                    <div class="dealRegistration">
+                        <apex:pageBlock id="hiddenBlock" rendered="false"></apex:pageBlock>
+                        <apex:pageBlock title="Deal Registration" mode="edit" rendered="{!NOT($ObjectType.Lead.fields.Name.Accessible)}">
+                    	    Unable to access Deals due to profile permissions. Please contact your Axcient rep.
+    					</apex:pageBlock>
+                    </div>
+                    <apex:pageBlock title="Deal Registration" mode="edit" rendered="{!$ObjectType.Lead.fields.Name.Accessible}" >
+                        <apex:pageBlockButtons location="top">
+                            <apex:commandButton title="Register Deal" value="Register Deal" action="{!registerDeal}" style="border:1.5px solid #4D4D5B" />
+                        </apex:pageBlockButtons>
+                        <style type="text/css">
+                            .dealRegistration{
+                            }
+                            #dealTable{
+	                            padding: 20px;
+	                            border-radius: 30px 30px 30px 30px;
+                            }
+                            tbody tr:nth-child(even) {
+                                background-color: #7B959F;
+                                color: white; 
+                            }
+                            tbody tr:nth-child(odd) {
+                               background-color: white;
+                               color: #27586B;
+                            }
+                        </style>
+						<apex:pageBlockSection rendered="{!deals.size > 0}">
+	                        <div class="theDealTable"> 
+                                <table id="dealTable" style="width:100%">
+                                	<thead>
+	                                	<tr>
+	                                		<th></th>
+	                                		<th>Name</th> 
+	                                		<th>Company</th> 
+	                                		<th>Street</th> 
+	                                		<th>City</th>
+	                                		<th>State</th>
+	                                		<th>Postal Code</th>
+	                                		<th>First Name</th>
+	                                		<th>Last Name</th>
+	                                		<th>Phone</th>
+	                                		<th>In Approval</th> 
+	                                		<th>Deal Status</th> 
+	                                	</tr>
+                                	</thead>
+                                	<tbody>
+	                                	<apex:repeat value="{!deals}" var="d">
+	                                		<tr>
+		                                		<td></td>
+	        		                        	<td>{!d.Name}</td>
+	        					                <td>{!d.Company}</td>
+	        					                <td>{!d.Street}</td>
+	        					                <td>{!d.City}</td>
+	        					                <td>{!d.State}</td>
+	        					                <td>{!d.PostalCode}</td>
+	        					                <td>{!d.FirstName}</td>
+	        					                <td>{!d.LastName}</td>
+	        					                <td>{!d.Phone}</td>
+	        					                <td>{!d.InApproval__c}</td>
+	        					                <td>{!d.Status}</td>
+	                                		</tr>
+	                                	</apex:repeat>
+                                	</tbody>
+                                </table>
+	                        </div>
+						</apex:pageBlockSection>
+						<apex:pageBlockSection rendered="{!deals.size == 0}">
+							You don't have any deal registrations in the queue.
+						</apex:pageBlockSection>
+						<apex:pageBlockSection rendered="{!AND(NOT(ISBLANK(oppList)), oppList.size > 0)}">
+	                        <div class=""> 
+                                <table id="oppsTable" style="width:100%">
+	                                <thead>
+	                                	<tr>
+	                                		<th></th>
+											<th></th>
+	                                		<th>Name</th> 
+	                                		<th>Stage Name</th> 
+	                                		<th>Close Date</th> 
+	                                	</tr>
+	                                </thead>
+	                                <tbody>
+	                                	<apex:repeat value="{!oppList}" var="o">
+	                                		<tr>
+	                                			<td></td>
+	                                			<td>
+	        										<apex:commandButton value="Request Extension" action="{!extendDeal}" rerender="hiddenBlock" rendered="{!NOT(ISBLANK(o.Id))}" style="border:2px solid #27586B">
+	        								            <apex:param name="oppId"
+	        								                value="{!o.Id}"
+	        								                assignTo="{!oppId}"/>
+	        								        </apex:commandButton>
+	                                			</td>
+	        		                        	<td>{!o.Name}</td>
+	        					                <td>{!o.StageName}</td>
+	        					                <td>{!o.CloseDate}</td>
+	                                		</tr>
+	                                	</apex:repeat>
+	                                </tbody>
+                                </table>
+	                        </div>
+						</apex:pageBlockSection>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+            </apex:form>
+        </apex:define>
+    </apex:composition>
+</apex:page>

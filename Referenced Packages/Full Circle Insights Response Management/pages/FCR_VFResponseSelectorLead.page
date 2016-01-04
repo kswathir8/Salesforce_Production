@@ -1,0 +1,3 @@
+<apex:page standardController="Lead" showHeader="false" >
+    <c:FCR_VFResponseInfo record="{!Lead}" />
+</apex:page>

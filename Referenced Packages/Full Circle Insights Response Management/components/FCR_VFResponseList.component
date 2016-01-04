@@ -1,0 +1,39 @@
+<apex:component controller="FCRM.FCR_VFResponseListController" >
+    <apex:stylesheet value="{!$Resource.FCRM__FCRStyleSheet}"/>
+    <apex:attribute name="conditionalterm" assignTo="{!QueryCondition}" type="String" description="{!$Label.FCR_Conditional_Term_Description}"/>
+
+    <apex:actionFunction name="UpdateTheChart" reRender="idTheResponseList,idPageInfo,idRecordInfo"  />
+
+    <apex:outputText rendered="{!QueryCondition=='invalid'}" value="{!$Label.fcrm__FCR_Select_Valid_Filter}" />
+
+    <apex:pageBlock id="idThePageBlock" mode="edit" >
+        <apex:pageBlockTable id="idTheResponseList" value="{!DisplayData}" rendered="{!QueryCondition!='invalid'}" var="onerow">
+            <apex:repeat value="{!FieldIterator}" var="oneitem">
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:CommandLink rendered="{!oneitem!=0}" reRender="idTheResponseList"  action="{!HeaderClicked}">
+                            <apex:param assignTo="{!SortFieldCommand}" name="q" value="{!oneitem}"/>
+                            <apex:outputText rendered="{!oneitem!=0}" value="{!FieldLabels[oneitem]}" />
+                            <apex:image styleClass="{!IF(oneitem =ColumnSortIndex, IF(SortDescending=true, 'RLSortedDescending','RLSortedAscending'),'RLNotSorted') }" value="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="  />
+                        </apex:CommandLink>
+                    </apex:facet>
+                    <apex:outputText rendered="{! oneitem!=0 }" value="{!onerow[oneitem]}" />
+                    <apex:outputlink target="parent" value="{! '/' + onerow[oneitem]}" rendered="{!oneitem==0}" >{!$Label.fcrm__FCR_View}</apex:outputlink>
+                </apex:column>
+            </apex:repeat>
+         </apex:pageBlockTable>
+         <apex:OutputPanel id="idPageInfo" rendered="{!DisplayPagination}" >
+             <apex:commandButton value="Previous" disabled="{!CurrentPage==0}" reRender="idTheResponseList,idPageInfo" action="{!PagePrevious}" /> 
+             <apex:commandButton value="Next" disabled="{!CurrentPage>= (PageCount-1)}" reRender="idTheResponseList,idPageInfo" action="{!PageNext}"/> 
+             <apex:selectList id="idPageNumber" value="{!CurrentPageOption}" size="1" onchange="UpdateTheChart()" ><apex:selectOptions value="{!PageList}" /></apex:selectList>
+        </apex:OutputPanel> 
+        <apex:outputpanel id="idRecordInfo" rendered="{!QueryCondition!='invalid'}">
+        <apex:outputText escape="false" value=" {!$Label.fcrm__FCR_Total1} {!TotalEntries} {!$Label.fcrm__FCR_Total2}. " />
+        <apex:outputtext rendered="{!RecordsLimited}"> {!$Label.fcrm__FCR_Additional_Available}</apex:outputtext>
+        <apex:outputText escape="false" value=" {!$Label.fcrm__FCR_Maximum_Records} " />
+        </apex:outputpanel>
+     </apex:pageblock>
+  <br />
+  <apex:outputtext rendered="false">Query condition is: {!QueryCondition}</apex:outputtext>
+
+</apex:component>

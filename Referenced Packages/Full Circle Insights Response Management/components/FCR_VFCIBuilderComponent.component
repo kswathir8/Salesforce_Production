@@ -1,0 +1,20 @@
+<apex:component controller="FCRM.FCR_VFBatchProcessorController" allowDML="true" >
+    <script type="text/javascript">
+        function refresh()
+        {
+            window.location = window.location;
+        }
+    </script>
+    <apex:outputPanel rendered="{!AppDisabled}" id="idCIPanelDisabled">
+        <apex:outputText value="Application currently disabled - Campaign influence database cannot be rebuilt until the application is enabled." />
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!Not(AppDisabled)}" id="idCIPanel">
+        <apex:outputText value="{!$Label.fcrm__FCR_LastInfluenceRun}: {!LastDatabaseBuild}" />
+        <p>
+        <apex:commandButton rendered="{!AsyncRebuildStatus = 0}" action="{!Rebuild}" value="{!$Label.fcrm__FCR_Refresh_CI_Data}"/>
+        <apex:outputText rendered="{!AsyncRebuildStatus>0}" value="{!$Label.fcrm__FCR_Processing_Status} {!Status}" />
+        </p>    
+    </apex:outputpanel>
+    <apex:actionPoller rendered="{!AsyncRebuildStatus>0}" action="{!Poll}" interval="30" oncomplete="refresh();"  />    
+ 
+</apex:component>

@@ -1,0 +1,131 @@
+<apex:page standardController="Sales_Order__c" sidebar="false" renderAs="pdf" showHeader="false"  extensions="CreatePackingSlipController" >
+    <div style="width:90%;margin-left:5%;min-height:100%;">
+    <table align="center" style="width:100%;margin-left:0px;" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+            <td style="width:60%;">
+            <table style="width:70%;" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td >
+                        <apex:image url="{!URLFOR($Resource.AxcientLogo)}" width="200" height="50"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <br/>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >{!add.Address__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >{!add.City__c}, {!add.State__c} {!add.Zip_Postal_Code__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >P: {!add.Phone__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                 <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >F: {!add.Fax__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel >{!add.Email__c}</apex:outputLabel>
+                    </td>
+                </tr>
+                
+            </table>
+            </td>
+            <td>
+                <table style="width:100%;" cellspacing="0" cellpadding="0" border="0">
+                <tr >
+                    <td align="center" style="width:60%;border: 1px solid #000;background-color:#000;border-radius:10px;">
+                        <apex:outputLabel style="font-size:25px;color:white;font-weight:bold;" >Packing Slip</apex:outputLabel>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel style="font-weight:bold;">Order #:&nbsp;</apex:outputLabel>
+                        <apex:outputText value="{!salesOrder.Name}"/><br/>                      
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px;">
+                        <apex:outputLabel style="font-weight:bold;" >Order Date:&nbsp;</apex:outputLabel>
+                        <apex:outputText value="{0,date,MMM dd yyyy}"><apex:param value="{!salesOrder.Date__c}"/></apex:outputText>
+                    </td>
+                </tr>
+                 
+            </table>
+            </td>
+        <br/>
+        </tr>
+    </table>
+    
+    <hr/><br/>
+    <table align="center" style="width:90%;font-size:12px" cellspacing="0" cellpadding="0" border="0" >
+        <tr>
+            <td style="width:65%" valign="top"> 
+                <apex:outputLabel style="font-weight:bold;" >Bill To:&nbsp;</apex:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px;font-weight:bold;">{!salesOrder.Bill_to_Name__c}</apex:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px" value="{!salesOrder.Bill_to_Address_1__c}"></apex:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px" value="{!salesOrder.Bill_to_City__c}"></apex:outputLabel>
+                <apex:outputLabel rendered="{!IF(salesOrder.Bill_to_City__c!=null,true,false)}" value=", "></apex:outputLabel>
+                <apeX:outputLabel value="{!salesOrder.Bill_to_State__c + ' ' +salesOrder.Bill_to_Zip_Code__c}"></apeX:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px" value="{!salesOrder.Bill_to_Country__c}"></apex:outputLabel>
+            </td>
+            <td style="width:35%">                
+                <apex:outputLabel style="font-weight:bold;" >Ship To:&nbsp;</apex:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px;font-weight:bold;">{!salesOrder.Ship_to_Name__c}</apex:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px" value="{!salesOrder.Ship_to_Address_1__c}"></apex:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px" value="{!salesOrder.Ship_to_City__c}"></apex:outputLabel>
+                <apex:outputLabel rendered="{!IF(salesOrder.Ship_to_City__c!=null,true,false)}" value=", "></apex:outputLabel>
+                <apeX:outputLabel value="{!salesOrder.Ship_to_State__c + ' ' +salesOrder.Ship_to_Zip_Code__c}"></apeX:outputLabel><br/>
+                <apex:outputLabel style="margin-left:15px" value="{!salesOrder.Ship_to_Country__c}"></apex:outputLabel>
+            </td>
+        </tr>
+    </table> 
+        <br/><br/><br/> 
+        <apex:outputLabel >Reference #: </apex:outputLabel>
+        <apex:outputField value="{!salesOrder.Reference_Number__c}"/>
+        <table style="width:100%;font-size:12px" border="1" cellpadding="0" cellspacing="0">
+            <tr>
+                <th style="background-color:#E9E5E5;height:30px;">Item</th>
+                <th style="background-color:#E9E5E5">Description</th>
+                <th style="background-color:#E9E5E5">Unit</th>
+                <th style="background-color:#E9E5E5">Quantity Shipped</th>
+            </tr>
+            <apex:repeat value="{!allSoItems}" var="soItem" id="theRepeat">
+               <tr>
+                   <td style="height:30px;vertical-align:top;width:15%"> <apex:outputText value="{!soItem.Item__c}" id="ProductId"/></td>
+                   <td style="vertical-align:top;width:65%"> 
+                       <apex:outputText value="{!soItem.Description__c}" id="Description"/><br/>
+                       <apex:outputText value="{!soItem.Axcient_Serial_Number__c}">Axcient Serial #:&nbsp;</apex:outputText><br/>
+                       <apex:outputText value="{!soItem.Axcient_Asset_Tag__c}">Axcient Asset Tag #:&nbsp;</apex:outputText>
+                   </td>
+                   <td style="vertical-align:top;width:10%"> <apex:outputText value="{!soItem.Unit__c}" id="Unit"/></td>
+                   <td style="vertical-align:top;width:10%"> <apex:outputText value="{0,number,#,###}" id="Quantity"><apex:param value="{!soItem.Quantity__c}"/></apex:outputText></td>
+                  
+               </tr>
+            </apex:repeat>
+        
+        </table>
+        <br/><br/><br/><br/><br/><br/>
+       <div style="position:absolute;bottom:0;left:0;width:90%;height:50px;margin-left:5% " >
+           <apex:outputLabel style="color:#00688B;font-style:italic;" >**Axcient reserves the right to charge for EVAL/DEMO/DAS units that are not returned within 30 days of contract end date.**</apex:outputLabel>
+       </div> 
+   </div>
+   
+</apex:page>

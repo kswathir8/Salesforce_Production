@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Use this text email template to inform the customer that there is new correspondence on the case. With instruction to reply by entering text within the designated markers, this ensures the cleanest case comment, but has the appearance of a system-generated email. Includes the 25 most recent public comments, Case Number, Status, Priority Level, Subject, and Description.</description>
+    <encodingKey>ISO-8859-1</encodingKey>
+    <name>New Comment w/ Markers (text)</name>
+    <style>none</style>
+    <subject>Case: {!Case.CaseNumber} {!Case.Subject} {!Case.Case_Thread_Id__c}</subject>
+    <type>text</type>
+</EmailTemplate>

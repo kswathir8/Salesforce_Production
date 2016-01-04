@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>FCR_Bypass_Nurture_Timeout__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>If selected any responses to this campaign will ignore nurture timeout dates set on the lead/contact record.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If selected any responses to this campaign will ignore nurture timeout dates set on the lead/contact record.</inlineHelpText>
+        <label>Bypass Nurture Timeout</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Campaign_Notification_Override__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Allows you to override the defined Full Circle CRM Notification settings</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Select when notifications should fire if different than what is in the Full Circle CRM Notification settings.</inlineHelpText>
+        <label>Campaign Notification Override</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Do Not Notify on Open</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Do Not Notify on Already Engaged</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Do Not Notify on Open or Already Engaged</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Campaign_Precedence__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set to true if a newly generated response to this campaign should replace an existing active response.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Set to true if a newly generated response to this campaign should replace an existing active response.</inlineHelpText>
+        <label>Campaign Precedence</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Campaign_Sourced_By__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Used in the response intelligence tab to determine funnel attribution. Do not adjust these picklist values. Set as required on page layout.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Please select which team is driving this campaign.</inlineHelpText>
+        <label>Campaign Sourced By</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Marketing</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sales</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Partner</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sales Development</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_CascadeParent__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Reference to cascaded parent campaign</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the parent campaign if this campaign was created as the result of a repeat response.</inlineHelpText>
+        <label>Cascade Parent</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipLabel>Cascaded Campaigns</relationshipLabel>
+        <relationshipName>CascadeParent</relationshipName>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Cascade_Parent_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Displays the ID of the Cascade Parent Campaign. Can be used for dynamic reports.</description>
+        <externalId>false</externalId>
+        <formula>FCR_CascadeParent__r.Id</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Displays the ID of the Cascade Parent Campaign.</inlineHelpText>
+        <label>Cascade Parent ID</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_ClosedOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Influenced revenue from responses related to closed-won campaigns</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Revenue Influenced by this campaign.</inlineHelpText>
+        <label>Influence Revenue</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_ClosedOpRevenueModel2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Influenced revenue from responses related to closed-won campaigns (model 2)</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Revenue Influenced by this campaign (model 2)</inlineHelpText>
+        <label>Influence Revenue (model 2)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_ClosedOpRevenueModel3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Influenced revenue from responses related to closed-won campaigns (model 3)</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Revenue Influenced by this campaign.(model 3)</inlineHelpText>
+        <label>Influence Revenue (model 3)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Cost_Per_Response_With_Repeats__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Cost Per Response with repeats is evaluated if the actual cost has a value and there are responses in the field Total Responses (with repeats) - else value is 0.</description>
+        <externalId>false</externalId>
+        <formula>IF ( 
+AND( 
+NOT(ISBLANK(ActualCost )), 
+NOT(ISBLANK( FCR_Total_Responses_With_Repeats__c )),
+FCR_Total_Responses_With_Repeats__c&gt;0), 
+ActualCost / FCR_Total_Responses_With_Repeats__c, 
+0)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Populated if the actual cost has a value and there are responses in the field Total Responses (with repeats).</inlineHelpText>
+        <label>Cost Per Response (with repeats)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Cost_Per_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Cost Per Response is evaluated if the actual cost has a value and there are responses, else value is 0.</description>
+        <externalId>false</externalId>
+        <formula>IF ( 
+AND( 
+NOT(ISBLANK(ActualCost )), 
+NOT(ISBLANK( NumberOfResponses)),
+NumberOfResponses&gt;0), 
+ActualCost / NumberOfResponses, 
+0)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Cost Per Response is evaluated if the actual cost has a value and there are responses, else value is 0.</inlineHelpText>
+        <label>Cost Per Response</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_LostOpRevenueModel1__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Influenced pipeline attributed to closed lost opportunities</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Influenced pipeline attributed to closed lost opportunities</inlineHelpText>
+        <label>Influence Lost</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_LostOpRevenueModel2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Influenced pipeline attributed to closed lost opportunities from model 2</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Influenced pipeline attributed to closed lost opportunities from model 2</inlineHelpText>
+        <label>Influence Lost (model 2)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_LostOpRevenueModel3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Influenced pipeline attributed to closed lost opportunities from model 3</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Influenced pipeline attributed to closed lost opportunities from model 3</inlineHelpText>
+        <label>Influence Lost (model 3)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Marketing_Region__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The region this campaign is running in.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The region this campaign is running in.</inlineHelpText>
+        <label>Marketing Region</label>
+        <picklist>
+            <picklistValues>
+                <fullName>APAC</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>EMEA</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Global</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>LATAM</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>NA</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Net_New_Names__c</fullName>
+        <deprecated>false</deprecated>
+        <description># of responses where the campaign member Net New Name field is true. This value is updated via 24 hour batch process.</description>
+        <externalId>false</externalId>
+        <inlineHelpText># of campaign members that are new names.</inlineHelpText>
+        <label># Net New Names</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Net_New_Response_Ratio__c</fullName>
+        <deprecated>false</deprecated>
+        <description>% of responses that are net new names.</description>
+        <externalId>false</externalId>
+        <formula>(FCR_Net_New_Names__c /  NumberOfResponses) * 100</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Net New Response Percent</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_OpenOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Revenue from responses related to open opportunities</description>
+        <externalId>false</externalId>
+        <label>Influence Pipeline</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_OpenOpRevenueModel2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Revenue from responses related to open opportunities (model 2)</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Revenue from responses related to open opportunities (model 2)</inlineHelpText>
+        <label>Influence Pipeline (model 2)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_OpenOpRevenueModel3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Revenue from responses related to open opportunities (model 3)</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Revenue from responses related to open opportunities (model 3)</inlineHelpText>
+        <label>Influence Pipeline (model 3)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_QR_s__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Number of Qualified Responses on this Campaign. Updated via batch update.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of Qualified Responses to this Campaign.</inlineHelpText>
+        <label># Qualified Responses</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_QR_to_Opportunity_Ratio__c</fullName>
+        <deprecated>false</deprecated>
+        <description>% of qualified responses that resulted in an opportunity</description>
+        <externalId>false</externalId>
+        <formula>(NumberOfOpportunities /  FCR_QR_s__c ) * 100</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>% of qualified responses that resulted in an opportunity</inlineHelpText>
+        <label>QR to Opportunity %</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Qualified_Responses_With_Repeats__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Number of qualified responses including repeat (cascade) campaign responses. Updated by batch process every 24 hours. Data may not reflect most recent data depending on last update.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Number of qualified responses including repeat (cascade) campaign responses. Updated by batch process every 24 hours. Data may not reflect most recent data depending on last update.</inlineHelpText>
+        <label># Qualified Responses (with repeats)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Repeat_Campaign_Number__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>If the campaign is a repeat (cascade) campaign, this indicates the number in the cascade.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If the campaign is a repeat (cascade) campaign, this field indicates the number in the cascade.</inlineHelpText>
+        <label>Repeat Campaign Number</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Repeat_Response_Timeout_Segments__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates the minimum time allowed between responses to the same campaign by the same individual before they are added to a repeat campaign.  Without a value repeat responses will default to the global value.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the minimum time allowed between responses to the same campaign by the same individual before they are added to a repeat campaign.</inlineHelpText>
+        <label>Repeat Response Timeout Segments</label>
+        <picklist>
+            <picklistValues>
+                <fullName>2 Minutes</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>8 Hours</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>1 Day</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>2 Days</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>1 Week</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Repeat_Responses_Allowed__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>True if repeat responses are allowed for this campaign (i.e. cascading enabled).</description>
+        <externalId>false</externalId>
+        <inlineHelpText>True if repeat responses are allowed for this campaign (i.e. cascading enabled).</inlineHelpText>
+        <label>Repeat Responses Allowed</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Responses_to_Won__c</fullName>
+        <deprecated>false</deprecated>
+        <description>% of responses that converted to closed won opportunities.</description>
+        <externalId>false</externalId>
+        <formula>(NumberOfWonOpportunities /  NumberOfResponses) * 100</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>% of responses that resulted in a won opportunity.</inlineHelpText>
+        <label>% Responses Won</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Sales_Information__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Provide information for the Sales team on followup. Displayed on the lead/contact layout for Active Responses.</description>
+        <externalId>false</externalId>
+        <label>Sales Information</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_TotalOpRevenueModel1__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 1</description>
+        <externalId>false</externalId>
+        <formula>FCR_LostOpRevenueModel1__c + FCR_OpenOpRevenueModel1__c + FCR_ClosedOpRevenueModel1__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 1</inlineHelpText>
+        <label>Total Influence</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_TotalOpRevenueModel2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 2</description>
+        <externalId>false</externalId>
+        <formula>FCR_LostOpRevenueModel2__c + FCR_OpenOpRevenueModel2__c + FCR_ClosedOpRevenueModel2__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 2</inlineHelpText>
+        <label>Total Influence (model2)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_TotalOpRevenueModel3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 3</description>
+        <externalId>false</externalId>
+        <formula>FCR_LostOpRevenueModel3__c + FCR_OpenOpRevenueModel3__c + FCR_ClosedOpRevenueModel3__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 3</inlineHelpText>
+        <label>Total Influence (model3)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Total_Responses_With_Repeats__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A count of the total responses to this campaign  and any repeat (cascade) campaign responses.Updated by batch process every 24 hours.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Total number of responses with any any repeat (cascade) campaign responses.Updated by batch process every 24 hours.</inlineHelpText>
+        <label>Total Responses (with repeats)</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+</CustomObject>

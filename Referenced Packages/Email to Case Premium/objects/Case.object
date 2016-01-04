@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldSets>
+        <fullName>New_Comment_Case_Fields</fullName>
+        <availableFields>
+            <field>AccountId</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>AssetId</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>BusinessHoursId</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>ContactId</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Description</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>IsEscalated</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Origin</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>OwnerId</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>ParentId</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Priority</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Reason</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>SubStatus__c</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <availableFields>
+            <field>Subject</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </availableFields>
+        <description>New Comment</description>
+        <displayedFields>
+            <field>Type</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <displayedFields>
+            <field>Status</field>
+            <isFieldManaged>false</isFieldManaged>
+            <isRequired>false</isRequired>
+        </displayedFields>
+        <label>New Comment Case Fields</label>
+    </fieldSets>
+    <fields>
+        <fullName>AdditionalBCC__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores email addresses entered on the New Comment page Additional BCC field.</description>
+        <externalId>false</externalId>
+        <label>Additional BCC</label>
+        <length>5000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>AdditionalCC__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores email addresses entered on the New Comment page Additional CC field.</description>
+        <externalId>false</externalId>
+        <label>Additional CC</label>
+        <length>5000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>AdditionalTo__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores email addresses entered on the New Comment page Additional To field. The SuppliedEmail (Web Email) value is added automatically on case creation if a valid Contact isn&apos;t associated.</description>
+        <externalId>false</externalId>
+        <label>Additional To</label>
+        <length>5000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Case_Thread_Id__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A formula to generate the Salesforce Case Thread Id for display on detail pages or inclusion in email templates.</description>
+        <externalId>false</externalId>
+        <formula>&quot;[ ref:_&quot; &amp; 
+LEFT( $Organization.Id , 5) &amp; 
+IF (MID ( $Organization.Id, 6, 1) &lt;&gt; &quot;0&quot;, RIGHT($Organization.Id,10), 
+IF (MID ( $Organization.Id, 7, 1) &lt;&gt; &quot;0&quot;,RIGHT($Organization.Id, 9), 
+IF (MID ( $Organization.Id, 8, 1) &lt;&gt;&quot;0&quot;, RIGHT($Organization.Id, 8), 
+IF (MID ( $Organization.Id, 9, 1)&lt;&gt; &quot;0&quot;, RIGHT($Organization.Id, 7), 
+IF (MID ( $Organization.Id,10, 1) &lt;&gt; &quot;0&quot;, RIGHT($Organization.Id, 6), 
+IF (MID ($Organization.Id, 11, 1) &lt;&gt; &quot;0&quot;, RIGHT($Organization.Id, 5), 
+IF(MID ( $Organization.Id, 12, 1) &lt;&gt; &quot;0&quot;, RIGHT($Organization.Id,4), 
+IF (MID ( $Organization.Id, 13, 1) &lt;&gt; &quot;0&quot;,RIGHT($Organization.Id, 3), 
+IF (MID ( $Organization.Id, 14, 1) &lt;&gt;&quot;0&quot;, RIGHT($Organization.Id, 2), &quot;&quot;) ) ) ) ) ) ) ) )
+&amp; &quot;._&quot; &amp;LEFT( Id, 5) &amp; 
+IF(MID ( Id, 6, 1) &lt;&gt; &quot;0&quot;, RIGHT(Id, 10), 
+IF (MID ( Id, 7, 1)&lt;&gt; &quot;0&quot;, RIGHT(Id, 9), 
+IF (MID ( Id, 8, 1) &lt;&gt; &quot;0&quot;, RIGHT(Id,8), 
+IF (MID ( Id, 9, 1) &lt;&gt; &quot;0&quot;, RIGHT(Id, 7), 
+IF (MID ( Id, 10,1) &lt;&gt; &quot;0&quot;, RIGHT(Id, 6), 
+IF (MID ( Id, 11, 1) &lt;&gt; &quot;0&quot;,RIGHT(Id, 5), 
+IF (MID ( Id, 12, 1) &lt;&gt; &quot;0&quot;, RIGHT(Id, 4), 
+IF (MID( Id, 13, 1) &lt;&gt; &quot;0&quot;, RIGHT(Id, 3), 
+IF (MID ( Id, 14, 1) &lt;&gt;&quot;0&quot;, RIGHT(Id, 2), &quot;&quot;) ) ) ) ) ) ) ) ) &amp; &quot;:ref ]&quot;</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Thread Id</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Disable_Email_Distribution__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Setting this field to true disables the Email Distribution feature on a case by case basis if Email Distribution is enabled.</description>
+        <externalId>false</externalId>
+        <label>Disable Email Distribution</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>ExtraEmails__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Stores all email addresses on inbound emails. This data is used by Auto Create Contacts, Auto Add Case Team Members and Auto Add Contact Roles.</description>
+        <externalId>false</externalId>
+        <label>ExtraEmails</label>
+        <length>4000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>HistoryText_Inc_Private__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>History Text Inc Private</label>
+        <length>32768</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>HistoryText__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Contains a chronology of the most recent 25 public case comments (up to 32,000 chars) for inclusion in email templates. This field is updated when inbound emails are received and outbound emails are sent through the New Comment page.</description>
+        <externalId>false</externalId>
+        <label>HistoryText</label>
+        <length>32000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Knowledge_Base_URL__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Knowledge Base URL</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Most_Recent_Private_Comment__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Contains the most recent private comment, as it was typed, without any pre-pended recipients or attachments notations that may be added to the case comment record.</description>
+        <externalId>false</externalId>
+        <label>Most Recent Private Comment</label>
+        <length>4000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Most_Recent_Public_Comment__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Contains the most recent public comment, as it was typed, without any pre-pended recipients or attachments notations that may be added to the case comment record.</description>
+        <externalId>false</externalId>
+        <label>Most Recent Public Comment</label>
+        <length>4000</length>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>SubStatus__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This field is deprecated. Do not use it.</description>
+        <externalId>false</externalId>
+        <label>SubStatus (Deprecated)</label>
+        <picklist>
+            <controllingField>Status</controllingField>
+            <picklistValues>
+                <fullName>In Progress</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Complete</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Unfinished</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Important</fullName>
+                <controllingFieldValues>Escalated</controllingFieldValues>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>ASAP</fullName>
+                <controllingFieldValues>Escalated</controllingFieldValues>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>DOUBLE                  SPACE</fullName>
+                <controllingFieldValues>New</controllingFieldValues>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <webLinks>
+        <fullName>New_Comment</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>New Comment</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>var myURL=&apos;/apex/E2CP__New_Comment?id={!Case.Id}&amp;scontrolCaching=1&amp;core.apexpages.devmode.url=1&apos;;
+
+if(typeof srcUp == &apos;function&apos;) {
+myURL+= &apos;&amp;isdtp=vw&amp;showheader=false&apos;;
+srcUp(myURL);
+} else {
+location=myURL;
+}</url>
+    </webLinks>
+</CustomObject>

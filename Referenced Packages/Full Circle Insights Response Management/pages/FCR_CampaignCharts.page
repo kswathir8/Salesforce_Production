@@ -1,0 +1,142 @@
+<apex:page standardController="Campaign" ShowHeader="false">
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+    
+	google.load('visualization', '1');   
+  
+    function renderChart(chartDivId, title, entryLabel1, entryLabel2, entryVal1, entryVal2)
+    {            
+    	entryVal1 = entryVal1 == '' ? 0 : entryVal1;
+    	entryVal2 = entryVal2 == '' ? 0 : entryVal2;
+        var wrapper = new google.visualization.ChartWrapper({
+          chartType: 'PieChart',
+          dataTable: [[entryLabel1, entryLabel2],
+                      [entryLabel1, parseInt(entryVal1)],
+                      [entryLabel2, parseInt(entryVal2)]],
+          options: {
+          	'title': title,
+          	'width': 400,
+          	'height': 170,
+          	'colors': ['#94948F', '#005EC4'],
+          	'is3D': true
+          },
+          containerId: chartDivId
+        });  
+    
+        wrapper.draw();
+    }      
+  
+</script>
+	<!-- Begin Default Content REMOVE THIS -->
+	<h1 style="font-size: 16px; color: #008CBA; padding-bottom: 10px;">
+		<img src="{!$Resource.Full_Circle_CRM_Sm_Logo}" width="80" height="25"
+			style="vertical-align: text-top; vertical-align: text-bottom;"></img>
+		&nbsp; &nbsp; Full Circle CRM Campaign Metrics
+	</h1>
+	<apex:form >
+		<div style="display:none;">
+		<apex:outputText value="{!Campaign.FCRM__FCR_Net_New_Response_Ratio__c}"/>
+		<apex:outputText value="{!Campaign.FCRM__FCR_Net_New_Names__c}"/>
+		<apex:outputText value="{!Campaign.NumberOfResponses}"/>
+		<apex:outputText value="{!Campaign.FCRM__FCR_QR_to_Opportunity_Ratio__c}"/>
+		<apex:outputText value="{!Campaign.FCRM__FCR_QR_s__c}"/>
+		<apex:outputText value="{!Campaign.NumberOfOpportunities}"/>
+		<apex:outputText value="{!Campaign.FCRM__FCR_Responses_to_Won__c}"/>
+		<apex:outputText value="{!Campaign.NumberOfWonOpportunities}"/>
+		</div>
+	</apex:form>	
+	<apex:outputPanel rendered="{!Campaign.FCRM__FCR_Campaign_Sourced_By__c = 'Sales'}">
+		<table style="width: 100%; border: none;">
+			<tr>
+				<td width="33%">
+					<p>Total Inquiries - % New Names</p>
+					<div id="pie_chart_sales_div_1" /> 
+					<script>                            
+				        renderChart(
+				        	'pie_chart_sales_div_1',
+				        	"{!TEXT(ROUND(Campaign.FCR_Net_New_Response_Ratio__c,2))&'% of '& TEXT(Campaign.NumberOfResponses) & ' Targets'}",
+				        	'Targets',
+				        	'New Names',        				        	 
+				        	"{!Text(IF((Campaign.NumberOfResponses - Campaign.FCR_Net_New_Names__c) > 0, Campaign.NumberOfResponses - Campaign.FCR_Net_New_Names__c, 0))}",
+				        	"{!Text( Campaign.FCR_Net_New_Names__c )}");
+				    </script>
+				</td>
+				<td width="33%">
+					<p>QT to Opportunity Conversion Rate</p>
+					<div id="pie_chart_sales_div_2" /> 
+					<script>                            
+				        renderChart(
+				        	'pie_chart_sales_div_2',
+				        	"{!TEXT(ROUND(Campaign.FCR_QR_to_Opportunity_Ratio__c,2))&'% of '& TEXT(Campaign.FCR_QR_s__c) & ' Qualified Targets' }", 
+				        	'QTs',
+				        	'Opps',
+				        	"{!Text(IF((Campaign.FCR_QR_s__c - Campaign.NumberOfOpportunities) > 0, Campaign.FCR_QR_s__c - Campaign.NumberOfOpportunities, 0))}",				        	
+				        	"{!Text(Campaign.NumberOfOpportunities)}");
+				    </script>
+				</td>
+
+				<td width="33%">
+					<p>QT to Closed/Won Conversion Rate</p>
+					<div id="pie_chart_sales_div_3" />
+					<script>                            
+				        renderChart(
+				        	'pie_chart_sales_div_3',
+				        	"{!TEXT(ROUND(Campaign.FCR_Responses_to_Won__c,2)) & '% of ' & Text(Campaign.FCR_QR_s__c) & ' Qualified Targets'}", 
+				        	'QTs',
+				        	'Opps',				        	
+				        	"{!Text(IF((Campaign.FCR_QR_s__c - Campaign.NumberOfWonOpportunities) > 0, Campaign.FCR_QR_s__c - Campaign.NumberOfWonOpportunities, 0))}",
+				        	"{!Text(Campaign.NumberOfWonOpportunities )}"); 
+				    </script>     
+				</td>			
+			</tr>
+		</table>
+	</apex:outputPanel>
+	<apex:outputPanel rendered="{!Campaign.FCRM__FCR_Campaign_Sourced_By__c <> 'Sales'}">
+		<table style="width: 100%; border: none;">
+			<tr>
+				<td width="33%">
+					<p>Total Inquiries - % New Names</p>
+					<div id="pie_chart_marketing_div_1" /> 
+					<script>                            
+				        renderChart(
+				        	'pie_chart_marketing_div_1',
+				        	"{!TEXT(ROUND(Campaign.FCR_Net_New_Response_Ratio__c,2))&'% of '& TEXT(Campaign.NumberOfResponses) & ' Inquiries'}",
+				        	'Inquiries',
+				        	'New Names',        
+				        	"{!Text(IF((Campaign.NumberOfResponses - Campaign.FCR_Net_New_Names__c) > 0, Campaign.NumberOfResponses - Campaign.FCR_Net_New_Names__c, 0))}",		        	 
+				        	"{!Text( Campaign.FCR_Net_New_Names__c )}");
+				    </script>
+				</td>
+				<td width="33%">
+					<p>MQR to Opportunity Conversion Rate</p>
+					<div id="pie_chart_marketing_div_2" />
+					<script>                            
+				        renderChart(
+				        	'pie_chart_marketing_div_2',
+				        	"{!TEXT(ROUND(Campaign.FCR_QR_to_Opportunity_Ratio__c,2))&'% of '& TEXT(Campaign.FCR_QR_s__c) & ' Marketing Qualified Responses' }", 
+				        	'MQRs',
+				        	'Opps',	
+				        	"{!Text(IF((Campaign.FCR_QR_s__c - Campaign.NumberOfOpportunities) > 0, Campaign.FCR_QR_s__c - Campaign.NumberOfOpportunities, 0))}",			        	
+				        	"{!Text(Campaign.NumberOfOpportunities)}");
+				    </script>
+				</td>
+
+				<td width="33%">
+					<p>MQR to Closed/Won Conversion Rate</p>
+					<div id="pie_chart_marketing_div_3" />
+					<script>                            
+				        renderChart(
+				        	'pie_chart_marketing_div_3',
+				        	"{!TEXT(ROUND(Campaign.FCR_Responses_to_Won__c,2)) & '% of ' & Text(Campaign.FCR_QR_s__c) & ' Marketing Qualified Responses'}", 
+				        	'MQRs',
+				        	'Opps',		
+				        	"{!Text(IF((Campaign.FCR_QR_s__c - Campaign.NumberOfWonOpportunities) > 0, Campaign.FCR_QR_s__c - Campaign.NumberOfWonOpportunities, 0))}",		        	
+				        	"{!Text(Campaign.NumberOfWonOpportunities )}");
+				    </script>     
+				</td>
+
+			</tr>
+
+		</table>
+		</apex:outputpanel>
+</apex:page>

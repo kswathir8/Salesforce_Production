@@ -1,0 +1,117 @@
+<apex:page controller="FCRM.FCI_DefaultHybridConfigEditController" tabStyle="Full_Circle_Campaign_Influence__tab" >
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCI_StyleSheet)}"/>
+    <apex:SectionHeader title="Edit: {!configDesc}"/>
+    <style>
+    .ct{text-align:center;}
+    </style>      
+    <apex:form id="idTheForm">
+        <apex:pageblock mode="edit">
+        
+            <apex:pageBlockButtons > 
+                <apex:commandButton value="Save" action="{!SaveOnly}"/>
+                <apex:commandButton value="Save and Return" action="{!SaveAndReturn}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons> 
+                    
+            <apex:pageblocksection columns="2" title="General Configuration">
+                <apex:inputText label="Label" value="{!newConfigDesc}"/>
+                <apex:outputText value="This model's label." />
+                <apex:selectRadio label="Date Filter" value="{!dateFilter}" layout="pageDirection" >
+                    <apex:selectOption itemvalue="create" itemlabel="From opportunity create date" />
+                    <apex:selectOption itemValue="close" itemlabel="From opportunity close date" />
+                </apex:selectRadio>
+                <apex:outputText value="Specify the type of filter to apply - only responses within the filtered date range are considered (except for the first touch response that is always considered)." />
+                <apex:inputText label="Days to Filter" value="{!daysToFilter}"/>
+                <apex:outputtext value="Only responses within this many days before opportunity create or close are considered (depending on date filter)." />
+                <apex:inputCheckbox label="Close Date Cut-off" value="{!closeDateCutoff}"/>
+                <apex:outputText value="When selected, do not attribute influence to any responses after the close date, even if the opportunity is still open and the close date is in the past." />
+                <apex:inputText label="Account Weight" value="{!accountWeight}"/>
+                <apex:outputText value="Weight applied to all campaign member responses on every contact related to the Account." />
+                <apex:inputText label="Lead Response Weight" value="{!leadResponseWeight}"/>
+                <apex:outputText value="Weight applied to all campaign member responses on every lead related to the Account." />
+                <apex:inputText label="Repeat Response Weight" value="{!repeatResponseWeight}" />
+                <apex:outputText value="Weight applied to repeat responses (may be negative)" />                                
+                <apex:inputCheckbox label="Capture Zero Amount Attribution Details" value="{!captureZeroAmtAttr}"/>
+                <apex:outputText value="When selected, capture influence detail objects even for opportunities with zero or no amount specified." />
+                <apex:inputCheckbox label="Attribution for Account Contacts Only" value="{!attrForAccountContactsOnly}"/>
+                <apex:outputtext value="Attribute influence to contacts related to the Opportunity's contact roles only if the contacts are also related to the Account." />                
+                <apex:inputCheckbox label="Use Largest Role Weight" value="{!useLargestRoleWeight}"/>
+                <apex:outputtext value="Contacts with more than one role will only be attributed the largest role weight." />
+                <apex:inputCheckbox label="Require Response Date" value="{!requireResponseDate}"/>                                   
+                <apex:outputText value="When checked, only Campaign Member objects with the FCR_Response_Date__c field populated are considered for influence attribution." />                                                
+                <apex:selectList label="Currency Field" value="{!currencyField}" size="1" multiselect="false"> 
+                    <apex:selectOptions value="{!currencyFieldOptions}" />                        
+                </apex:selectList>
+                <apex:outputText value="Select the Opportunity currency field to use in influence calculations." />
+                <apex:selectList label="Lead's Account Field" value="{!leadAccountField}" size="1" multiselect="false"> 
+                    <apex:selectOptions value="{!leadAccountFieldOptions}" />                        
+                </apex:selectList>
+                <apex:outputText value="Select the Account lookup field on the Lead object to include leads in influence calculations." />
+                <apex:selectList label="Campaign Exclude From Influence Field" value="{!campaignExcludeFromInfluenceField}" size="1" multiselect="false"> 
+                    <apex:selectOptions value="{!campaignExcludeFieldOptions}" />                         
+                </apex:selectList>
+                <apex:outputText value="Select the campaign checkbox field that will exclude a campaign's responses from attribution." />                
+                <apex:selectList label="Contact Exclude From Influence Field" value="{!contactExcludeFromInfluenceField}" size="1" multiselect="false"> 
+                    <apex:selectOptions value="{!contactExcludeFieldOptions}" />                        
+                </apex:selectList>
+                <apex:outputText value="Select the contact checkbox field that will exclude a contact's responses from attribution." />
+                <apex:selectList label="Opportunity Exclude From Influence Field" value="{!oppExcludeFromInfluenceField}" size="1" multiselect="false"> 
+                    <apex:selectOptions value="{!oppExcludeFieldOptions}" />                        
+                </apex:selectList>
+                <apex:outputText value="Select the opportunity checkbox field that will exclude an opportunity's responses from attribution." />                                                                                   
+            </apex:pageblocksection>
+            
+            <apex:pageblocksection columns="2" title="Contact Type Weighting">
+                <apex:inputText label="Primary Contact Weight" value="{!primaryContactWeight}" />
+                <apex:outputtext value="Weight applied to responses on primary contacts for this opportunity." />
+                <apex:inputText label="Other Contact Weight" value="{!otherContactWeight}" />
+                <apex:outputtext value="Points applied to responses on other contacts for this opportunity." />                
+                <apex:inputText label="Originating Contact Weight" value="{!originatingContactWeight}" />
+                <apex:outputtext value="Points applied to the 'tipping point' responses that was active when this opportunity was created." />                                
+            </apex:pageblocksection>            
+            
+            <apex:pageblocksection columns="2" title="Campaign Weighting">
+                <apex:inputText label="Primary Campaign Source Weight" value="{!primaryCampaignSourceWeight}"/>
+                <apex:outputText value="Weight applied to Opportunity's Primary Campaign Source distributed evenly among matching responses." />            
+                <apex:inputCheckbox label="Always Include Primary Campaign Weight" value="{!alwaysIncludePrimaryCampaignWeight}"/>
+                <apex:outputText value="If checked, tracks Primary Campaign Source Weight even if there are no responses from that campaign tied to the Opportunity." />            
+                <apex:inputText label="First Campaign Touch Weight" value="{!firstCampaignTouchWeight}" />
+                <apex:outputtext value="Weight applied to first response on first campaign touch campaign." />
+                <apex:inputCheckbox label="Restrict First Touch Campaign by Date Filter" value="{!restrictFirstTouchCampaignByDateFilter}"/>
+                <apex:outputText value="If checked, the First Campaign Touch will be the earliest response that meets the date filter settings. When unchecked the earliest response is selected independent of any date filter settings." />            
+                <apex:inputText label="Last Campaign Touch Weight" value="{!lastCampaignTouchWeight}" />
+                <apex:outputtext value="Weight applied to first response on last campaign touch campaign." />            
+            </apex:pageblocksection>                   
+                    
+            <apex:pageblocksection columns="1" title="Role Weighting">
+                <apex:pageBlockTable value="{!roleweights}" var="rw" >
+                    <apex:column headerValue="Role">
+                        <apex:outputText value="{!rw.role}"  />
+                    </apex:column>
+                    <apex:column headerValue="Weight">
+                        <apex:inputText value="{!rw.weight}"/>
+                    </apex:column>                                                
+                </apex:pageBlockTable>                                                    
+            </apex:pageblocksection>     
+            
+            <apex:pageblocksection columns="2" title="Exclude Campaigns By Type">
+                <apex:pageblockSectionItem >
+                    <c:FCI_VFDualListSelect HideAddRemove="true" LeftHeader="Include" RightHeader="Exclude" AvailableIDs="{!AvailableCampaignTypes}" AvailableStrings="{!AvailableCampaignTypeLabels}"
+                        SelectedIDs="{!SelectedCampaignTypes}" SelectedStrings="{!SelectedCampaignTypeLabels}" AllowReorder="false" MaxSelect="15"
+                        ListSize="8" />
+                <apex:outputText > Responses can be excluded by campaign type.</apex:outputText>
+                </apex:pageblockSectionItem>            
+            </apex:pageblocksection>       
+                    
+            <apex:pageblocksection columns="2" title="Exclude Opportunities By Type">
+                <apex:pageblockSectionItem >
+                    <c:FCI_VFDualListSelect HideAddRemove="true" LeftHeader="Include" RightHeader="Exclude" AvailableIDs="{!AvailableOppTypes}" AvailableStrings="{!AvailableOppTypeLabels}"
+                        SelectedIDs="{!SelectedOppTypes}" SelectedStrings="{!SelectedOppTypeLabels}" AllowReorder="false" MaxSelect="15"
+                        ListSize="8" />
+                <apex:outputText > Opportunities can be excluded by their type.</apex:outputText>
+                </apex:pageblockSectionItem>            
+            </apex:pageblocksection>                        
+        </apex:pageblock>
+    </apex:form>
+    <c:FCI_PageFooter />
+</apex:page>

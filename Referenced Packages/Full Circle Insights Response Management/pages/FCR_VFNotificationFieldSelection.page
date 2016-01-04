@@ -1,0 +1,26 @@
+<apex:page controller="FCRM.FCR_VFFieldSelectionController" title="Notification field Configuration" tabStyle="Full_Circle_CRM__tab">
+    <apex:SectionHeader title="Full Circle CRM Notification Field Configuration" help="https://www.fullcirclecrm.com/fcrm/app/email-templates/">
+        <apex:form >
+            <apex:pageblock id="idThePage" mode="edit" >
+                <apex:pageBlockSection id="idFieldSelect" title="Select Additional Notification Fields" columns="1">
+                    <apex:outputText >The fields that you specify here for each object will be available for use in notification templates. 
+                    Only custom fields that are not part of managed packages may be specified here. Standard fields and selected Full Circle CRM fields
+                    are included automatically. You may select up to 10 fields on each object.
+                    </apex:outputText><br />
+                    <apex:outputText style="font-weight:bold"  value="Campaign Member fields" />
+                    <c:FCR_VFFieldListSelect ObjectType="CampaignMember" SelectedIDs="{!SelectedCampaignMemberFields}" />
+                    <apex:outputText style="font-weight:bold"  value="Lead fields" />
+                    <c:FCR_VFFieldListSelect ObjectType="Lead" SelectedIDs="{!SelectedLeadFields}" />
+                    <apex:outputText style="font-weight:bold"  value="Contact fields" />
+                    <c:FCR_VFFieldListSelect ObjectType="Contact" SelectedIDs="{!SelectedContactFields}" />
+                    <apex:outputText style="font-weight:bold"  value="Account fields" />
+                    <c:FCR_VFFieldListSelect ObjectType="Account" SelectedIDs="{!SelectedAccountFields}" />
+                </apex:pageBlockSection>
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="Save and return" action="{!NotificationConfigSave}"/>
+                    <apex:commandButton value="Cancel" immediate="true" action="{!getNotificationPageReference}"/>
+                </apex:pageBlockButtons>
+            </apex:pageblock>    
+        </apex:form>
+    </apex:SectionHeader>
+</apex:page>

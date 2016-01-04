@@ -1,0 +1,773 @@
+<apex:page standardController="n2de__Distributor__c" extensions="n2de.DistributorDetailController" sidebar="false">
+<!-- Replace default header icon -->
+<style>
+img.pageTitleIcon{
+	display: none;
+}
+.content{
+	background-image: url({!URLFOR($Resource.DEResources, 'images/distributor32.png')});
+	background-repeat: no-repeat;
+	background-position-x: 2px;
+}
+.warning_box{
+	margin-left: 5px;
+}
+.warning_box img{
+	width: 15px;
+}
+#advanced_warning_block {
+	max-width: 606px;	
+	padding-top: 10px;
+}
+.adv_warning {
+	color: red;
+	font-weight: bold;
+}
+</style>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.8.21.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>	
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/requiredBlockUtil.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4-nc2.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+	<c:CommonMask />
+	<c:CommonHelp help_page="adding-a-scheduled-distributor" rendered="{!NOT(IsPull) && NOT(IsTrigger)}"/>
+	<c:CommonHelp help_page="pull-distributors" rendered="{!IsPull}"/>
+	<c:CommonHelp help_page="trigger-distributors" rendered="{!IsTrigger}"/>
+	<apex:form >
+		<apex:sectionHeader title="{!IF(IsTrigger, 'Trigger', IF(IsPull, 'Pull Distributor', 'Scheduled Distributor'))} Edit" subtitle="{!distributor.Name}"/>
+		<apex:pageBlock id="distributor_edit" title="{!IF(IsTrigger, 'Trigger', IF(IsPull, 'Pull Distributor', 'Scheduled Distributor'))} Edit" mode="edit">
+
+			<apex:pageMessages escape="false"/>
+			
+			<apex:pageBlockButtons >
+				<apex:commandButton onclick="return checkAdvancedFilter()" action="{!saveDistributor}" value="Save"/>
+				<apex:commandButton action="{!backToSummary}" value="Cancel" immediate="true"/>
+			</apex:pageBlockButtons>
+			
+			<script>
+				function checkAdvancedFilter() {
+					if ($('.filters_enabled').attr('checked') == 'checked' && $('.advanced_filter').attr('checked') == 'checked') {
+						var soqlString = $('.soqlString').val();
+						var soqlStringlc = soqlString.toLowerCase();
+						if (soqlStringlc.indexOf('not') >= 0 || soqlStringlc.indexOf('!=') >= 0 || soqlStringlc.indexOf('excludes') >= 0) {
+							return confirm('This advanced filter contains negative conditions. It is not advisable to use these. Please consider re-formulating your rules. Are you sure you would like to continue?');
+						}
+					}
+					return true;
+				}
+			</script>
+			
+			<apex:pageBlockSection title="Information" columns="2" collapsible="false">
+				<apex:inputText value="{!distributor.Name}" styleClass="requiredIndicator" size="45" maxlength="45"/>
+				<apex:inputField value="{!distributor.n2de__Team__c}"/>
+				<apex:inputField value="{!distributor.n2de__Is_active__c}" />
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="{!$ObjectType.n2de__Team__c.Fields.n2de__Object_name__c.Label}"/>
+					<apex:outputText value="{!ObjectNameDescription}"/>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!distributor.n2de__Email_notifications_disabled__c}" rendered="{!NOT(IsPull)}"/>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="distribute_from" title="Distribute from" columns="2" collapsible="false" rendered="{!NOT(IsTrigger)}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Queue_id__c.InlineHelpText}" rendered="{!objectSupportsQueue && NOT(distributor.n2de__Is_distribute_from_user__c)}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Queue_id__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Queue_id__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!ObjectQueueOptions}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!distributor.n2de__Distribute_from_user__c}" styleClass="requiredIndicator" rendered="{!distributor.n2de__Is_distribute_from_user__c}"/>
+					
+				<apex:inputField value="{!distributor.n2de__Is_distribute_from_user__c}" rendered="{!objectSupportsQueue}">
+					<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+				</apex:inputField>
+				<apex:outputField value="{!distributor.n2de__Is_distribute_from_user__c}" rendered="{!NOT(objectSupportsQueue)}"/>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="distributor_method" title="Distribution method" columns="2" collapsible="false" rendered="{!NOT(IsTrigger)}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Algorithm__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Algorithm__c.Label}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!distributor.n2de__Algorithm__c}" size="1" rendered="{!NOT(IsPull)}">
+							<apex:selectOptions value="{!AlgorithmOptions}"/>
+							<apex:actionSupport event="onchange" action="{!changeAlgorithm}" onsubmit="showMask();" reRender="distributor_edit, script_panel, member_filter_section1, member_filter_section2"/>
+						</apex:selectList>
+						<apex:outputField value="{!distributor.n2de__Algorithm__c}" rendered="{!IsPull}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_respect_distribution_hours__c.InlineHelpText}" rendered="{!IsPull}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_respect_distribution_hours__c.Label}" />
+					<apex:inputField value="{!distributor.n2de__Is_respect_distribution_hours__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_weighting_enabled__c.InlineHelpText}" rendered="{!OR(distributor.n2de__Algorithm__c=='Round robin', distributor.n2de__Algorithm__c=='Round robin sticky assignment')}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_weighting_enabled__c.Label}" />
+					<apex:inputField value="{!distributor.n2de__Is_weighting_enabled__c}" styleClass="rr_disabled"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_round_robin_disabled__c.InlineHelpText}" rendered="{!AND(distributor.n2de__Algorithm__c=='Round robin lookup owner', NOT(distributor.n2de__Is_round_robin_disabled__c))}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_round_robin_disabled__c.Label}" />
+					<apex:inputField value="{!distributor.n2de__Is_round_robin_disabled__c}" styleClass="rr_disabled">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" action="{!clearMemberFilter}" reRender="distributor_method, script_panel, member_filter_section1, member_filter_section2"/>
+					</apex:inputField>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!AND(NOT(IsPull), distributor.n2de__Algorithm__c!='Round robin lookup owner', distributor.n2de__Algorithm__c!='Round robin', distributor.n2de__Algorithm__c!='Round robin sticky assignment')}"/>
+			</apex:pageBlockSection>
+			
+			<!-- Sticky assignment fields -->
+			<apex:pageBlockSection columns="2" rendered="{!AND(distributor.n2de__Algorithm__c=='Round robin sticky assignment', NOT(IsTrigger))}">
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_assignment_id_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_assignment_id_field_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Sticky_assignment_id_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!StickyIdFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_period__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_period__c.Label}"/>
+					<apex:outputPanel styleClass="requiredIndicator">
+						<apex:inputText value="{!StickyPeriodText}" maxlength="3" size="2"/>
+						<apex:selectList value="{!distributor.n2de__Sticky_unit__c}" size="1">
+							<apex:selectOptions value="{!StickyUnitOptionList}"/>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_match_level__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_match_level__c.Label}"/>
+					<apex:selectRadio value="{!distributor.n2de__Sticky_match_level__c}">
+						<apex:selectOptions value="{!StickyMatchLevelOptions}"/>
+					</apex:selectRadio>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_stick_on_OOO__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_stick_on_OOO__c.Label}" />
+					<apex:inputField value="{!distributor.n2de__Is_stick_on_OOO__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem />
+			</apex:pageBlockSection>
+				<!-- End of sticky assignment fields -->
+		
+				<!-- Lookup owner fields -->
+			<apex:pageBlockSection columns="1" rendered="{!AND(distributor.n2de__Algorithm__c=='Round robin lookup owner', NOT(IsTrigger))}">
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Lookup_unique_id_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!ObjectNameDescription} lookup field"/>
+					<apex:selectList value="{!distributor.n2de__Lookup_unique_id_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!LookupIdFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Lookup_object_name__c.InlineHelpText}">
+					<apex:outputLabel value="Lookup to"/>
+					<apex:outputPanel layout="block" styleClass="requiredIndicator">
+						<apex:selectList value="{!distributor.n2de__Lookup_object_name__c}" size="1">
+							<apex:selectOptions value="{!LookupObjectOptionList}"/>
+							<apex:actionSupport event="onchange" action="{!setDefaultLookupOwner}" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+						</apex:selectList>
+						<apex:selectList value="{!distributor.n2de__Lookup_match_field_name__c}" size="1">
+							<apex:selectOptions value="{!LookupMatchFieldOptionList}"/>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Where"/>
+					<apex:outputPanel layout="block">
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_field_name__c}" size="1">
+							<apex:selectOptions value="{!LookupFilterFieldOptions}"/>
+							<apex:actionSupport event="onchange" action="{!changeLookupFilterField}" onsubmit="showMask()" reRender="distributor_edit, script_panel"/>
+						</apex:selectList>
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_operator__c}" size="1">
+							<apex:selectOptions value="{!LookupFilterOperatorOptions}"/>
+							<apex:actionSupport event="onchange" onsubmit="showMask()" rerender="distributor_edit, script_panel"/>
+						</apex:selectList>
+						<apex:inputText value="{!distributor.n2de__Lookup_filter_value_long__c}" size="30" rendered="{!OR(LookupFilterFieldType=='', LookupFilterFieldType=='STRING', LookupFilterFieldType=='TEXTAREA', LookupFilterFieldType=='DOUBLE', LookupFilterFieldType=='INTEGER', LookupFilterFieldType=='CURRENCY')}"/>
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_value_long__c}" size="1" rendered="{!AND(LookupFilterFieldType=='PICKLIST', distributor.n2de__Lookup_filter_operator__c != 'in')}">
+							<apex:selectOptions value="{!LookupFilterFieldPicklistOptionList}"/>
+						</apex:selectList>
+						<apex:selectList value="{!LookupFilterFieldPicklistValues}" multiselect="true" styleClass="lookupMultiSelect" rendered="{!OR(LookupFilterFieldType=='MULTIPICKLIST', AND(LookupFilterFieldType=='PICKLIST', distributor.n2de__Lookup_filter_operator__c=='in'))}">
+							<apex:selectOptions value="{!LookupFilterFieldPicklistOptionList}"/>
+						</apex:selectList>
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_value_long__c}" size="1" rendered="{!LookupFilterFieldType=='BOOLEAN'}">
+							<apex:selectOption itemValue="true" itemLabel="true"/>
+							<apex:selectOption itemValue="false" itemLabel="false"/>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Lookup_owner_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="Assign to {!lookupObjectLabel} field" />
+					<apex:selectList value="{!distributor.n2de__Lookup_owner_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!LookupOwnerFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<!-- End of lookup owner assignment fields -->
+			</apex:pageBlockSection>
+				
+			<apex:pageBlockSection id="distributor_settings" title="Distribution settings" columns="2" collapsible="false" rendered="{!NOT(IsTrigger)}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control__c.Label}"/>
+					<apex:selectRadio value="{!distributor.n2de__Distribution_control__c}" style="min-width: 300px; max-width: 370px">
+						<apex:selectOptions value="{!DistributionControlOptions}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+					</apex:selectRadio>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control_member_cap__c.InlineHelpText}" rendered="{!AND(distributor.n2de__Distribution_control__c!='',distributor.n2de__Distribution_control__c!='None')}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control_member_cap__c.Label}"/>
+					<apex:inputText value="{!DistributionControlMbrCapText}" maxlength="5" size="6"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!OR(distributor.n2de__Distribution_control__c=='',distributor.n2de__Distribution_control__c=='None')}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Field_to_update_name__c}" size="1">
+						<apex:selectOptions value="{!UpdateFieldOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_value__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_value__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Field_to_update_value__c}" size="1" disabled="{!distributor.n2de__Field_to_update_name__c=null}">
+						<apex:selectOptions value="{!UpdateFieldValuesOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="trigger_method" title="Distribution method" columns="2" collapsible="false" rendered="{!IsTrigger}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Algorithm__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Algorithm__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Algorithm__c}" size="1">
+						<apex:selectOptions value="{!AlgorithmOptions}"/>
+						<apex:actionSupport event="onchange" action="{!changeAlgorithm}" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_round_robin_disabled__c.InlineHelpText}" rendered="{!AND(distributor.n2de__Algorithm__c=='Round robin lookup owner', NOT(distributor.n2de__Is_round_robin_disabled__c))}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_round_robin_disabled__c.Label}" />
+					<apex:inputField value="{!distributor.n2de__Is_round_robin_disabled__c}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" action="{!clearMemberFilter}" reRender="trigger_method, script_panel, member_filter_section1, member_filter_section2"/>
+					</apex:inputField>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!AND(distributor.n2de__Algorithm__c!='Dynamic owner', distributor.n2de__Algorithm__c!='Round robin lookup owner')}"/>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection columns="1" rendered="{!AND(distributor.n2de__Algorithm__c=='Dynamic owner', IsTrigger)}">
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Dynamic_owner_field_name__c.InlineHelpText}" rendered="{!distributor.n2de__Algorithm__c=='Dynamic owner'}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Dynamic_owner_field_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Dynamic_owner_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!DynamicOwnerFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+			</apex:pageBlockSection>
+			
+				<!-- Sticky assignment fields -->
+			<apex:pageBlockSection columns="2" rendered="{!AND(distributor.n2de__Algorithm__c=='Round robin sticky assignment', IsTrigger)}">
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_assignment_id_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_assignment_id_field_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Sticky_assignment_id_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!StickyIdFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_period__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_period__c.Label}"/>
+					<apex:outputPanel styleClass="requiredIndicator">
+						<apex:inputText value="{!StickyPeriodText}" maxlength="3" size="1"/>
+						<apex:selectList value="{!distributor.n2de__Sticky_unit__c}" size="1">
+							<apex:selectOptions value="{!StickyUnitOptionList}"/>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_match_level__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Sticky_match_level__c.Label}"/>
+					<apex:selectRadio value="{!distributor.n2de__Sticky_match_level__c}">
+						<apex:selectOptions value="{!StickyMatchLevelOptions}"/>
+					</apex:selectRadio>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_stick_on_OOO__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_stick_on_OOO__c.Label}" />
+					<apex:inputField value="{!distributor.n2de__Is_stick_on_OOO__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem />
+				<!-- End of sticky assignment fields -->
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection columns="1" rendered="{!AND(distributor.n2de__Algorithm__c=='Round robin lookup owner', IsTrigger)}">
+				<!-- Lookup owner fields -->
+				<apex:pageBlockSectionItem />	
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Lookup_unique_id_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!ObjectNameDescription} lookup field"/>
+					<apex:selectList value="{!distributor.n2de__Lookup_unique_id_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!LookupIdFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Lookup_object_name__c.InlineHelpText}">
+					<apex:outputLabel value="Lookup to"/>
+					<apex:outputPanel layout="block" styleClass="requiredIndicator">
+						<apex:selectList value="{!distributor.n2de__Lookup_object_name__c}" size="1">
+							<apex:selectOptions value="{!LookupObjectOptionList}"/>
+							<apex:actionSupport event="onchange" action="{!setDefaultLookupOwner}" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+						</apex:selectList>
+						<apex:selectList value="{!distributor.n2de__Lookup_match_field_name__c}" size="1">
+							<apex:selectOptions value="{!LookupMatchFieldOptionList}"/>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Where"/>
+					<apex:outputPanel layout="block">
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_field_name__c}" size="1">
+							<apex:selectOptions value="{!LookupFilterFieldOptions}"/>
+							<apex:actionSupport event="onchange" action="{!changeLookupFilterField}" onsubmit="showMask()" reRender="distributor_edit, script_panel"/>
+						</apex:selectList>
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_operator__c}" size="1">
+							<apex:selectOptions value="{!LookupFilterOperatorOptions}"/>
+							<apex:actionSupport event="onchange" onsubmit="showMask()" rerender="distributor_edit, script_panel"/>
+						</apex:selectList>
+						<apex:inputText value="{!distributor.n2de__Lookup_filter_value_long__c}" size="30" rendered="{!OR(LookupFilterFieldType=='', LookupFilterFieldType=='STRING', LookupFilterFieldType=='TEXTAREA', LookupFilterFieldType=='DOUBLE', LookupFilterFieldType=='INTEGER', LookupFilterFieldType=='CURRENCY')}"/>
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_value_long__c}" size="1" rendered="{!AND(LookupFilterFieldType=='PICKLIST', distributor.n2de__Lookup_filter_operator__c != 'in')}">
+							<apex:selectOptions value="{!LookupFilterFieldPicklistOptionList}"/>
+						</apex:selectList>
+						<apex:selectList value="{!LookupFilterFieldPicklistValues}" multiselect="true" styleClass="lookupMultiSelect" rendered="{!OR(LookupFilterFieldType=='MULTIPICKLIST', AND(LookupFilterFieldType=='PICKLIST', distributor.n2de__Lookup_filter_operator__c=='in'))}">
+							<apex:selectOptions value="{!LookupFilterFieldPicklistOptionList}"/>
+						</apex:selectList>
+						<apex:selectList value="{!distributor.n2de__Lookup_filter_value_long__c}" size="1" rendered="{!LookupFilterFieldType=='BOOLEAN'}">
+							<apex:selectOption itemValue="true" itemLabel="true"/>
+							<apex:selectOption itemValue="false" itemLabel="false"/>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Lookup_owner_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="Assign to {!lookupObjectLabel} field" />
+					<apex:selectList value="{!distributor.n2de__Lookup_owner_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!LookupOwnerFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<!-- End of lookup owner assignment fields -->
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection columns="2" id="trigger_settings" title="Distribution settings" rendered="{!IsTrigger}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control__c.Label}"/>
+					<apex:selectRadio value="{!distributor.n2de__Distribution_control__c}" style="max-width:{!IF(IsTrigger, '270', '370')}px {!IF(IsTrigger, '270', '370')}px">
+						<apex:selectOptions value="{!DistributionControlOptions}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+					</apex:selectRadio> 
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control_member_cap__c.InlineHelpText}" rendered="{!AND(distributor.n2de__Distribution_control__c!='',distributor.n2de__Distribution_control__c!='None')}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Distribution_control_member_cap__c.Label}"/>
+					<apex:inputText value="{!DistributionControlMbrCapText}" maxlength="5" size="6"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!OR(distributor.n2de__Distribution_control__c=='',distributor.n2de__Distribution_control__c=='None')}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Field_to_update_name__c}" size="1">
+						<apex:selectOptions value="{!UpdateFieldOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_value__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Field_to_update_value__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Field_to_update_value__c}" size="1" disabled="{!distributor.n2de__Field_to_update_name__c=null}">
+						<apex:selectOptions value="{!UpdateFieldValuesOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Default_owner_type__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Default_owner_type__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Default_owner_type__c}" size="1">
+						<apex:selectOptions value="{!DynamicOwnerTypeOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_edit, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!distributor.n2de__Default_owner_user__c}" styleClass="requiredIndicator" rendered="{!distributor.n2de__Default_owner_type__c=='User'}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Default_owner_queue_id__c.InlineHelpText}" rendered="{!distributor.n2de__Default_owner_type__c=='Queue'}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Default_owner_queue_id__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Default_owner_queue_id__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!ObjectQueueOptions}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="distribution_order" title="Queue order" columns="2" collapsible="false" rendered="{!NOT(IsTrigger)}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_1_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_1_field_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Order_1_field_name__c}" size="1" styleClass="requiredIndicator">
+						<apex:selectOptions value="{!OrderFieldOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_1_order_by__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_1_order_by__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Order_1_order_by__c}" size="1">
+						<apex:selectOptions value="{!OrderByOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_2_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_2_field_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Order_2_field_name__c}" size="1">
+						<apex:selectOptions value="{!OrderFieldOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distribution_order, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_2_order_by__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_2_order_by__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Order_2_order_by__c}" size="1" disabled="{!distributor.n2de__Order_2_field_name__c==''}">
+						<apex:selectOptions value="{!OrderByOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_3_field_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_3_field_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Order_3_field_name__c}" size="1">
+						<apex:selectOptions value="{!OrderFieldOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distribution_order, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_3_order_by__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Order_3_order_by__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Order_3_order_by__c}" size="1" disabled="{!distributor.n2de__Order_3_field_name__c==''}">
+						<apex:selectOptions value="{!OrderByOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<script type="text/javascript">
+				function showHideNInput(selectedDateRange) {
+					if (selectedDateRange && selectedDateRange.indexOf('_N_') > -1) {
+						$('.n_input').show();
+					} else {
+						$('.n_input').hide();
+					}
+				}
+			</script>
+			
+			<apex:pageBlockSection id="distributor_category_heading" title="{!ObjectNameDescription} filter" columns="2" collapsible="false">
+				<apex:pageBlockSectionItem />
+				<c:CommonInlineHelp help_page="filters"/>
+				<apex:inputField styleClass="filters_enabled" value="{!distributor.n2de__Is_distributor_category__c}">
+					<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="distributor_category_heading,distributor_category,script_panel"/>
+				</apex:inputField>
+				<apex:inputField styleClass="advanced_filter" value="{!Distributor.n2de__Is_advanced_filter__c}" rendered="{!AND(Distributor.n2de__Is_distributor_category__c, NOT(IsTrigger), OR(AdvancedFiltersEnabled, Distributor.n2de__Is_advanced_filter__c))}">
+					<apex:actionSupport onsubmit="showMask();" event="onchange" reRender="distributor_category_heading,distributor_category,script_panel"/>
+				</apex:inputField>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection id="distributor_category" columns="1" collapsible="false">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor_category__c.Fields.n2de__Filter_field_name__c.InlineHelpText}" rendered="{!AND(distributor.n2de__Is_distributor_category__c, NOT(Distributor.n2de__Is_advanced_filter__c))}">
+					<apex:outputLabel value="Filter rows"/>
+					<apex:outputPanel id="filter_panel">
+						<apex:dataTable value="{!DistributionFilterVOList}" var="filter" headerClass="tableHeader">
+							<apex:column styleClass="filterSeq">
+								<apex:outputText value="{!filter.FilterSeq}" styleClass="label"/>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Field</apex:facet>
+								<apex:outputPanel id="field" styleClass="requiredIndicator">
+									<apex:selectList value="{!filter.DistributorCategory.n2de__Filter_field_name__c}" size="1">
+										<apex:selectOptions value="{!filter.CategoryFilterFieldOptionList}"/>
+										<apex:actionSupport action="{!filter.changeCategoryFilter}" onsubmit="showMask(); showHideNInput();" event="onchange" reRender="filter_panel,script_panel"/>
+									</apex:selectList>
+								</apex:outputPanel>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Operator</apex:facet>
+								<apex:selectList value="{!filter.DistributorCategory.n2de__Filter_comparison_operator__c}" size="1" styleClass="filterOperator">
+									<apex:selectOptions value="{!filter.CategoryFilterComparisonOperatorOptionList}"/>
+									<apex:actionSupport onsubmit="showMask();" event="onchange" reRender="filter_panel,script_panel"/>
+								</apex:selectList>
+							</apex:column>
+							<apex:column styleClass="filter_value">
+								<apex:facet name="header">Value</apex:facet>
+								<apex:inputText value="{!filter.DistributorCategory.n2de__Filter_comparison_argument_long__c}" size="40" rendered="{!OR(filter.CategoryFieldType=='', filter.CategoryFieldType=='STRING', filter.CategoryFieldType=='DOUBLE', filter.CategoryFieldType=='INTEGER', filter.CategoryFieldType=='CURRENCY', filter.CategoryFieldType=='COMBOBOX', filter.CategoryFieldType=='TEXTAREA', filter.CategoryFieldType=='PHONE', filter.CategoryFieldType=='EMAIL')}"/>
+								<apex:selectList value="{!filter.DistributorCategory.n2de__Filter_comparison_argument_long__c}" size="1" rendered="{!filter.CategoryFieldType=='BOOLEAN'}">
+									<apex:selectOption itemValue="true" itemLabel="true"/>
+									<apex:selectOption itemValue="false" itemLabel="false"/>
+								</apex:selectList>
+								<apex:selectList value="{!filter.DistributorCategory.n2de__Filter_comparison_argument_long__c}" size="1" rendered="{!AND(filter.CategoryFieldType=='PICKLIST', filter.DistributorCategory.n2de__Filter_comparison_operator__c!='in')}">
+									<apex:selectOptions value="{!filter.CategoryFilterFieldPicklistOptionList}"/>
+								</apex:selectList>
+								<apex:selectList value="{!filter.CategoryFilterFieldPicklistValueList}" size="1" multiselect="true" styleClass="multiselectFilter" rendered="{!OR(filter.CategoryFieldType=='MULTIPICKLIST', AND(filter.CategoryFieldType=='PICKLIST', filter.DistributorCategory.n2de__Filter_comparison_operator__c=='in'))}">
+									<apex:selectOptions value="{!filter.CategoryFilterFieldPicklistOptionList}"/>
+								</apex:selectList>
+								<apex:selectList value="{!filter.DistributorCategory.n2de__Filter_comparison_argument_long__c}" size="1" rendered="{!AND(filter.CategoryFieldType=='REFERENCE', filter.DistributorCategory.n2de__Filter_field_name__c=='RecordTypeId', filter.DistributorCategory.n2de__Filter_comparison_operator__c!='in')}">
+									<apex:selectOptions value="{!filter.CategoryFilterFieldRecordTypeOptionList}"/>
+								</apex:selectList>
+								<apex:selectList value="{!filter.CategoryFilterFieldPicklistValueList}" size="1" multiselect="true" styleClass="multiselectFilter" rendered="{!AND(filter.CategoryFieldType=='REFERENCE', filter.DistributorCategory.n2de__Filter_field_name__c=='RecordTypeId', filter.DistributorCategory.n2de__Filter_comparison_operator__c=='in')}">
+									<apex:selectOptions value="{!filter.CategoryFilterFieldRecordTypeOptionList}"/>
+								</apex:selectList>
+								<apex:outputPanel >
+									<apex:selectList value="{!filter.filterKey}" size="1" rendered="{!OR(filter.CategoryFieldType=='DATE', filter.CategoryFieldType=='DATETIME')}">
+										<apex:selectOptions value="{!DateLiterals}"/>
+										<apex:actionSupport event="onchange" onsubmit="showMask()" action="{!changeFilterDateValue}" oncomplete="showHideNInput(filter.filterKey); hideMask()"/>
+									</apex:selectList>
+									<apex:inputText size="3" styleClass="n_input" html-placeholder="n" value="{!filter.filterNValue}" rendered="{!IF(contains(filter.filterKey, '_N_'), true, false) && OR(filter.CategoryFieldType=='DATE', filter.CategoryFieldType=='DATETIME')}"/>
+								</apex:outputPanel>
+							</apex:column>
+						</apex:dataTable>
+						<div class="addRowLink">
+							<apex:commandLink action="{!addFilterRow}" onclick="showMask()" value="Add Row" reRender="filter_panel,script_panel" rendered="{!DistributionFilterVOListSize<MaxFilterRows}"/>
+							&nbsp;&nbsp;
+							<apex:commandLink action="{!removeFilterRow}" value="Remove Row" onclick="showMask()" reRender="filter_panel,script_panel" rendered="{!DistributionFilterVOListSize>1}"/>
+						</div>
+						<div class="addRowLink">
+							<apex:commandLink action="{!addFilterLogic}" onclick="showMask()" value="Add Filter Logic..." reRender="filter_panel,script_panel" rendered="{!AND(NOT(Distributor.n2de__Is_filter_logic__c), DistributionFilterVOListSize>1, NOT(IsTrigger))}"/>
+							<apex:commandLink action="{!clearFilterLogic}" value="Clear Filter Logic" onclick="showMask()" reRender="filter_panel,script_panel" rendered="{!Distributor.n2de__Is_filter_logic__c}"/>
+						</div>
+						<apex:outputPanel id="filter_logic" rendered="{!Distributor.n2de__Is_filter_logic__c}">
+							<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Filter_logic__c.Label}: " styleClass="label"/>
+							<apex:inputText value="{!Distributor.n2de__Filter_logic__c}" rendered="{!Distributor.n2de__Is_filter_logic__c}" maxlength="255" size="100"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Filter_soql_string__c.InlineHelpText}"  rendered="{!AND(Distributor.n2de__Is_distributor_category__c, Distributor.n2de__Is_advanced_filter__c)}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Filter_soql_string__c.Label}"/>
+					<apex:outputPanel >
+						<apex:inputTextarea value="{!Distributor.n2de__Filter_soql_string__c}" rows="4" styleClass="soqlString"/>
+						<div id="advanced_warning_block">
+						<apex:outputText escape="false" styleClass="adv_warning" value="Advanced filters can have a negative impact on performance and affect the reliability of assignments. Please read the <a target=_blank href=http://help.nc-squared.com/advanced-filter-mode>Help</a> page before use, and consider other ways of formulating your rules to use standard filters instead."/>
+						</div>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Team member filter" id="member_filter_section1" columns="1">
+				<c:CommonInlineHelp help_page="team-member-filters"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_member_filter__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_member_filter__c.Label}"/>
+					<apex:inputCheckbox value="{!Distributor.n2de__Is_member_filter__c}" disabled="{!NOT(memberFiltersEnabled)}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="member_filter_section1, member_filter_section2, script_panel"/>
+					</apex:inputCheckbox>
+				</apex:pageBlockSectionItem>
+				<apex:selectList value="{!Distributor.n2de__Member_filter_type__c}" size="1" styleClass="requiredIndicator" rendered="{!Distributor.n2de__Is_member_filter__c}">
+					<apex:selectOptions value="{!MemberFilterOptions}" />
+					<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="member_filter_section1, member_filter_section2, script_panel"/>
+				</apex:selectList>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection columns="1" id="member_filter_section2">
+				<apex:pageBlockSectionItem helpText="Selected team members this distributor will distribute to." rendered="{!Distributor.n2de__Is_member_filter__c && Distributor.n2de__Member_filter_type__c=='Team members'}">
+					<apex:outputLabel value="Selected team members"/>
+					<apex:selectList value="{!CategoryFilterTeamMemberValueList}" size="1" multiselect="true" styleClass="multiselectTeamMembers">
+						<apex:selectOptions value="{!TeamMemberOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="Filter team members by tags" rendered="{!Distributor.n2de__Is_member_filter__c && Distributor.n2de__Member_filter_type__c=='Tags'}">
+					<apex:outputLabel value="Filter members by tag"/>
+					<apex:outputPanel id="team_member_filter_panel">
+						<apex:dataTable value="{!distributorTagList}" var="tag" headerClass="tableHeader">
+							<apex:column styleClass="filterSeq">
+								<apex:outputText value="{!tag.Sequence}" styleClass="label"/>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Type</apex:facet>
+								<apex:outputPanel id="tagType" styleClass="requiredIndicator">
+									<apex:selectList value="{!tag.Type}" size="1" styleClass="filterType">
+										<apex:selectOptions value="{!tag.TagTypeOptions}"/>
+										<apex:actionSupport onsubmit="showMask();" event="onchange" reRender="member_filter_section2,script_panel"/>
+									</apex:selectList>
+								</apex:outputPanel>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Collection</apex:facet>
+								<apex:outputPanel id="tagCategory">
+									<apex:selectList value="{!tag.DistributorTagCategoryId}" size="1">
+										<apex:selectOptions value="{!tag.TagCategoryOptions}"/>
+										<apex:actionSupport onsubmit="showMask();" event="onchange" reRender="member_filter_section2,script_panel"/>
+									</apex:selectList>
+								</apex:outputPanel>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Operator</apex:facet>
+								<apex:outputPanel id="tagOperator">
+									<apex:selectList value="{!tag.ComparisonOperator}" size="1" styleClass="filterOperator">
+										<apex:selectOptions value="{!tag.TagComparisonOptions}"/>
+									</apex:selectList>
+								</apex:outputPanel>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Tags</apex:facet>
+								<apex:outputPanel id="tagValue">
+									<apex:selectList value="{!tag.DistributorTagValueIds}" size="1" multiselect="true" styleClass="multiselectTags" rendered="{!tag.Type == 'Static'}">
+										<apex:selectOptions value="{!tag.TagValueOptions}"/>
+									</apex:selectList>
+									<apex:selectList value="{!tag.FieldName}" size="1" rendered="{!tag.Type == 'Dynamic'}">
+										<apex:selectOptions value="{!tag.TagFieldOptionList}"/>
+										<apex:actionSupport onsubmit="showMask();" action="{!tag.getFieldType}" event="onchange" reRender="member_filter_section2,script_panel"/>
+									</apex:selectList>
+								</apex:outputPanel>
+							</apex:column>
+						</apex:dataTable>
+						<div class="addRowLink">
+							<apex:commandLink action="{!addDistributorTag}" onclick="showMask()" value="Add Row" reRender="member_filter_section2, script_panel" rendered="{!distributorTagList.size < MaxFilterRows}"/>
+							&nbsp;&nbsp;
+							<apex:commandLink action="{!removeDistributorTag}" value="Remove Row" onclick="showMask()" reRender="member_filter_section2,script_panel" rendered="{!distributorTagList.size>1}"/>
+						</div>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Alerts" columns="1" collapsible="false" rendered="{!TeamHasAlerts}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_alert__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_alert__c.Label}"/>
+					<apex:outputPanel >
+						<apex:inputCheckbox value="{!distributor.n2de__Is_alert__c}">
+							<apex:actionSupport event="onchange" action="{!switchEnableAlerts}" onsubmit="showMask();" reRender="alert_msg, alert_period, auto_reassign, script_panel"/>
+						</apex:inputCheckbox>
+						<apex:outputPanel id="alert_msg">
+							<apex:outputText value="Note: Logs with alerting enabled exist for this distributor. On saving this Distributor, alerting will be cancelled for those logs and cannot be reversed." rendered="{!IsAlertDisabledWarning}" styleClass="alertMsg"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection id="auto_reassign" title="Auto re-assign" columns="2" collapsible="false" rendered="{!TeamHasAlerts}">
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_auto_reassign__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_auto_reassign__c.Label}"/>
+					<apex:inputCheckbox value="{!distributor.n2de__Is_auto_reassign__c}" disabled="{!NOT(distributor.n2de__Is_alert__c)}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="auto_reassign, script_panel"/>
+					</apex:inputCheckbox>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Reassign_queue_id__c.InlineHelpText}" rendered="{!OR(NOT(distributor.n2de__Is_reassign_to_user__c), NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c))}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Reassign_queue_id__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Reassign_queue_id__c}" size="1" styleClass="{!IF(AND(distributor.n2de__Is_auto_reassign__c, distributor.n2de__Is_alert__c), 'requiredIndicator', '')}" disabled="{!OR(NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c))}">
+						<apex:selectOptions value="{!ObjectQueueOptions}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!distributor.n2de__Reassign_to_user__c}" styleClass="requiredIndicator" rendered="{!AND(distributor.n2de__Is_reassign_to_user__c, distributor.n2de__Is_auto_reassign__c, distributor.n2de__Is_alert__c)}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_reassign_to_user__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Is_reassign_to_user__c.Label}"/>
+					<apex:inputCheckBox id="is_reassign_user" value="{!distributor.n2de__Is_reassign_to_user__c}" disabled="{!OR(NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c))}">
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="auto_reassign, script_panel"/>
+					</apex:inputCheckBox>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Reassign_field_to_update_name__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Reassign_field_to_update_name__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Reassign_field_to_update_name__c}" size="1" disabled="{!OR(NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c))}">
+						<apex:selectOptions value="{!UpdateFieldOptionList}"/>
+						<apex:actionSupport event="onchange" onsubmit="showMask();" reRender="auto_reassign, script_panel"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Reassign_field_to_update_value__c.InlineHelpText}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distributor__c.Fields.n2de__Reassign_field_to_update_value__c.Label}"/>
+					<apex:selectList value="{!distributor.n2de__Reassign_field_to_update_value__c}" size="1" styleClass="{!IF(OR(distributor.n2de__Reassign_field_to_update_name__c=null, NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c)), '', 'requiredIndicator')}" disabled="{!OR(NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c), distributor.n2de__Reassign_field_to_update_name__c=null)}">
+						<apex:selectOptions value="{!ReassignUpdateFieldValuesOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="When checked, user will be logged out automatically on auto re-assign" rendered="{!UserLoginModeEnabled}">
+					<apex:outputLabel value="Automatic user logout"/>
+					<apex:inputCheckbox value="{!LogoutUserOnReassign}" disabled="{!OR(NOT(distributor.n2de__Is_auto_reassign__c), NOT(distributor.n2de__Is_alert__c))}"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:outputPanel id="script_panel">
+				<script>
+					var warningIconUrl = '{!URLFOR($Resource.DEResources, 'images/alert32_2.png')}';
+					$(document).ready(function(){
+						//Add default required field identifier
+						RequiredBlockUtil.addRequiredBlock('.requiredIndicator');
+						//Add multiselect control
+						$('.multiselectFilter').multiselect({
+							minWidth: 400,
+							noneSelectedText: 'Make selection',
+							selectedList: 2,
+							position: {
+								my: 'left top',
+      							at: 'left bottom',
+								collision: 'flip'
+							}
+						});
+						//Add multiselect control
+						$('.multiselectTags').multiselect({
+							minWidth: 400,
+							noneSelectedText: 'Make selection',
+							selectedList: 2,
+							position: {
+								my: 'left top',
+      							at: 'left bottom',
+								collision: 'flip'
+							}
+						});
+						//Add multiselect control
+						$('.multiselectTeamMembers').multiselect({
+							minWidth: 400,
+							noneSelectedText: '--All team members--',
+							selectedList: 2,
+							position: {
+								my: 'left top',
+      							at: 'left bottom',
+								collision: 'flip'
+							}
+						});
+						//Add multiselect control
+						$('.lookupMultiSelect').multiselect({
+							minWidth: 400,
+							noneSelectedText: 'Make selection',
+							selectedList: 2,
+							position: {
+								my: 'left top',
+      							at: 'left bottom',
+								collision: 'flip'
+							}
+						});
+						$(".filter_value input").keyup( function(){
+							setFilterWarning($(this));
+						});
+						$(".filter_value input").each( function(){
+							setFilterWarning($(this));
+						});
+						hideMask();
+					});
+					
+					function setFilterWarning(thisElement){
+						var filterValue = $(thisElement).val();
+						if($(thisElement).parent().find('.warning_box').size() > 0){
+							$(thisElement).parent().find('.warning_box').remove();
+						}
+						var warningMsg = '';
+						var isEqualsOperator = $(thisElement).parent().parent().find('.filterOperator').val() == 'equals';
+						var hasComma = filterValue.indexOf(',') >=0;
+						var hasSemiColon = filterValue.indexOf(';') >=0;
+						if(isEqualsOperator && (hasComma || hasSemiColon)){
+							warningMsg += 'Use the <b>"in"</b> operator to compare against a list of values. ';
+						}else if(hasComma){
+							warningMsg += 'Use <b>semi-colon ";"</b> not <b>comma ","</b> as a list delimiter';
+						}
+						if(warningMsg.length > 0){
+							$(thisElement).after('<span class="warning_box"><img src="' + warningIconUrl + '"/>' + warningMsg + '</span>');
+						}
+					}
+				</script>
+			</apex:outputPanel>
+			
+		</apex:pageBlock>
+	</apex:form>
+	
+	<style>
+		.tableHeader {
+			font-size: 11px;
+			color: #4A4A56;
+		}
+		.filterSeq {
+			width: 20px;
+		}
+		.filterOperator {
+			width: 110px;
+		}
+		.addRowLink {
+			padding-top: 4px;
+			padding-bottom: 10px;
+		}
+		.soqlString {
+			width: 600px;
+		}
+		.label {
+			font-weight: bold;
+			color: #4A4A56;
+		}
+		.alertMsg {
+			color: red;
+			font-weight: bold;
+			padding-left: 40px;
+		}
+	</style>
+<c:StatusPanel />
+</apex:page>

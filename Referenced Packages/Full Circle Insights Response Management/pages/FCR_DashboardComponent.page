@@ -1,0 +1,35 @@
+<apex:page showHeader="false" >
+<apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+<apex:form >
+  <apex:outputPanel layout="block" styleClass="fccrmWrapper">
+  <div class="fccrmDBContent">
+
+  <img src="{!$Resource.Full_Circle_CRM_Logo}" width="164" height="59" ></img>
+  <br />
+  <br /> 
+
+  <h2 style="font-size: 14px;color: #008CBA; padding-top: 15px">Full Circle CRM Dashboards &amp; Reports</h2>
+  <p>
+  <c:FCR_VFDashboardHelperLink apiname="FCR_Response_Management_Dashboard" datatype="dashboard">
+      Response Management Operations Dashboard
+  </c:FCR_VFDashboardHelperLink>
+
+    </p>
+  <p>
+  <c:FCR_VFDashboardHelperLink apiname="FCR_Marketing_Intelligence_Dashboard" datatype="dashboard">
+      Marketing Intelligence Dashboard
+  </c:FCR_VFDashboardHelperLink>
+  </p>
+  <p>
+  <c:FCR_VFDashboardHelperLink apiname="FCR_Full_Circle_CRM_Reports" datatype="folder">
+      Sample Reports
+  </c:FCR_VFDashboardHelperLink>
+  </p>
+  
+  
+ 
+  </div>
+    </apex:outputPanel>
+</apex:form>
+
+</apex:page>

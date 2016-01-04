@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>Object that holds information on leads that require processing after bulk lead convert. Also used store datetime boundry for merge testing and information about Deferred status changes.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>false</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <externalSharingModel>ReadWrite</externalSharingModel>
+    <fields>
+        <fullName>ChangeFlags__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Change flags on response when DeferredOpType is 2.</description>
+        <externalId>false</externalId>
+        <label>ChangeFlags</label>
+        <precision>16</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ConvertedContactID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Contact ID of converted lead, or Contact ID on deferred status change</description>
+        <externalId>false</externalId>
+        <label>Converted Contact ID</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ConvertedOpportunityID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>ID of converted opportunity</description>
+        <externalId>false</externalId>
+        <label>Converted Opportunity ID</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>DeferredOpType__c</fullName>
+        <deprecated>false</deprecated>
+        <description>0 = Conversion, 1 = Merge, 2 = Status change
+If null, Conversion if LeadID is not null</description>
+        <externalId>false</externalId>
+        <label>DeferredOpType</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Last_Contact_Merge_Processed__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date/time of last merged contact processed</description>
+        <externalId>false</externalId>
+        <label>Last Contact Merge Processed</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Last_Lead_Merge_Processed__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date or time of last lead merge processed</description>
+        <externalId>false</externalId>
+        <label>Last Lead Merge Processed</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>LeadID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>ID of converted lead or ID of lead on status change</description>
+        <externalId>false</externalId>
+        <label>Lead ID</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Lead_Is_Passive__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set if lead is in passive mode</description>
+        <externalId>false</externalId>
+        <label>Lead Is Passive</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Prior_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Old status of lead (prior to lead conversion)</description>
+        <externalId>false</externalId>
+        <label>Prior Status</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ResponseIDtoSync__c</fullName>
+        <deprecated>false</deprecated>
+        <description>ID of response to sync on status change (DeferredOpType=2)</description>
+        <externalId>false</externalId>
+        <label>ResponseIDtoSync</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>StatusChangeType__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Type of status change being stored. 0 = Lead, 1 = Contact, 2 = PersonAccount</description>
+        <externalId>false</externalId>
+        <label>StatusChangeType</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Lead status or response status (depending on DeferredOpType</description>
+        <externalId>false</externalId>
+        <label>Status</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>Lead Convert Item</label>
+    <listViews>
+        <fullName>All</fullName>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <nameField>
+        <label>LeadConvertItem Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Lead Convert Items</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

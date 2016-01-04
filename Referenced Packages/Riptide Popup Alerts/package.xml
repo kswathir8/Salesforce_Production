@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Riptide Popup Alerts</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>Riptide Popup Alerts provides a custom field called Alert Message for Leads, Contacts, Accounts, Opportunities, and Cases. When used in conjunction with the Popup Alert controls, these fields allow your organization to display an alert to anyone viewing the record.</description>
+    <namespacePrefix>rrpu</namespacePrefix>
+    <types>
+        <members>Account_Popup_Control</members>
+        <members>Case_Popup_Control</members>
+        <members>Contact_Popup_Control</members>
+        <members>Lead_Popup_Control</members>
+        <members>Opportunity_Popup_Control</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>Account.Alert_Message__c</members>
+        <members>Case.Alert_Message__c</members>
+        <members>Contact.Alert_Message__c</members>
+        <members>Lead.Alert_Message__c</members>
+        <members>Opportunity.Alert_Message__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Riptide_Software</members>
+        <name>CustomPageWebLink</name>
+    </types>
+    <types>
+        <members>Custom Links</members>
+        <name>HomePageComponent</name>
+    </types>
+    <types>
+        <members>Pop_up_Alert</members>
+        <name>Scontrol</name>
+    </types>
+    <version>35.0</version>
+</Package>

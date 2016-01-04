@@ -1,0 +1,118 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Scoring Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Scoring Configuration" help="https://www.fullcirclecrm.com/fcrm/app/scoring/">
+    <apex:pageMessages />
+    <apex:form >
+        <apex:pageblock mode="edit" >
+            <apex:pageBlockSection title="Scoring Threshold" columns="2">
+                <apex:inputField label="Scoring Threshold" value="{!ScoringObject.FCRM__TQR_Threshold__c}"/>
+                <apex:outputText >Scoring threshold for response to be considered a qualified response. 
+                    Set to zero for every response to be considered qualified.</apex:outputText>
+                <apex:pageMessage rendered="{!NOT(ISBLANK(ScoringTQRError))}" severity="Error" summary="{!ScoringTQRError}" />
+                <apex:outputText rendered="{!NOT(ISBLANK(ScoringTQRError))}" value=" " />
+             </apex:pageBlockSection>
+             <apex:pageBlockSection title="Scoring Operation" columns="1">
+                 In order to handle multiple source of scoring and different scoring engines, you can choose when the response 
+                 management system continues evaluation after scoring.
+                 <ul>
+                 <li>Immediate evaluation - when scoring information is available when the response arrives.</li>
+                 <li>Asynchronous evaluation - to allow your scoring code to execute when the response arrives.</li>
+                 <li>Manual evaluation - Evaluation will continue when the Boolean field Do Pending Scoring (FCR_TakeScoringSnapshot__c) is set to 
+                 true on the lead or contact. The field will be reset to false by the response management system.</li>
+                 </ul>
+
+             </apex:pageBlockSection>
+             <apex:pageBlockSection columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idScoreImmediate" value="Evaluate score immediately" />
+                    <apex:inputCheckbox id="idScoreImmediate" value="{!ScoringEvaluateAfterResponse}"/>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >Evaluate score immediately after response is received. When using this option, it is 
+                    important that all scoring sources are defined before the response is received. In particular, any external 
+                    lead/contact based scoring system must evaluate lead/contact scores before submitting the response.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idScoreAsync" value="Evaluate score asynchronously" />
+                    <apex:inputCheckbox id="idScoreAsync" value="{!ScoringEvaluateAsynchronously}"/>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >Evaluate score using a future operation. Use this option if your scoring logic executes on 
+                    an after-update campaignmember trigger. If both immediate and asynchronous are set, evaluation will take place immediately.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idIncrementMode" value="Enable scoring increment mode" />
+                    <apex:inputCheckbox id="idIncrementMode" value="{!ScoringIncrementMode}"/>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >In standard mode (unchecked), the score for a response is the sum of all scores specified in the scoring source fields. 
+                    In increment mode (checked), the score for a response is the sum of the previous lead/contact score, the campaign source field score, 
+                    the campaignmember source field score and the difference between the current value of the lead/contact source field score and previous value of the 
+                    lead/contact source field score.</apex:outputText>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="Scoring Source Fields">
+            Scoring information for leads and contacts can come from different sources - ranging from external scoring engines to 
+            fixed or calculated fields. This section allows you to specify from which fields to pull scoring information. 
+            <p>Scoring fields must all be numeric. They may be formula fields. Decimal values will be truncated to their integer value. If you use a letter based 
+            scoring engine, create a formula field to map the letter scores to an integer value.
+            </p>
+            <p>Fields set to 'Do Not Score' do not contribute to the score. Leave all 
+            fields set to 'Do Not Score' and set the Scoring Threshold to zero to disable scoring and process every response as qualified.</p>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idLeadScoreField" value="Lead scoring field" />
+                    <apex:selectList id="idLeadScoreField" value="{!ScoringLeadScoreField}" size="0">
+                        <apex:selectOptions value="{!LeadScoreFieldOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >Specify the field containing the current lead score as determined by your lead scoring logic.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idContactScoreField" value="Contact scoring field" />
+                    <apex:selectList id="idContactScoreField" value="{!ScoringContactScoreField}" size="0">
+                        <apex:selectOptions value="{!ContactScoreFieldOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >Specify the field containing the current contact score as determined by your lead scoring logic.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idCampaignScoreField" value="Campaign scoring field" />
+                    <apex:selectList id="idCampaignScoreField" value="{!ScoringCampaignScoreField}" size="0">
+                        <apex:selectOptions value="{!CampaignScoreFieldOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >Specify the field containing the campaign based score.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idCampaignMemberScoreField" value="CampaignMember scoring field" />
+                    <apex:selectList id="idCampaignMemberScoreField" value="{!ScoringCampaignMemberScoreField}" size="0">
+                        <apex:selectOptions value="{!CampaignMemberScoreFieldOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                    <apex:outputText >Specify the field containing the campaignmember based score. This field will typically be 
+                    a formula field that will be used to perform your own scoring calculations. Note that if you use a formula field here you 
+                    must configure the system to score asynchronously, as the formula value will not be evaluated in immediate scoring mode.</apex:outputText>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="2" title="Asynchronous Processing">
+                <apex:inputField value="{!scoringobject.FCRM__Scoring_Batch_Size__c}"/>
+                <apex:outputText value="Size of scoring batch when using asynchronous scoring (10-200)." />
+                <apex:inputField value="{!scoringobject.FCRM__Evaluation_Batch_Size__c}"/>
+                <apex:outputText value="Size of evaluation batch when using asynchronous scoring (10-200). Evaluation refers to
+                    processing of threshold qualfied responses after scoring." />
+            </apex:pageBlockSection>
+
+            <apex:pageblockSection columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on the currently saved data. Save the page and then return to the page for an updated report.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!ScoringDiagnosticInfo}" />
+            </apex:pageblockSection>
+
+
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!ScoringSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    </apex:SectionHeader>
+
+</apex:page>

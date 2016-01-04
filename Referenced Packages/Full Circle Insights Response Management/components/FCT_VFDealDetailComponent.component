@@ -1,0 +1,49 @@
+<apex:component controller="FCRM.FCT_DealExplorerTable" >
+    <apex:attribute name="Name" assignTo="{!TName}" type="String" description="Name of this component"/>
+    <apex:actionFunction name="{!TName}Paginate" action="{!ComponentLoaded}" oncomplete="{!TName}RefreshContents()" />
+    <apex:actionFunction name="{!TName}RefreshContents" action="{!ComponentLoaded}" oncomplete="{!TName}DEUpdateInfo()" reRender="mainpanel" />
+    <apex:outputPanel id="mainpanel" layout="block">
+        <apex:outputPanel layout="block" style="height:{!20 * MaxPageSize}px" rendered="{!if(LoadState < 2, true, false)}">
+            {!$Label.fcrm__FCR_Data_Loading} 
+        </apex:outputPanel>
+        <apex:outputpanel rendered="{! LoadState==2}">
+            <apex:pageBlock mode="edit">
+                <apex:PageBlockTable value="{!RowData}" var="row" >
+                    <apex:repeat value="{!columns}" var="col">
+                        <apex:column rendered="{!col.Visible}" >
+                            <apex:facet name="header">
+                            <apex:commandLink action="{!sortcommand}" reRender="mainpanel">
+                                <apex:param name="sortcolumn" value="{!col.ColumnName}" />
+                                <apex:outputText value="{!col.ColumnLabel}" />
+                                <apex:image styleClass="{!IF(col.ColumnName=sortcolumn, IF(sortascending!=true, 'RLSortedDescending','RLSortedAscending'),'RLNotSorted') }" value="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="  />                                
+                            </apex:commandLink>
+                            
+                            </apex:facet>
+                            <apex:outputLink rendered="{!NOT(ISNULL(row.valuemap[col.ColumnName].LinkValue))}" value="{!'/' & row.valuemap[col.ColumnName].LinkString}">
+                                <apex:outputText value="{!row.valuemap[col.ColumnName].TextValue}" />
+                            </apex:outputLink>
+                            <apex:outputText rendered="{!ISNULL(row.valuemap[col.ColumnName].LinkValue)}" value="{!row.valuemap[col.ColumnName].TextValue}"/>
+                        </apex:column>
+                    </apex:repeat>
+                </apex:PageBlockTable>
+                <apex:OutputPanel id="idPageInfo" rendered="{!DisplayPagination}" >
+                     <apex:commandButton value="Previous" disabled="{!CurrentPage<=1}" reRender="mainpanel" action="{!PagePrevious}" /> 
+                     <apex:commandButton value="Next" disabled="{!CurrentPage>= (PageCount)}" reRender="mainpanel" action="{!PageNext}"/> 
+                     <apex:selectList id="idPageNumber" value="{!currentpage}" size="1" onchange="{!TName}Paginate()" ><apex:selectOptions value="{!PageList}" /></apex:selectList>
+                </apex:OutputPanel> 
+            </apex:pageBlock>
+        </apex:outputpanel>
+        <script type="text/javascript">
+            function {!TName}DEUpdateInfo()
+            {
+                if(0=={!LoadState}) {!TName}RefreshContents();
+                if(1=={!LoadState}) {!TName}RefreshContents();
+            
+            }
+        </script>        
+        <script type="text/javascript">
+            {!TName}DEUpdateInfo();
+        </script>        
+    </apex:outputPanel>
+
+</apex:component>

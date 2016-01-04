@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>FCR_Admin_Person_RecordType__c</fullName>
+        <deprecated>false</deprecated>
+        <description>RecordType of related person account if present</description>
+        <externalId>false</externalId>
+        <label>Admin Person RecordType</label>
+        <length>20</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_Update_Counter__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>This counter is changed any time this object is updated by the response management system.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This counter is changed any time this object is updated by the response management system.</inlineHelpText>
+        <label>Admin Update Counter</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Created_By_Lead_Conversion__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set to false by default this value is mapped from lead on conversion.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Set to true if contact was created from lead conversion.</inlineHelpText>
+        <label>Created By Lead Conversion</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Name_Created_Date__c</fullName>
+        <defaultValue>Today()</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates the day the name was created. If contact is created from lead convert, the value will be populated from the lead.</description>
+        <externalId>false</externalId>
+        <label>Name Created Date</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Nurture_Timeout__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Nurture timeout date for this contact.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the earliest date this contact can promote out of nurture for follow up.</inlineHelpText>
+        <label>Nurture Timeout</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_PostAssignNotificationPending__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set to true to indicate that a notification is pending after assignment of a contact to to receipt of a qualified response.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Adminstrative field used for scoring and notifications.</inlineHelpText>
+        <label>Post Assign Notification Pending</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Prior_Contact_Score__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Previous contribution of the Contact score field (as defined in configuration) towards the response score.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The Contact Score prior to the most recent update.</inlineHelpText>
+        <label>Prior Contact Score</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Response_Score__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Response score on contact.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The score of the contact at the time the most recent response was processed.</inlineHelpText>
+        <label>Response Score</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Status_Synced_From_Response__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Administrative field that indicates that the status of this contact was set during response sync.</description>
+        <externalId>false</externalId>
+        <label>Status Synced From Response</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The status of the contact.</description>
+        <externalId>false</externalId>
+        <label>Contact Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Not Engaged</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Open - Not Contacted</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Working</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Qualifying</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Validation</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Requalify</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sales Nurture</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Unqualified</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sent to Partner</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Active Opportunity (System Value)</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>true</trackHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Superpower_Field__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This field will always be cleared after being set. Please see Full Circle CRM Documentation for use of this field.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This field will always be cleared after being set. Please see Full Circle CRM Documentation for use of this field.</inlineHelpText>
+        <label>FCCRM Superpower Field</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Take_Scoring_Snapshot__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set this field to true to score any pending responses for this contact</description>
+        <externalId>false</externalId>
+        <label>Do Pending Scoring</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Temp_Lead_Created_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Administrative Field - Temporary holder for Lead Create Date. Cleared by Full Circle CRM After comparison with the Contact FCR_Name_Created_Date__c field.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Administrative Field - Temporary holder for Lead Create Date. Cleared by Full Circle CRM After comparison with the Contact FCR_Name_Created_Date__c field.</inlineHelpText>
+        <label>Temp Lead Created Date</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Date</type>
+    </fields>
+</CustomObject>

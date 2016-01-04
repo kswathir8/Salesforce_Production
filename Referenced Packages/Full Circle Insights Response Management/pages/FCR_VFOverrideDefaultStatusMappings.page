@@ -1,0 +1,78 @@
+<apex:page controller="FCRM.FCR_VFOverrideStatusMappingsController" title="Response Processing Configuration" tabStyle="Full_Circle_CRM__tab">
+    <apex:SectionHeader title="Full Circle CRM Status Mapping Overrides Configuration" help="https://www.fullcirclecrm.com/fcrm/app/status-mapping-overrides-config/">
+        <apex:form id="frmoverrides">
+            <apex:actionFunction name="updatedisplay" reRender="idOverridesBlock"/>
+
+            <apex:selectradio rendered="{! AvailableOptions>1}" value="{!DisplayType}" onchange="updatedisplay()"  >
+                <apex:selectoption rendered="{!HasLeadRecordType}" itemValue="Leads" itemLabel="Leads" title="Override status mappings for lead recordtypes"/>
+                <apex:selectoption rendered="{!HasContactRecordType}" itemValue="Contacts" itemLabel="Contacts"  title="Override status mappings for contact recordtypes"/>
+                <apex:selectoption rendered="{!HasPersonAccountRecordType}" itemValue="Accounts" itemLabel="Accounts"  title="Override status mappings for person account recordtypes"/>
+            </apex:selectradio>
+            <apex:pageBlock rendered="{! AvailableOptions=0}">
+                <apex:outputText >
+                    No overridable record types were found in this organization, or all record types have
+                    been defined as non-response record types in the General Configuration section. 
+                </apex:outputText>
+                <apex:pageblockButtons >
+                    <apex:commandButton value="Cancel" action="{!getStatusMappingPageReference}"/>
+                </apex:pageblockButtons>
+            </apex:pageBlock>
+            <apex:pageBlock rendered="{!AvailableOptions>0}">
+                <apex:outputText value="Click on the record type you wish to edit" />
+                <apex:panelBar id="idOverridesBlock" >
+                    <apex:repeat value="{!LeadContactOverrideList}" var="mapping">
+                        <apex:panelBarItem label="{!RecordTypeNames[mapping.name] + IF(OverrideList[mapping.name],' - overridden', '')}" >
+                            <apex:pageBlockSection columns="2" rendered="{!DisplayType='Leads'}">
+                                <apex:selectList label="Initial Lead status" size="1" value="{!mapping.FCRM__ForceLeadStatusOnCreate__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsLeads}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Lead status (and related response status) for newly created Lead." />
+                                <apex:selectList label="Lead status after response" size="1" value="{!mapping.FCRM__DefaultLeadResponseStatusOnCreate__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsLeads}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Lead status (and related response status) for new active response." />
+                            </apex:pageBlockSection>
+                            <apex:pageBlockSection columns="2" rendered="{! OR(DisplayType='Contacts', DisplayType='Accounts')}">
+                                <apex:outputText rendered="{! DisplayType='Accounts'}" value="Person accounts use contact mappings" />
+                                <apex:outputText rendered="{! DisplayType='Accounts'}" />
+                                <apex:selectList label="Initial Contact status" size="1" value="{!mapping.FCRM__ForceContactStatusOnCreate__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Contact status for newly created Contact." />
+                                <apex:selectList label="Contact status after response" size="1" value="{!mapping.FCRM__DefaultContactStatusOnCreate__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Contact status after new active response." />
+                                <apex:selectList label="Contact status when converted with no Opportunity" size="1" value="{!mapping.FCRM__DefaultContactStatusOnConversionNoOp__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Contact status after conversion with no Opportunity." />
+                                <apex:selectList label="Contact status when converted with opportunity" size="1" value="{!mapping.FCRM__DefaultContactStatusOnConversionOpenOp__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Contact status after conversion with open Opportunity." />
+                                <apex:selectList label="Contact status after Opportunity won" size="1" value="{!mapping.FCRM__DefaultContactStatusOnOpportunityClose__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Contact status after Opportunity won." />
+                                <apex:selectList label="Contact status after Opportunity lost" size="1" value="{!mapping.FCRM__DefaultContactStatusOnOpportunityLost__c}">
+                                    <apex:selectOptions value="{!StatusMappingOptionsContacts}" />
+                                </apex:selectList>
+                                <apex:outputText value="Default Contact status after Opportunity lost. If not set, the contact status after Opportunity won will be used." />
+                            
+                            </apex:pageBlockSection>
+                            
+                        </apex:panelBarItem>
+                    </apex:repeat>
+
+                </apex:panelBar>
+                <apex:pageblockButtons >
+                    <apex:commandButton value="Save and Return" action="{!SaveOverrides}"/>
+                    <apex:commandButton value="Cancel" action="{!getStatusMappingPageReference}"/>
+                </apex:pageblockButtons>
+            </apex:pageBlock>
+            
+        </apex:form>
+    </apex:SectionHeader>
+
+</apex:page>

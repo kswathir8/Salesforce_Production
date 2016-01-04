@@ -1,0 +1,215 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Response Configuration" tabStyle="Full_Circle_CRM__tab" action="{!DoUpdate}" >
+    <apex:SectionHeader title="Full Circle CRM Main Configuration" help="https://www.fullcirclecrm.com/fcrm/app/main-configuration/">
+
+    <apex:form >
+        <!-- Configuration update section - don't modify -->
+        <apex:outputPanel id="idConfigSection" rendered="{!NOT(IsValid)}">
+            <apex:actionFunction action="{!DoUpdate}" name="dotheupdate"/>
+            <p>Updating field cache...  Please be patient</p>
+        </apex:outputPanel>
+        
+        <apex:outputPanel rendered="{!IsValid}">
+            <apex:actionFunction name="UpdateStatuses" reRender="idGeneralStatus,idStatusMapping,idResponseProcessing,idResponsePrompt,idSyncFields,idAssignment,idScoring,idNotification,idInfluence,idAdditionalDiag,idDataExplorer,idEmailService"/>
+            <p><apex:outputText style="font-weight:bold;{!IF(ResponseConfiguration.FCRM__Disable_Application__c,'color:red;','color:green;')}" value="{!IF(ResponseConfiguration.Disable_Application__c,'The Full Circle CRM Response Management Application is disabled',
+                                    'The Full Circle CRM Response Management Application is enabled')}" />
+            </p>
+            <table width="100%">
+                <tr>
+                    <td style="font-weight:bold">Configuration section</td>
+                    <td style="font-weight:bold">Current status</td>
+                    <td style="font-weight:bold">Description</td>
+                </tr>
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="General Configuration" action="{!getConfigGeneralReference}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idGeneralStatus" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="General" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>General configuration selections including enabling the application and managing active and passive mode.</td>
+            
+                </tr>
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Response Processing" action="{!getConfigResponseProcessing}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idResponseProcessing" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="ResponseProcessing" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure response processing settings including repeat response timeouts, repeat response users and
+                    response cascading.</td>
+            
+                </tr>
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Status Mappings" action="{!getConfigStatusMapping}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idStatusMapping" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="StatusMapping" LimitResults="3" SingleMessageOnError="One or more issues found" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure mappings from lead and contact status to response status, and define default 
+                    status values for various conditions.</td>
+                </tr>
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Response Prompts" action="{!getResponseUIPrompts}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idResponsePrompt" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="ResponsePrompt" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure the response UI campaign prompts. These are the campaigns you can choose from when using the 
+                    Response UI component.</td>
+                </tr>
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Sync Fields" action="{!getConfigSyncFields}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idSyncFields" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="SyncFields" LimitResults="2" SpecialFlags="1" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure synchronization fields. These are fields that are synced between a lead or contact and their current active response.</td>
+                </tr>
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Scoring" action="{!getConfigScoring}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idScoring" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="Scoring" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure scoring settings.</td>
+                </tr>
+
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Assignment" action="{!getConfigAssignment}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idAssignment" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="Assignments" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure assignment settings for leads and contacts. Specify queues and users subject to reassignment.</td>
+                </tr>
+
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Notifications" action="{!getConfigNotification}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idNotification" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="Notification" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure Email and chatter notifications.</td>
+                </tr>
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Campaign Attribution" action="{!getConfigResponseDB}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idInfluence" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticInfo="{!InfluenceDiagnosticInfo}" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Define Campaign attribution and influence models and configure Response Information Database processing.</td>
+                </tr>
+                <apex:outputPanel rendered="{!OldCIModelsActive}"> 
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Data Explorer" action="{!getConfigDataExplorer}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idDataExplorer" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="DataExplorer" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Configure Full Circle CRM Data explorer and visualization features.</td>
+                    </tr>                
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!NOT(V3AsyncSystemEnabled)}">
+                <tr>
+                    <td><apex:outputtext value="Email service configuration"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idEmailService" layout="inline">
+                        <c:FCR_VFDiagnosticList DiagnosticType="EmailServices" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>You can configure an Email service to control the user performing Full Circle CRM background and asynchronous operations. 
+                    Configure this feature through Setup-Develop Email Services.</td>
+                </tr>
+                </apex:outputPanel>
+            </table>
+            
+            <p><apex:outputText style="font-weight:bold;color:green;" value="Advanced Tools and Diagnostics" />
+            </p>
+
+
+            <table width="100%">
+                <tr>
+                    <td style="font-weight:bold">Configuration section</td>
+                    <td style="font-weight:bold">Current status</td>
+                    <td style="font-weight:bold">Description</td>
+                </tr>
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Advanced Configuration" action="{!getAdvancedConfig}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel layout="inline">
+                        </apex:outputPanel>
+                    </td>
+                    <td>Use this to set advanced configuration options.</td>
+                </tr>
+
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Additional Diagnostics" action="{!getDiagnosticsA}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idAdditionalDiag" layout="inline">
+                            <c:FCR_VFDiagnosticList DiagnosticInfo="{!AdditionalDiagnosticTestStatus}" LimitResults="2" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Perform additional diagnostic tests.</td>
+                </tr>
+
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Event Logs" action="{!getConfigLogging}"/></td>
+                    <td width="200px">
+                        <apex:outputPanel layout="inline">
+                        </apex:outputPanel>
+                    </td>
+                    <td>View the internal application event logs. Configure diagnostic notification options.</td>
+                </tr>
+
+                <apex:outputPanel layout="none" rendered="{!NOT(NewAsyncSystemEnabled) && NOT(V3AsyncSystemEnabled)}">
+                <tr>
+                    <td><apex:commandButton style="width:140px" value="Process Future Calls" action="{!RequestAsync}" reRender="idAsyncStatusPanel"/></td>
+                    <td width="200px">
+                        <apex:outputPanel id="idAsyncStatusPanel" layout="inline">
+                            <c:FCR_VFDiagnosticList DiagnosticInfo="{!LastAsyncStatus}" LimitResults="1" />
+                        </apex:outputPanel>
+                    </td>
+                    <td>Normally not required, use this on lightly used systems to force immediate processing of pending future operations. 
+                    Note that the status only updates after the button is pressed or the page refreshed.
+                    Press the button every 5-10 seconds until the status shows None pending.</td>
+                </tr>
+                </apex:outputPanel>
+
+            </table>
+        
+        
+            
+        
+        </apex:outputPanel>
+    </apex:form>
+
+    </apex:SectionHeader>
+    
+    <apex:outputPanel id="idconfigscript">
+        <script type="text/javascript">
+            function continueupdate()
+            {
+                if(!{!IsValid}) dotheupdate();
+            }
+            continueupdate();
+            if({!IsValid}) UpdateStatuses();
+        </script>
+    </apex:outputPanel>
+</apex:page>

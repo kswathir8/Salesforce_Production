@@ -1,0 +1,189 @@
+<apex:page controller="n2de.DistributionLogListController" sidebar="false" tabStyle="Logs__tab" >
+	<c:CommonHelp help_page="distribution-logs" />
+	<c:CommonHeader />
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/select2.min.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/select2.css')}" type="text/css" />
+	<c:CommonMask />
+	
+	<apex:form >
+	
+		<apex:sectionHeader title="{!$ObjectType.n2de__Distribution_log__c.LabelPlural}" subtitle="Home"/>
+		<br/>
+		<apex:outputPanel id="log_select">
+			<apex:selectList value="{!ListView}" size="1" rendered="{!IsManager}" styleClass="listViewSelect nosearch-select">
+				<apex:selectOptions value="{!ListViewOptionList}"/>
+				<apex:actionSupport event="onchange" action="{!refreshTotalRecords}" reRender="log_select,log_list" onSubmit="showMask()" onComplete="hideMask()"/>
+			</apex:selectList>
+			<apex:selectList value="{!TeamId}" size="1" styleClass="listViewSelect search-select">
+				<apex:selectOptions value="{!TeamOptionList}"/>
+				<apex:actionSupport event="onchange" action="{!refreshTotalRecords}" reRender="log_select,log_list" onSubmit="showMask()" onComplete="hideMask()"/>
+			</apex:selectList>
+			<apex:selectList value="{!StatusView}" size="1" styleClass="listViewSelect nosearch-select">
+				<apex:selectOptions value="{!StatusOptionList}"/>
+				<apex:actionSupport event="onchange" action="{!refreshTotalRecords}" reRender="log_select,log_list" onSubmit="showMask()" onComplete="hideMask()"/>
+			</apex:selectList>
+			<apex:selectList value="{!DistributorId}" size="1" styleClass="listViewSelect search-select">
+				<apex:selectOptions value="{!DistributorOptionList}"/>
+				<apex:actionSupport event="onchange" action="{!refreshTotalRecords}" reRender="log_select,log_list" onSubmit="showMask()" onComplete="hideMask()"/>
+			</apex:selectList>
+			<apex:selectList value="{!TeamMemberOwnerId}" size="1" rendered="{!IsManager && ListView != 'My Logs'}" styleClass="listViewSelect search-select">
+				<apex:selectOptions value="{!TeamMemberOptionList}"/>
+				<apex:actionSupport event="onchange" action="{!refreshTotalRecords}" reRender="log_select,log_list" onSubmit="showMask()" onComplete="hideMask()"/>
+			</apex:selectList><br/><br/>
+			<apex:inputText value="{!SearchObjectName}" id="log_filter" styleClass="listViewSelect" size="40" html-placeholder="Search logs by name..."/>&nbsp;&nbsp;
+			<apex:commandButton value="Search" onclick="showMask()" action="{!searchLogs}" oncomplete="hideMask()" reRender="log_list"/>
+		</apex:outputPanel>
+		<br/><br/>
+		<apex:pageBlock id="log_list">
+			<apex:pageMessages />
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton value="Delete" action="{!deleteSelectedLogs}" reRender="log_list" rendered="{!$ObjectType.n2de__Distribution_log__c.Deletable}" onclick="if (!window.confirm('Are you sure?')) return false;"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockTable value="{!DistributionLogsList}" var="DL">
+				<apex:column id="checkbox" rendered="{!$ObjectType.n2de__Distribution_log__c.Deletable}">
+					<apex:facet name="header">
+						<apex:inputCheckbox value="{!AllRowsSelect}" styleClass="all_rows_select"/>
+					</apex:facet>
+					<apex:inputCheckbox value="{!DL.isSelected}" styleClass="{!IF(DL.RecordAccess.HasDeleteAccess, 'row_select', '')}" disabled="{!NOT(DL.RecordAccess.HasDeleteAccess)}" title="{!IF(NOT(DL.RecordAccess.HasDeleteAccess), 'You do not have permissions to delete this record.', '')}"/>
+				</apex:column>
+				<apex:column headerValue="Action">
+					<apex:commandLink action="{!deleteLog}" reRender="log_list" rendered="{!DL.RecordAccess.HasDeleteAccess}" onclick="if (!window.confirm('Are you sure?')) return false;">
+						<b>Del</b>
+						<apex:param name="actionlogid" value="{!DL.Log.Id}" assignTo="{!ActionLogId}"/>
+					</apex:commandLink>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Distribution_log__c.Fields.n2de__Assigned_object_record_name__c.Label} {!IF(SortField=='Assigned_object_record_name__c',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" rerender="log_list">
+                        	<apex:param name="sortField" value="Assigned_object_record_name__c" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputPanel >
+						<apex:outputLink value="/{!DL.Log.n2de__Assigned_object_Id__c}" rendered="{!DL.ObjectRecordName!=''}">{!DL.ObjectRecordName}</apex:OutputLink>
+						<apex:outputText value="{!DL.Log.n2de__Assigned_object_record_name__c}" rendered="{!DL.ObjectRecordName==''}"/>
+					</apex:outputPanel>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Distribution_log__c.Fields.n2de__Assignment_date__c.Label} {!IF(SortField=='Assignment_date__c',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" rerender="log_list">
+                        	<apex:param name="sortField" value="Assignment_date__c" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!DL.Log.n2de__Assignment_date__c}"/>
+				</apex:column>
+				<apex:column styleClass="rowIcon">
+					<apex:facet name="header">Alerts</apex:facet>
+                    <apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/alert32_2.png')}" width="20" height="20" rendered="{!DL.Log.n2de__In_alert__c}" title="{!DL.Log.n2de__Alert_tip__c}"/>
+                    <apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/re-assign32_2.png')}" width="20" height="20" title="{!DL.Log.n2de__Alert_tip__c}. Re-assigned to {!IF(BEGINS(DL.Log.n2de__Reassigned_to_id__c, '005'), 'user', 'queue')}: {!DL.ReassignedOwnerName}" rendered="{!DL.Log.n2de__Is_reassigned_to_queue__c}"/>
+				</apex:column>
+				<apex:column styleClass="rowIcon">
+					<apex:facet name="header">Type</apex:facet>
+					<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/stickypin_32.png')}" width="20" height="20" rendered="{!DL.Log.n2de__Is_sticky__c}" title="Sticky Assignment"/>
+					<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/maglass_32.png')}" width="20" height="20" rendered="{!DL.Log.n2de__Is_lookup__c}" title="Lookup Owner Assignment"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Distribution_log__c.Fields.n2de__Action_date__c.Label} {!IF(SortField=='Action_date__c',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" rerender="log_list">
+                        	<apex:param name="sortField" value="Action_date__c" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!DL.Log.n2de__Action_date__c}"/>
+				</apex:column>
+				<apex:column headerValue="Last Action">
+                    <apex:outputText value="{!DL.LastAction}"/>
+				</apex:column>
+				<apex:column value="{!DL.ObjectName}">
+					<apex:facet name="header">Object</apex:facet>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Distribution_log__c.Fields.n2de__Distributor__c.Label} {!IF(SortField=='Distributor__c',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" rerender="log_list">
+                        	<apex:param name="sortField" value="Distributor__r.Name" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputField value="{!DL.Log.n2de__Distributor__c}" rendered="{!DL.Log.n2de__Distributor__c != null}" />
+                    <apex:outputText value="{!DL.Log.n2de__Distributor_name__c}" rendered="{!DL.Log.n2de__Distributor__c == null}" title="This Distributor has been deleted" styleClass="deleted_distributor" />
+                    
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">
+                        <apex:commandLink value="{!$ObjectType.n2de__Distribution_log__c.Fields.n2de__Distribution_team_member__c.Label} {!IF(SortField=='Distribution_team_member__r.User__r.Name',IF(SortOrder=='desc','↓','↑'),'')}" action="{!sortColumn}" rerender="log_list">
+                        	<apex:param name="sortField" value="Distribution_team_member__r.User__r.Name" assignTo="{!SortField}"/>
+                        </apex:commandLink>
+                    </apex:facet>
+                    <apex:outputLink value="/{!DL.Log.n2de__Distribution_team_member__c}">{!IF(DL.Log.Distribution_team_member__r.n2de__Queue_id__c=null, DL.Log.Distribution_team_member__r.User__r.Name, DL.QueueName)}</apex:OutputLink>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Current {!$ObjectType.n2de__Distribution_log__c.Fields.n2de__Owner__c.Label}</apex:facet>
+                    <apex:outputText value="{!DL.OwnerName}"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">{!$ObjectType.n2de__Distribution_log__c.Fields.n2de__In_error__c.Label}</apex:facet>
+                    <apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/error.png')}" width="20" height="20" rendered="{!DL.Log.n2de__In_error__c}" title="Error: {!DL.Log.n2de__Error_message__c}"/>
+				</apex:column>
+			</apex:pageBlockTable>
+			<apex:outputPanel >
+				<apex:outputText value="no records to display" rendered="{!NOT(recordsToDisplay)}"/>
+			</apex:outputPanel>
+			<apex:toolbar styleClass="pagingToolBar">
+				<apex:toolbarGroup itemSeparator="none" location="left" id="toolbar_left">
+					<apex:outputPanel rendered="{!totalRecords > 10}">
+						<apex:outputText >Display </apex:outputText>
+						<apex:selectList value="{!rowsPerPage}" size="1">
+							<apex:selectOptions value="{!rowsPerPageOptionList}"/>
+							<apex:actionSupport event="onchange" action="{!resetPage}" reRender="log_list" onSubmit="showMask()" onComplete="hideMask()" />
+						</apex:selectList>
+						<apex:outputText > records per page</apex:outputText>
+					</apex:outputPanel>
+				</apex:toolbarGroup>
+				<apex:toolbarGroup itemSeparator="none" location="right" id="toolbar_right">
+					<apex:commandLink value="<Previous page" action="{!previousPage}"  rendered="{!hasPrevious}" reRender="log_list" onclick="showMask()" onComplete="hideMask()"/><apex:outputLabel value=" | " rendered="{!AND(hasNext, hasPrevious)}"/>
+					<apex:commandLink value="Next page>" action="{!nextPage}" rendered="{!hasNext}" reRender="log_list" onclick="showMask()" onComplete="hideMask()"/>
+				</apex:toolbarGroup>
+			</apex:toolbar>
+			<script>
+				jQuery(document).ready(function($){
+					$('select.search-select').select2({dropdownAutoWidth : true}); 
+					$('select.nosearch-select').select2({
+						minimumResultsForSearch: -1,
+						dropdownAutoWidth : true
+					}); 
+				
+					$('.all_rows_select').click(function() {
+						var checkBoxState = false;
+						if($(this).is(':checked')){
+							checkBoxState = true;
+						}
+						
+						$('input.row_select').each(function(){
+			           		$(this).prop("checked", checkBoxState);
+						});
+					});
+				});
+			</script>
+			
+		</apex:pageBlock>
+	</apex:form>
+	
+	<style>
+		.pagingToolBar {
+			background-color: #F3F3EC;
+			background-image: none;
+			border: none;
+		}
+		.listViewLabel {
+			font-weight: bold;
+			margin-left: 20px;
+		}
+		.listViewSelect {
+			margin-left: 20px;
+		}
+		.deleted_distributor{
+			color: grey;
+		}
+		.rowIcon{
+			text-align: center;
+		}
+	</style>
+<c:StatusPanel />
+</apex:page>

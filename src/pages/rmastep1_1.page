@@ -1,0 +1,43 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case"  >
+	
+	<apex:sectionHeader title="RMA Wizard" subtitle="Step 4 of 6"/>
+
+	<apex:form id="theForm" > 
+		<apex:pageBlock id="theSearchBlock" title="Detail Information for RMA" mode="edit" >
+			<apex:pageBlockButtons location="both" >
+				<apex:commandButton action="{!step2}" value="Previous" />          		
+				<apex:commandButton action="{!step5}" value="Next" >
+					<apex:param name="a" assignTo="{!contactId }" value="{!Questionnaire_Wizard__c.Contact__c}"/>
+				</apex:commandButton>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection collapsible="false" id="s4df" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel >RMA Type?</apex:outputLabel>
+					<apex:inputField value="{!Questionnaire_Wizard__c.RMA_Type__c}" required="true" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection collapsible="false" id="sdf" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel >Reason for RMA</apex:outputLabel>
+					<apex:inputField value="{!Questionnaire_Wizard__c.Reason__c}" required="true" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection collapsible="false" id="sddf" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel >Firmware Version</apex:outputLabel>
+					<apex:inputField value="{!Questionnaire_Wizard__c.Firmware_Version__c}" required="true" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection collapsible="false" id="sdvf" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel >Model Number</apex:outputLabel>
+					<apex:inputField value="{!Questionnaire_Wizard__c.Model__c}" required="true" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

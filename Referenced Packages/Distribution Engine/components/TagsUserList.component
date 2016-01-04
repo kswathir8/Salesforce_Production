@@ -1,0 +1,106 @@
+<apex:component controller="n2de.TagAssignUserController">
+	<style>
+	.pagingToolBar {
+		background-color: #F3F3EC;
+		background-image: none;
+		border: none;
+	}
+	.member_image{
+		width: 25px;
+		margin-left: 15px;
+	}
+	.search_box{
+		float: left;
+		margin-left: 15px;
+	}
+	.view_selection {
+		float: right;
+		margin: 10px;
+		height: 0;
+		top: -50px;
+		position: relative;
+		margin-top: 15px;
+	}
+	</style>
+	<apex:outputPanel id="script_panel">
+	<script>
+	var typingTimer;               //timer identifier
+	var doneTypingInterval = 500;  //time in ms, 5 second for example
+	var userFilter = '{!JSENCODE(userFilter)}';
+	$(document).ready(function(){
+		$('.userFilter').keyup(function(){
+		    clearTimeout(typingTimer);
+		    typingTimer = setTimeout(filterUsers, doneTypingInterval);
+		});
+	});
+	function filterUsers(){
+		if($('.userFilter').val() != userFilter){
+			showMask();
+			doUpdateAF();
+		}
+	}
+	</script>
+	</apex:outputPanel>
+	<c:CommonMask />
+	<c:CommonHelp help_page="distributor-tags"/>	
+	<apex:form >
+		<apex:actionFunction name="doUpdateAF" action="{!doUpdate}" oncomplete="hideMask()" reRender="user_table, script_panel" />
+		<apex:sectionHeader title="Assign Tags" />
+		<apex:pageMessages id="pageMessages"/>
+		<c:TagsTabSelection activeTab="assign"/>
+		
+		<apex:pageBlock title="Select user" id="pg_block">
+			<apex:outputPanel styleClass="view_selection" id="view_select">
+		        <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_listicon.png')}" title="List view" width="20" height="20" />
+		        <apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/test_verticalbaricon.png')}" height="20" />
+		        <apex:outputLink value="/apex/{!NamespacePrefix}TagAssignment">
+		        	<apex:image url="{!URLFOR($Resource.n2de__DEResources, 'images/grid-32.png')}" title="Grid view" width="20" height="20" />
+		        </apex:outputLink>
+	        </apex:outputPanel>
+			<apex:outputPanel >
+				<div class="search_box">
+					Team&nbsp;&nbsp;
+					<apex:selectList value="{!teamFilter}" size="1" styleClass="" >
+						<apex:selectOption itemValue="" itemLabel="All teams"/>
+						<apex:selectOptions value="{!teamOptionList}" />
+						<apex:actionSupport event="onchange" action="{!doUpdate}" onSubmit="showMask()" reRender="user_table, script_panel" oncomplete="hideMask()"/>
+					</apex:selectList>
+				</div>
+				<div class="search_box">
+					<div id="user_search_box" >User&nbsp;&nbsp;<apex:inputText styleClass="userFilter" value="{!userFilter}"/></div>
+				</div>
+				<div style="clear: both" />
+			</apex:outputPanel>
+			<apex:pageBlockSection columns="1">
+				<apex:pageBlockTable value="{!userList}" var="u" id="user_table">
+					<apex:column width="5%">
+						<apex:image value="{!u.photoUrl}" rendered="{!LEN(u.photoUrl) > 0}" styleClass="member_image"/>
+						<apex:image value="{!URLFOR($Resource.n2de__DEResources, 'images/teammember32.png')}" rendered="{!LEN(u.photoUrl) == 0}" styleClass="member_image"/>
+					</apex:column>
+					<apex:column headerValue="User name">
+						<apex:outputLink value="/apex/{!NamespacePrefix}TagAssignment?id={!u.user.Id}&view=list">{!u.Name}</apex:outputLink>
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+			
+			<apex:toolbar styleClass="pagingToolBar">
+				<apex:toolbarGroup itemSeparator="none" location="left">
+					<apex:outputPanel rendered="{!totalRecords > 10}">
+						<apex:outputText >Display &nbsp;</apex:outputText>
+						<apex:selectList value="{!rowsPerPage}" size="1">
+							<apex:selectOptions value="{!rowsPerPageOptionList}"/>
+							<apex:actionSupport event="onchange" action="{!resetPage}" reRender="pg_block" onSubmit="showMask()" onComplete="hideMask()" />
+						</apex:selectList>
+						<apex:outputText > records per page</apex:outputText>
+					</apex:outputPanel>
+				</apex:toolbarGroup>
+				<apex:toolbarGroup itemSeparator="line" location="right">
+					<apex:commandLink value="<Previous page" action="{!previousPage}"  rendered="{!hasPrevious}" reRender="pg_block" onclick="showMask()" onComplete="hideMask()"/>
+					<apex:commandLink value="Next page>" action="{!nextPage}" rendered="{!hasNext}" reRender="pg_block" onclick="showMask()" onComplete="hideMask()"/>
+				</apex:toolbarGroup>
+			</apex:toolbar>
+		</apex:pageBlock>
+		
+	</apex:form>
+	
+</apex:component>

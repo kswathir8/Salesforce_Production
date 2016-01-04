@@ -1,0 +1,384 @@
+<apex:page Controller="n2de.ConsoleController" sidebar="false" tabstyle="Console__tab" action="{!init}">
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<style>
+		#record_count .team_count{
+		    text-align: center;
+		    font-weight: bold;
+		}
+		#record_count .team_count a{
+		    color: #808080;
+		    font-weight: bold;
+		}
+		#record_count .team_name a{
+		    color: #808080;
+		}
+		#record_count th:first-child{
+		    text-align: left !important;
+		}
+		#record_count th{
+		    color: #808080;
+		    font-weight: bold;
+		    font-size: 14pt;
+		    text-align: center;
+		}
+		#record_count img{
+		    width: 20px;
+		    top: 5px;
+		    position: relative;
+		}
+		th.count{
+		    width: 15%;
+		}
+		.console_selection {
+			float: right;
+			height: 31px;
+			position: relative;
+			top: -50px;
+			right: 50px;
+		}
+		.console_selection img {
+			width: 25px;
+			position: relative;
+			top: 5px;
+			margin-right: 5px;
+		}
+		.console_selection a{
+			border: 1px solid gray;
+			padding: 15px;
+			border-bottom: none;
+			border-radius: 5px 5px 0 0;
+			margin-right: 10px;
+			text-decoration: none;
+		}
+		.console_selection a.active{
+			background-color: #F8F8F8;
+		}
+		.panel table, .calendar_panel table{
+		    width: 100%;
+		    //margin: 5px;
+		}
+		.panel, .calendar_panel{
+		    margin: 10px;
+		    padding: 10px;
+		    border-radius: 5px;
+		    width: 50%;
+		}
+		.border{
+			border: 1px solid #808080;
+		}
+		.short_panel{
+		    height: 150px;
+		}
+		.clear{
+		    clear: both;
+		}
+		.panel h1{
+		    font-size: 18pt;
+		    margin: 5px;
+		    margin-bottom: 10px;
+		    color: #808080;
+		}
+		.user_img{
+		    width: 25px;
+		    margin-left: 5px;
+		}
+		#clear{
+		    clear: both;
+		}
+		#dist_console .panel td{
+		    font-size: 12pt;
+		    color: #808080;
+		}
+		.schedule_error{
+		    background-color: darkgray;
+		}
+		.schedule_error *{
+		    color: white !important;
+		}
+		.panel_container{
+		    width: 100%;
+		    height: 180px;
+		    vertical-align: top;
+		}
+		.sub_console{
+			position: relative;
+		    top: -30px;
+		}
+		#activity{
+			height: 122px;
+		    overflow: auto;
+		}
+		.scheduler_history th{
+		    color: gray;
+		}
+		.scheduler_history td{
+		    font-size: 10pt !important;
+		}
+		.data{
+		    font-size: 8pt !important;
+		}
+		.data td{
+		    border: 1px solid gray;
+		    font-size: 8pt;
+		}
+		#activity_rows_to_display{
+			float: right;
+			margin-top: 5px;
+			display: none;
+		}
+		#activity_rows_to_display a{
+			cursor: pointer;
+		}
+		.tall_panel{
+		    min-height: 180px;
+		    height: 180px;
+		    vertical-align: top
+		}
+	</style>
+<apex:pageMessages />
+<c:CommonMask />
+	<apex:outputPanel rendered="{!isMobile != true}" styleClass="outer_panel">
+	<c:ConsoleDistribution />
+	<c:ConsoleQueue />
+	<c:ConsoleTeam />
+	<c:ConsoleTest rendered="{!JSENCODE($CurrentPage.parameters.testMode) == 'true'}"/>
+		<script>
+			var testMode = '{!JSENCODE($CurrentPage.parameters.testMode)}' == 'true';
+			var testOjectId = '{!JSENCODE($CurrentPage.parameters.id)}';
+			var testObjectName = '{!JSENCODE($CurrentPage.parameters.testObjectName)}';
+			$(document).ready(function() {
+				if(!testMode){
+					loadDistributionConsole();
+				}else{
+					testObject();
+				}
+			});
+			
+			function loadDistributionConsole() {
+				$('#queue_console').hide();
+				$('#team_console').hide();
+				$('#dist_console').show();
+				$(".console_selection a.active").removeClass("active");
+				$("#distribution_tab").addClass("active");
+				loadDistributionPanels();
+			}
+			
+			function loadQueueConsole() {
+				$('#dist_console').hide();
+				$('#team_console').hide();
+				$('#queue_console').show();
+				$(".console_selection a.active").removeClass("active");
+				$("#queue_tab").addClass("active");
+				loadQueueCountsTab();
+			}
+			
+			function loadTeamConsole() {
+				$('#dist_console').hide();
+				$('#queue_console').hide();
+				$('#team_console').show();
+				$(".console_selection a.active").removeClass("active");
+				$("#team_tab").addClass("active");
+				loadTeamCalendar();
+			}
+		</script>
+		<apex:sectionHeader title="Distribution Console" subtitle="Home"/>
+		<c:CommonHelp help_page="distribution-console"/>
+		<apex:pageBlock >
+			<div class="console_selection">
+				<a id="distribution_tab" href="#dist_console" onclick="loadDistributionConsole()"><img title="Distribution Console" src="{!URLFOR($Resource.DEResources, 'images/distributor32.png')}"/>
+				Distribution
+				</a>
+				<a id="queue_tab" href="#queue_console" onclick="loadQueueConsole()"><img title="Queue Console" src="{!URLFOR($Resource.DEResources, 'images/queue32_3.png')}"/>
+				Queues
+				</a>
+				<a id="team_tab" href="#team_console" onclick="loadTeamConsole()"><img title="Team Console" src="{!URLFOR($Resource.DEResources, 'images/teams32.png')}"/>
+				Availability
+				</a>
+			</div>
+			<br/>
+ 			<div id="dist_console" class="sub_console" style="display: none;">
+				<table class="panel_container" style="border-spacing: 20px;">
+					<tr>
+				    <td class="panel border tall_panel status_panel">
+				        <img src="{!URLFOR($Resource.DEResources, 'images/scheduler40.png')}" width="40px"/>
+				        <h1>Scheduler</h1>
+				        <hr/>
+				        <div id="scheduler_status">
+				        	<img alt="loading" src="/img/loading.gif"/>
+				        </div>
+				    </td>
+   
+				    <td class="panel border tall_panel">
+						<img src="{!URLFOR($Resource.DEResources, 'images/run40.png')}" width="40px"/>
+					    <h1>Scheduler activity</h1>
+					    <hr/>
+					    <div id="activity">
+					    	<img alt="loading" src="/img/loading.gif"/>
+					    
+				        </div>
+				        <div id="activity_rows_to_display"><a href="">Show more</a></div>
+				    </td>
+   					</tr>
+  						<tr>
+				    <td colspan="2" class="panel border tall_panel">
+				        <img src="{!URLFOR($Resource.DEResources, 'images/distributor32.png')}" width="40px"/>
+				        <h1>Today's distributions</h1>
+				        <hr/>
+				        <div id="counts">
+				        	<img alt="loading" src="/img/loading.gif"/>
+				        </div>
+				    </td>
+  						</tr>
+				</table>
+			</div>
+
+			<div id="queue_console" class="sub_console" style="display: none;">
+				<table class="panel_container" style="border-spacing: 20px;">
+					<tr>
+				    <td colspan="2" class="panel tall_panel">
+				        <div id="queuecounts">
+				        <img alt="loading" src="/img/loading.gif"/>
+				        </div>
+				    </td>
+				    </tr>
+				</table>
+			</div>
+			<div id="team_console" class="sub_console" style="display: none;">
+				<table class="panel_container" style="border-spacing: 20px;">
+					<tr>
+		    		<td colspan="2" class="calendar_panel tall_panel">
+				        <div id="team_calendar">
+				        	<img id="loading_img" alt="loading" src="/img/loading.gif"/>
+				        </div>
+		    		</td>
+			    	</tr>
+				</table>
+			</div>
+		</apex:pageBlock>
+	</apex:outputPanel>
+
+<apex:outputPanel rendered="{!isMobile == true}">
+<style>
+.panel{
+    border: none !important;
+}
+.panel td{
+    font-size: 12pt;
+}
+.panel th{
+	padding-bottom: 10px;
+}
+</style>
+<table class="panel_container">
+<tr>
+<td class="panel tall_panel">
+    <img src="{!URLFOR($Resource.DEResources, 'images/distributor32.png')}" width="40px"/>
+    <h1>Today</h1>
+    <hr/>
+    <table id="record_count">
+    <tr>
+        <th><img src="{!URLFOR($Resource.DEResources, 'images/teams32.png')}" title="Todays total distributions"/></th>
+        <th class="count"><img src="{!URLFOR($Resource.DEResources, 'images/pusharrow32.png')}" title="Todays total distributions"/></th>
+        <th class="count"><img src="{!URLFOR($Resource.DEResources, 'images/alert32_2.png')}" title="Alert Count" /></th>
+        <th class="count"><img src="{!URLFOR($Resource.DEResources, 'images/re-assign32_2.png')}" title="Reassignment Count"/></th>
+        <th class="count"><img src="{!URLFOR($Resource.DEResources, 'images/error32.png')}" title="Error Count"/></th>
+    </tr>
+    <apex:repeat value="{!todaysTeamCounts}" var="team">
+        <tr>
+            <td class="team_name">{!team.teamName}</td>
+            <apex:outputPanel rendered="{!NOT(team.loggingDisabled)}">
+	            <td class="team_count">{!team.totalCount}</td>
+	            <td class="team_count">{!team.recordCount}</td>
+	            <td class="team_count">{!team.reassignCount}</td>
+	            <td class="team_count">{!team.errorCount}</td>
+            </apex:outputPanel>
+             <apex:outputPanel rendered="{!team.loggingDisabled}">
+	            <td class="team_count">-</td>
+	            <td class="team_count">-</td>
+	            <td class="team_count">-</td>
+	            <td class="team_count">-</td>
+            </apex:outputPanel>
+        </tr>
+    </apex:repeat>
+    </table>
+</td>
+</tr>
+<tr>
+    <td class="panel tall_panel {!IF(schedulerOn && !schedulerStatus.JobFailed, '', 'schedule_error')}">
+        <img src="{!URLFOR($Resource.n2de__DEResources, 'images/scheduler40.png')}" width="40px"/>
+        <h1>Scheduler</h1>
+        <hr/>
+        <table>
+        <apex:outputPanel rendered="{!schedulerOn == true &&  !schedulerStatus.JobFailed}">
+        <tr>
+            <td>
+                Running every {!schedulerStatus.Frequency} minute<apex:outputText value="s" rendered="{!schedulerStatus.Frequency > 1}"/>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 10pt;">
+                <br/>
+                Started at {!schedulerStatus.StartedTime} by
+                <a href="/{!schedulerStatus.StartedByUser.Id}">{!schedulerStatus.StartedByUser.Name}</a>
+                using {!schedulerStatus.processingMethod} processing
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 10pt;">
+                Current time: 
+                <span id="current_time">{!currentTime}</span>&nbsp;({!timezoneDescription})
+            </td>
+        </tr>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!schedulerOn == false}">
+        <tr>
+            <td>
+                Scheduler is turned off
+            </td>
+        </tr>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!schedulerStatus.JobFailed == true}">
+        <tr>
+            <td>
+                Scheduler has aborted. Please restart from Settings tab.
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 10pt;">
+                <br/><br/><br/>
+                <h2 style="color: orange">Why has this happened?</h2>
+                <br/>
+                This could be because someone has manually deleted the scheduled job or because the Salesforce platform is currently experiencing difficulties.
+            </td>
+        </tr>
+        </apex:outputPanel>
+        </table>
+    </td>
+    </tr>
+    <tr>
+    <td class="panel tall_panel">
+        <img src="{!URLFOR($Resource.n2de__DEResources, 'images/run40.png')}" width="40px"/>
+        <h1>Recent runs</h1>
+        <hr/>
+        <table class="scheduler_history">
+        <tr>
+            <th>Date / time</th>
+            <th>Duration</th>
+            <th>Assignments</th>
+        </tr>
+        <apex:repeat value="{!SchedulerActivity}" var="log">
+            <tr>
+                <td>{!log.StartTime}</td>
+                <td>{!log.Duration}s</td>
+                <td>{!log.RecordCount}</td>
+            </tr>
+        </apex:repeat>
+        </table>
+    </td>
+    </tr>
+</table>
+</apex:outputPanel>
+<apex:outputPanel layout="none" id="status_panel" rendered="{!NOT(isMobile)}">
+	<c:StatusPanel />
+</apex:outputPanel>
+</apex:page>

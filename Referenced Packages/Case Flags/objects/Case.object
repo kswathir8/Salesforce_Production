@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>CaseFlag__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This should be used  to display the Case Flag if your organization is not using business hours.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c),null, 
+IF(Case_Flag_Age__c &gt; (IF(ISBLANK(CaseTimeOffset4__c) , $Setup.FlagPref__c.TimeOffset4__c,CaseTimeOffset4__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset4Image__c, &quot;L4&quot;, 16, 16), 
+IF(Case_Flag_Age__c &gt;= (IF(ISBLANK(CaseTimeOffset3__c ), $Setup.FlagPref__c.TimeOffset3__c,CaseTimeOffset3__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset3Image__c, &quot;L3&quot;, 16, 16), 
+IF(Case_Flag_Age__c &gt;= (IF(ISBLANK(CaseTimeOffset2__c ), $Setup.FlagPref__c.TimeOffset2__c,CaseTimeOffset2__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset2Image__c, &quot;L2&quot;, 16, 16), 
+IF(Case_Flag_Age__c &gt;= (IF(ISBLANK(CaseTimeOffset1__c ), $Setup.FlagPref__c.TimeOffset1__c,CaseTimeOffset1__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset1Image__c, &quot;L1&quot;,16,16), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.BlankOffsetImage__c, &quot;L0&quot;,16,16)) 
+))) 
+)</formula>
+        <label>Flag</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseFlagsBusinessHours__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>A reference to the Case Flags Business Hours record used to calculate the Case Flag Business Age. This is set automatically and should not be manipulated.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Business Hours</label>
+        <referenceTo>CaseFlagsBusinessHours__c</referenceTo>
+        <relationshipLabel>Cases</relationshipLabel>
+        <relationshipName>Cases</relationshipName>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>true</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>CaseFlagsEscalationTime1__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A timestamp to indicate when the total business hours on the case will exceed Age 1 Hours. This can be used as the basis for workflow email alerts or other automation.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Escalation Time 1</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>CaseFlagsEscalationTime2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A timestamp to indicate when the total business hours on the case will exceed Age 2 Hours. This can be used as the basis for workflow email alerts or other automation.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Escalation Time 2</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>CaseFlagsEscalationTime3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A timestamp to indicate when the total business hours on the case will exceed Age 3 Hours. This can be used as the basis for workflow email alerts or other automation.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Escalation Time 3</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>CaseFlagsEscalationTime4__c</fullName>
+        <deprecated>false</deprecated>
+        <description>A timestamp to indicate when the total business hours on the case will exceed Age 4 Hours. This can be used as the basis for workflow email alerts or other automation.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Escalation Time 4</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset1__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of hours after the Case Flag Date/Time when Flag 1 will be displayed.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Age 1 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of hours after the Case Flag Date/Time when Flag 2 will be displayed.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Age 2 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of hours after the Case Flag Date/Time when Flag 3 will be displayed.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Age 3 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CaseTimeOffset4__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of hours after the Case Flag Date/Time when Flag 4 will be displayed.</description>
+        <externalId>false</externalId>
+        <label>Case Flags Age 4 Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Account__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Deprecated. Use Flag or Flag (BH) instead.</description>
+        <externalId>false</externalId>
+        <formula>IF((NOW() - ViewedFlag__c)*24 &gt; Account.AcctTimeOffset4__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset4Image__c, &quot;L4&quot;, 16, 16), 
+IF((NOW() - ViewedFlag__c)*24 &gt; Account.AcctTimeOffset3__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset3Image__c, &quot;L3&quot;, 16, 16), 
+IF((NOW() - ViewedFlag__c)*24 &gt; Account.AcctTimeOffset2__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset2Image__c, &quot;L2&quot;, 16, 16), 
+IF((NOW() - ViewedFlag__c)*24 &gt; Account.AcctTimeOffset1__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset1Image__c, &quot;L1&quot;,16,16), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.BlankOffsetImage__c, &quot;L0&quot;,16,16)) 
+)))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>zDep Case Flag (Account)</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Age_Text__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The Case Flag Age decimal rendered as a eight-digit string used to aid with sorting on list views.</description>
+        <externalId>false</externalId>
+        <formula>LPAD(TEXT(ROUND(Case_Flag_Age__c*100,0)),8,&apos;0&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Age Text</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Age__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The total amount of time (in hours) since the Case Flag was set.</description>
+        <externalId>false</externalId>
+        <formula>(NOW() - ViewedFlag__c)*24</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Age</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Account__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Deprecated. Use Flag or Flag (BH) instead.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c),null,
+
+IMAGE( &quot;/servlet/servlet.FileDownload?fs=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp;
+
+IF(Case_Flag_Business_Age__c &gt; Account.AcctTimeOffset4__c , 
+ $Setup.FlagPref__c.Offset4Image__c,
+
+IF(Case_Flag_Business_Age__c &gt;= Account.AcctTimeOffset3__c , 
+ $Setup.FlagPref__c.Offset3Image__c,
+
+IF(Case_Flag_Business_Age__c &gt;= Account.AcctTimeOffset2__c, 
+$Setup.FlagPref__c.Offset2Image__c,
+
+IF(Case_Flag_Business_Age__c &gt;= Account.AcctTimeOffset1__c,
+$Setup.FlagPref__c.Offset1Image__c,
+
+$Setup.FlagPref__c.BlankOffsetImage__c))))
+
+,&quot;&quot;, 16, 16))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>zDep Case Flag Business (Account)</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Age__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The total amount of time (in business hours) since the Case Flag was set.</description>
+        <externalId>false</externalId>
+        <formula>PreviousBusinessHours__c + CurrentBusinessHours__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Business Age</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Default__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Deprecated. Use Flag or Flag (BH) instead.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c),null,
+
+IMAGE( &quot;/servlet/servlet.FileDownload?fs=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp;
+
+IF(Case_Flag_Business_Age__c &gt; $Setup.FlagPref__c.TimeOffset4__c, 
+ $Setup.FlagPref__c.Offset4Image__c,
+
+IF(Case_Flag_Business_Age__c &gt;= $Setup.FlagPref__c.TimeOffset3__c , 
+ $Setup.FlagPref__c.Offset3Image__c,
+
+IF(Case_Flag_Business_Age__c &gt;= $Setup.FlagPref__c.TimeOffset2__c, 
+$Setup.FlagPref__c.Offset2Image__c,
+
+IF(Case_Flag_Business_Age__c &gt;= $Setup.FlagPref__c.TimeOffset1__c,
+$Setup.FlagPref__c.Offset1Image__c,
+
+$Setup.FlagPref__c.BlankOffsetImage__c))))
+
+,&quot;&quot;, 16, 16))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>zDep Case Flag Business (Default)</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Time_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the day portion of the Case Flag in business hours as &quot;X Days&quot;.</description>
+        <externalId>false</externalId>
+        <formula>IF(Case_Flag_Business_Age__c &lt; 24, null,
+TEXT(ROUND(Case_Flag_Business_Age__c /24-0.49999,0)) + &apos; Days&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Business Time Days</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Time_Hours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the hour portion of the Case Flag in business hours as &quot;Y Hours&quot;.</description>
+        <externalId>false</externalId>
+        <formula>TEXT(ROUND(MOD(Case_Flag_Business_Age__c,24)-0.49999,0)) + &apos; Hours&apos;</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Business Time Hours</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Time_Mins__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the minute portion of the Case Flag in business hours as &quot;Z Minutes&quot;.</description>
+        <externalId>false</externalId>
+        <formula>TEXT(ROUND(MOD(Case_Flag_Business_Age__c,1) * 60,0)) + &apos; Minutes&apos;</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Business Time Mins</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the Case Flag in business hours as &quot;X Days Y Hours Z Minutes&quot;.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c),null,
+Case_Flag_Business_Time_Days__c + &apos; &apos; +
+Case_Flag_Business_Time_Hours__c + &apos; &apos; +
+Case_Flag_Business_Time_Mins__c)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Business Time</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Business__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This should be used  to display the Case Flag if your organization is using business hours.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c),null, 
+IF(Case_Flag_Business_Age__c &gt; (IF(ISBLANK(CaseTimeOffset4__c), $Setup.FlagPref__c.TimeOffset4__c,CaseTimeOffset4__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset4Image__c, &quot;L4&quot;, 16, 16), 
+IF(Case_Flag_Business_Age__c &gt;= (IF(ISBLANK(CaseTimeOffset3__c), $Setup.FlagPref__c.TimeOffset3__c,CaseTimeOffset3__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset3Image__c, &quot;L3&quot;, 16, 16), 
+IF(Case_Flag_Business_Age__c &gt;= (IF(ISBLANK(CaseTimeOffset2__c), $Setup.FlagPref__c.TimeOffset2__c,CaseTimeOffset2__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset2Image__c, &quot;L2&quot;, 16, 16), 
+IF(Case_Flag_Business_Age__c &gt;= (IF(ISBLANK(CaseTimeOffset1__c), $Setup.FlagPref__c.TimeOffset1__c,CaseTimeOffset1__c)), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset1Image__c, &quot;L1&quot;,16,16), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.BlankOffsetImage__c, &quot;L0&quot;,16,16)) 
+))) 
+)</formula>
+        <label>Flag (BH)</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Default__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Deprecated. Use Flag or Flag (BH) instead.</description>
+        <externalId>false</externalId>
+        <formula>IF((NOW() - ViewedFlag__c)*24 &gt; $Setup.FlagPref__c.TimeOffset4__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset4Image__c, &quot;L4&quot;, 16, 16), 
+IF((NOW() - ViewedFlag__c)*24 &gt; $Setup.FlagPref__c.TimeOffset3__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset3Image__c, &quot;L3&quot;, 16, 16), 
+IF((NOW() - ViewedFlag__c)*24 &gt; $Setup.FlagPref__c.TimeOffset2__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset2Image__c, &quot;L2&quot;, 16, 16), 
+IF((NOW() - ViewedFlag__c)*24 &gt; $Setup.FlagPref__c.TimeOffset1__c, 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.Offset1Image__c, &quot;L1&quot;,16,16), 
+IMAGE( &quot;/servlet/servlet.FileDownload?flagsort=&quot; &amp; Case_Flag_Age_Text__c &amp; &quot;&amp;file=&quot; &amp; $Setup.FlagPref__c.BlankOffsetImage__c, &quot;L0&quot;,16,16)) 
+)))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>zDep Case Flag (Default)</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Time_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the day portion of the Case Flag as &quot;X Days&quot;.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c) || Case_Flag_Age__c &lt; 24, null, TEXT(FLOOR(Case_Flag_Age__c /24)) + &apos; Days&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Time Days</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Time_Hours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the hours portion of the Case Flag as &quot;Y Hours&quot;.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c) || Case_Flag_Age__c &lt; 1, null, TEXT(FLOOR(MOD(Case_Flag_Age__c,24))) + &apos; Hours&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Time Hours</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Time_Mins__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the minute portion of the Case Flag as &quot;Z Minutes&quot;.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c), null, TEXT(ROUND(MOD(Case_Flag_Age__c,1) * 60,0)) + &apos; Minutes&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Time Mins</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Case_Flag_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Renders the Case Flag Age as &quot;xx Days xx Hours xx Minutes&quot;.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(Case_Flag_Time_Days__c), null, Case_Flag_Time_Days__c + &apos; &apos;) +
+IF(ISNULL(Case_Flag_Time_Hours__c), null, Case_Flag_Time_Hours__c + &apos; &apos;) +
+IF(ISNULL(Case_Flag_Time_Mins__c), null, Case_Flag_Time_Mins__c)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Time</label>
+        <required>false</required>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>CurrentBusinessHours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The amount of business hours that have lapsed on the current day.</description>
+        <externalId>false</externalId>
+        <formula>IF(ISNULL(ViewedFlag__c) || CaseFlagsBusinessHours__r.TodayStartTime__c &gt; NOW() || ViewedFlag__c &gt; CaseFlagsBusinessHours__r.TodayEndTime__c,0,(
+IF(CaseFlagsBusinessHours__r.TodayEndTime__c &lt; NOW(),CaseFlagsBusinessHours__r.TodayEndTime__c,NOW()) - IF(CaseFlagsBusinessHours__r.TodayStartTime__c &gt; ViewedFlag__c,CaseFlagsBusinessHours__r.TodayStartTime__c,ViewedFlag__c))*24)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Current Business Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Enable_Case_Flags__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Enable Case Flags</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>EndPoint__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The earlier of the current time and the end of the business day. Used in the computation of business hours.</description>
+        <externalId>false</externalId>
+        <formula>MIN(NowHours__c,  CaseFlagsBusinessHours__r.EndTimeHours__c)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>End Point</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Initial_Response_Business_Hours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The business hours between Date/Time Opened and Initial Response, based on the business hours assigned to the case.</description>
+        <externalId>false</externalId>
+        <label>Initial Response Business Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Initial_Response_Hours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The hours between Date/Time Opened and Initial Response.</description>
+        <externalId>false</externalId>
+        <formula>(Initial_Response__c - CreatedDate) * 24</formula>
+        <label>Initial Response Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Initial_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Timestamp of Initial Response set the first time the Case Flag is cleared.</description>
+        <externalId>false</externalId>
+        <label>Initial Response</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>NowHours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The current time expressed as the hours elapsed since midnight. Used in the computation of business hours.</description>
+        <externalId>false</externalId>
+        <formula>24*(NOW() -  CaseFlagsBusinessHours__r.Midnight__c)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Now Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>PreviousBusinessHours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The amount of business hours that have lapsed prior to, but not including, the current day.</description>
+        <externalId>false</externalId>
+        <label>Previous Business Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>StartPoint__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The later of the Case Flag Date/Time hours and start of the business day. Used in the computation of business hours.</description>
+        <externalId>false</externalId>
+        <formula>MAX(ViewedFlagHours__c,   CaseFlagsBusinessHours__r.StartTimeHours__c)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Start Point</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ViewedFlagHours__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The Case Flag Date/Time expressed as the hours elapsed since midnight.</description>
+        <externalId>false</externalId>
+        <formula>24*(ViewedFlag__c - CaseFlagsBusinessHours__r.Midnight__c)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Case Flag Date/Time Hours</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackHistory>false</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ViewedFlag__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The timestamp that the Case Flag was set.</description>
+        <externalId>false</externalId>
+        <label>Case Flag Date/Time</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>true</trackHistory>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <webLinks>
+        <fullName>Clear_Flag</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>page</linkType>
+        <masterLabel>Clear Flag</masterLabel>
+        <openType>replace</openType>
+        <page>FlagClear</page>
+        <protected>false</protected>
+    </webLinks>
+    <webLinks>
+        <fullName>Clear_Flags</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Clear Flags</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/22.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/22.0/apex.js&quot;)}
+
+var recs = {!GETRECORDIDS($ObjectType.Case)}.join(&apos;,&apos;);
+if(recs != &apos;&apos;) {
+
+var results = sforce.apex.execute(&quot;FLAGS/GlobalUtil&quot;,&quot;clearFlagsWithErrors&quot;, {string:recs});
+
+if (results.length &gt; 0) {
+var err = &apos;The following cases do not have Case Flags enabled and did not have their flag cleared. Please contact your system administrator for assistance.&apos;;
+for (var i = 0;i &lt; results.length;i++)
+err += &apos;\n&apos;+results[i];
+alert(err);
+}
+
+for(var key in ListViewport.instances){
+
+setTimeout(&quot;ListViewport.instances[&apos;&quot; + key + &quot;&apos;].refreshList();&quot;,10);
+}
+
+}
+
+if (sfdcPage &amp;&amp; sfdcPage.refreshDetail &amp;&amp; (sfdcPage.searchCount || sfdcPage.currentSearchId)) {
+sfdcPage.refreshDetail();
+} else {
+var relatedLists = window.sfdcPage.relatedLists;
+for (var i = 0;i &lt; relatedLists.length;i++) {
+if (relatedLists[i].title == &apos;Cases&apos;) {
+window.sfdcPage.makeRLAjaxRequest(null,relatedLists[i].listId);
+}
+}
+}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Set_Flag</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <linkType>page</linkType>
+        <masterLabel>Set Flag</masterLabel>
+        <openType>replace</openType>
+        <page>FlagNow</page>
+        <protected>false</protected>
+    </webLinks>
+    <webLinks>
+        <fullName>Set_Flags</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Set Flags</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/22.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/22.0/apex.js&quot;)}
+
+var recs = {!GETRECORDIDS($ObjectType.Case)}.join(&apos;,&apos;);
+if(recs != &apos;&apos;) {
+
+var results = sforce.apex.execute(&quot;FLAGS/GlobalUtil&quot;,&quot;setFlagsWithErrors&quot;, {string:recs});
+
+if (results.length &gt; 0) {
+var err = &apos;The following cases do not have Case Flags enabled and did not have their flag set. Please contact your system administrator for assistance.&apos;;
+for (var i = 0;i &lt; results.length;i++)
+err += &apos;\n&apos;+results[i];
+alert(err);
+}
+for(var key in ListViewport.instances){
+setTimeout(&quot;ListViewport.instances[&apos;&quot; + key + &quot;&apos;].refreshList();&quot;,10);
+}
+
+}
+
+if (sfdcPage &amp;&amp; sfdcPage.refreshDetail &amp;&amp; (sfdcPage.searchCount || sfdcPage.currentSearchId)) {
+sfdcPage.refreshDetail();
+} else {
+var relatedLists = window.sfdcPage.relatedLists;
+for (var i = 0;i &lt; relatedLists.length;i++) {
+if (relatedLists[i].title == &apos;Cases&apos;) {
+
+//window.sfdcPage.makeRLAjaxRequest(null,relatedLists[i].listId);
+
+setTimeout(&quot;window.sfdcPage.makeRLAjaxRequest(null,window.sfdcPage.relatedLists[&quot; + i + &quot;].listId);&quot;, 1050);
+}
+}
+}</url>
+    </webLinks>
+</CustomObject>

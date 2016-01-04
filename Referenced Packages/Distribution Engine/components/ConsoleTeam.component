@@ -1,0 +1,376 @@
+<apex:component controller="n2de.ConsoleTeamController">
+	<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/moment.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/fullcalendar.2.1.1.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/select2.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/randomColor.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.multiselect.min.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery.multiselect.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/select2.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/fullcalendar.2.1.1.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/fullcalendar.print.2.1.1.css')}" type="text/css" media="print"/>
+	<c:CommonMask />
+	<style>
+		div.search a span.select2-chosen {
+			width: 130px !important;
+		}
+		.ui-multiselect-optgroup-label a{
+			text-align: left !important;
+		}
+		.sf_button {
+			height: 22px !important;
+			text-decoration: none;
+			padding: 4px 4px !important;
+		}
+		.fc-title {
+			font-size: 110%;
+			height: 17px;
+		}
+		#team_select_table{
+			background-color: beige;
+			border: 1px solid gray;
+			border-radius: 5px;
+			margin-top: 20px;
+			margin-bottom: 20px;
+			float: left;
+		}
+		#team_select_table button, .btn{
+			margin-left: 20px !important;
+		}
+	</style>
+	
+	<script type="text/javascript">
+	function loadTeamCalendar() {
+		$('#team_console').html('<img alt="loading" src="/img/loading.gif"/>');
+		var html = '<div id="select_bar">' + buildSelectHtml() + '</div><br/><br/>';
+		html += '<div id="calendar_view"></div>';
+		$('#team_console').html(html);
+		$('#collection_select').multiselect({
+			minWidth: 400,
+			noneSelectedText: '-- Tag collections --',
+			selectedList: 2
+		});
+		$('#tag_select').multiselect({
+			minWidth: 400,
+			noneSelectedText: '-- Tags --',
+			selectedList: 2,
+			height: 250
+		});
+		$('#team_select').select2(); 
+		$('select.no_search').select2({
+			minimumResultsForSearch: -1
+		});
+		$('#calendar_view').fullCalendar({
+			header: {
+			    left: 'prev,next today',
+			    center: 'title',
+			    right: 'month,agendaWeek,agendaDay'
+		   	},
+		   	editable: false,
+		   	selectable: false,
+			eventTextColor: 'black',
+			timeFormat: 'HH:mm',
+			height: 670,
+			eventLimit: {
+				'agenda': 12,
+				'month': 4
+			},
+			eventLimitClick: {
+				'agenda': 'popover',
+				'month': 'agendaDay'
+			},
+			viewRender: function(view, element) {
+				showMask();
+				getMembersForTags();
+			},
+			eventRender: function (event, element) {
+				styleEvent(event, element);
+			}
+		});
+	}
+	
+	function buildSelectHtml() {
+		var teamIcon = '{!URLFOR($Resource.DEResources, 'images/teams32.png')}';	
+	
+		var html = '';
+		html += '<table id="team_select_table" style="width: 100%">';
+		
+		html += '<tr><td class="panel" id="tag_panel">';
+		html +=  '<select id="team_select" class="search" onchange="getUsers()">' +
+				'<option value="">-- Select team --</option>';
+				var teamsString = '{!JSENCODE(userTeams)}';
+				var teamList = JSON.parse(teamsString);
+				if (teamList) {
+					for (var i = 0; i < teamList.length; i++) {
+						var team = teamList[i];
+						html += '<option value="' + team.Id + '">' + team.Name + '</option>';
+					}
+				}
+		html += '</select>';
+		
+		//tag collection and tag select	
+		var multiTagIcon = '{!URLFOR($Resource.DEResources, 'images/tag_multi32.png')}';
+		html += '<select id="collection_select" class="multi" multiple="multiple" onchange="showMask(); updateTags()">';
+				var collections = {!tagCollections};
+				if (collections) {
+					for (var i = 0; i < collections.length; i++) {
+						var col = collections[i];	
+						html += '<option value="' + col.collectionId + '">' + col.collectionName + '</option>';
+					}
+				}
+		html += '</select>&nbsp;' +
+				'<select id="tag_select" class="multi" multiple="multiple">' +
+				'</select>&nbsp;' +
+				'<input type="button" class="btn sf_button" value="Go" onclick="getUsers()"/>' +
+				'</td></tr>' +
+				'</table>';
+		return html;
+	}
+	
+	/**
+	* Get all tags for the selected collections and display in the multiselect
+	*/
+	function updateTags() {
+		var selectedCollections = $('#collection_select').val();
+		var tagCollectionString = '{!JSENCODE(tagCollections)}';
+		var collectionTags = JSON.parse(tagCollectionString);
+		var selectedTags = $('#tag_select').val();
+		
+		$('#tag_select').children().remove();
+		$('#tag_select').multiselect('refresh');
+		if (collectionTags) {
+			for (var i = 0; i < collectionTags.length; i++) {
+				var col = collectionTags[i];
+				if ($.inArray(col.collectionId, selectedCollections) != -1) {
+				var html = '<optgroup label="' + col.collectionName + '" value="' + col.collectionId + '">';
+					var tagList = col.tags;
+					for(var j = 0; j < tagList.length; j++) {
+						var t = tagList[j];
+						if ($.inArray(t.tagId, selectedTags) != -1) {
+							//maintain selected state of existing tags
+							html += '<option value="' + t.tagId + '" selected="selected">' + t.tagName + '</option>';
+						} else {
+							html += '<option value="' + t.tagId + '">' + t.tagName + '</option>';						
+						}
+					}
+					html + '</optgroup>';
+					$('#tag_select').append(html);
+				}
+			}
+		}
+		$('#tag_select').multiselect('refresh');
+		hideMask();
+	}
+	
+	function getUsers() {
+		var teamId = $('#team_select').val();
+		var collections = $('#collection_select').val();
+		var tags = $('#tag_select').val();
+		if (teamId == '') {
+			alert('Please select a team.');
+		} else {
+			showMask();
+			displayTagSelection();
+			getMembersForTags();
+		}
+	}
+
+	function displayTagSelection() {
+		var singleTagIcon = '{!URLFOR($Resource.DEResources, 'images/tag32.png')}';	
+		$('#selected_tags').remove();
+		var optGroups = $('#tag_select').children();
+		if ($('#tag_select').val()) {
+			var html = '<div id="selected_tags"><hr/>';
+			for (var i = 0; i < optGroups.length; i++) {
+				var og = optGroups[i]; 
+				var selectedTags = $('optgroup[value="' + og.getAttribute('value') + '"] :selected');
+				if (selectedTags.length >= 1) {
+					var selectedTagsString = '<b>' + og.label + '</b> equals <b>' + selectedTags[0].label;
+					for (var s = 1; s < selectedTags.length; s++) {
+						selectedTagsString += ', ' + selectedTags[s].label;
+					}
+					html += '<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="' + singleTagIcon + '" style="height: 16px;"/>&nbsp;&nbsp;&nbsp;' + selectedTagsString + '</b></span><br/>';
+				}
+			}
+			html+= '</div>';
+			$('#tag_panel').append(html);
+		}
+	}
+	
+	/* Get all selected tags (names) mapped to their collection id
+	*/
+	function getCollectionTagMap() {
+		var selectedTags = $('#tag_select :selected');
+		var collectionTagMap = {};
+		for (var i = 0; i < selectedTags.length; i++) { 
+			var tagOpt = selectedTags[i];
+			var collectionId = tagOpt.parentNode.getAttribute('value');
+			if (collectionTagMap[collectionId]) {
+				var tagList = collectionTagMap[collectionId];
+				//tags are all lower case
+				tagList.push(tagOpt.text.toLowerCase());
+				collectionTagMap[collectionId] = tagList;
+			} else {
+				var tagList = [];
+				tagList.push(tagOpt.text.toLowerCase());
+				collectionTagMap[collectionId] = tagList; 
+			}
+		}
+		return collectionTagMap;
+	}
+
+	var userColourMap = {};
+	function getMembersForTags() {
+		var collectionTagMap = getCollectionTagMap();
+		var teamId = $('#team_select').val();
+		var calView = $('#calendar_view').fullCalendar('getView');
+		Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ConsoleTeamController.getMembersForTagsRemote}', 
+			teamId, collectionTagMap, calView.start.format('YYYY-MM-DD HH:mm:ss'), calView.end.format('YYYY-MM-DD HH:mm:ss'),
+			function(result, event){
+				if (event.type === 'exception'){
+					hideMask();
+					alert(event.message);
+				}else{
+					loadCalendar(result);
+				}
+		});
+	}
+
+	function buildEventArray(users) {
+		var eventArray = [];
+		var calView = $('#calendar_view').fullCalendar('getView');
+
+		for (var u = 0; u < users.length; u++) {
+			var userObj = users[u];
+			var userHols = userObj.holidays;
+			var startClone = calView.start.clone();
+			var endClone = calView.end.clone();
+			
+			if (!userColourMap[userObj.user.Id]) {
+				userColourMap[userObj.user.Id] = randomColor({luminosity: 'light'}); 
+			}
+			while (startClone.isBefore(endClone)) {
+				var startOfDay = startClone.clone().startOf('day');
+				var endOfDay = startClone.clone().endOf('day');
+			
+				var isAvailable = true;
+				var startMoment;
+				var endMoment;
+				for (var i = 0; i < userHols.length; i++) {
+					var hol = userHols[i];
+
+					var holStartMoment = hol.localStartDateTime;
+					var holEndMoment = hol.localEndDateTime;
+					
+					//We're definitely unavailable all day
+					if ((startClone.isAfter(holStartMoment, 'day') && startClone.isBefore(holEndMoment, 'day')) || 
+						(hol.startIsAllDay && startClone.isSame(holStartMoment, 'day')) || (hol.endIsAllDay && startClone.isSame(holEndMoment, 'day'))) {
+						isAvailable = false;
+					}	
+						
+					if (startClone.isSame(holStartMoment, 'day')) {
+						//holiday starts today - we're not available for at least some of the day
+						isAvailable = false;
+						if (!hol.startIsAllDay && !startOfDay.isSame(holStartMoment, 'minute')) {
+							//We're online today until the holiday starts
+							var available = {
+								title: userObj.user.Name,
+								className: userObj.user.Id,
+								userid: userObj.user.Id,
+								start: startOfDay,
+								end: holStartMoment,
+								color: userColourMap[userObj.user.Id],
+								allDay: false
+							};
+							eventArray.push(available);
+						}
+					}
+					 
+					if (startClone.isSame(holEndMoment, 'day')) {
+						//It's the last day of holiday :( - we're not available at least some of the day
+						isAvailable = false;
+						if (!hol.endIsAllDay && !endOfDay.isSame(holEndMoment, 'minute')) {
+							//we're offline today until the holiday ends
+							var available = {
+								title: userObj.user.Name,
+								className: userObj.user.Id,
+								userid: userObj.user.Id,
+								start: holEndMoment,
+								end: endOfDay,
+								color: userColourMap[userObj.user.Id],
+								allDay: false
+							};
+							eventArray.push(available);
+						}
+					}
+				}
+
+				if (isAvailable) {
+					var available = {
+						title: userObj.user.Name,
+						className: userObj.user.Id,
+						userid: userObj.user.Id,
+						start: startOfDay,
+						end: endOfDay,
+						color: userColourMap[userObj.user.Id],
+						allDay: true
+					};
+					eventArray.push(available);
+				}
+				startClone .add('days', 1);
+			}
+		}
+		return eventArray;
+	}
+
+	function loadCalendar(events) {
+		var userColourMap = new Object();
+		var eventArray = buildEventArray(events);
+ 		$('#calendar_view').fullCalendar('removeEvents');
+		$('#calendar_view').fullCalendar('addEventSource', eventArray);
+		hideMask();
+  	}
+
+	function styleEvent(event, element) {
+		var evEl = element.find('.' + event.userid);
+		evEl.css('height', '15px');
+		evEl.context.title = event.title;
+		var timeList = [];
+		var titleList = [];
+		if (document.getElementsByClassName) {
+			timeList = element[0].getElementsByClassName('fc-time');
+		}
+		
+		var startOfDay = '00:00';
+		var endOfDay = '23:59';
+		var view = $('#calendar_view').fullCalendar('getView');
+		if (!event.allDay && timeList.length == 1) {
+			var time = timeList[0];
+			var startHour = event.start.hour();
+			var startMins = event.start.minute();
+			if (/^\d$/.test(startMins)) {
+				startMins = '0' + startMins;
+			}
+			if (/^\d$/.test(startHour)) {
+				startHour = '0' + startHour;
+			}
+			var start = startHour + ':' + startMins;
+
+			var endHour = event.end.hour();
+			var endMins = event.end.minute();
+			if (/^\d$/.test(endMins)) {
+				endMins = '0' + endMins;
+			}
+			if (/^\d$/.test(endHour)) {
+				endHour = '0' + endHour;
+			}
+			var end = endHour + ':' + endMins;
+			var startText = start == startOfDay ? 'start of day' : start;
+			var endText = end == endOfDay ? 'end of day' : end;
+
+			time.innerHTML = startText + ' - ' + endText;
+			time.className += ' event_time';
+		}	
+	}
+	</script>
+</apex:component>

@@ -1,0 +1,305 @@
+<apex:page controller="PartnerTemplate" action="{!redirectGuestToLogin}" showHeader="false" sidebar="false" standardStylesheets="false">
+<html lang="en">
+<!--[if IE 6]><html lang="en-US" class="no-js ie6"><![endif]-->
+<!--[if IE 7]><html lang="en-US" class="no-js ie7"><![endif]-->
+<!--[if IE 8]><html lang="en-US" class="no-js"><![endif]-->
+<!--[if gt IE 8]><!--> <!-- <html lang="en-US" class="no-js"> --><!--<![endif]-->
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+    <title>Axcient User Portal |<apex:insert name="page-title" /></title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <link rel="profile" href="//gmpg.org/xfn/11" />
+    <link rel="pingback" href="https://portal.axcient.com/xmlrpc.php" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon57.png" sizes="57x57" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon72.png" sizes="72x72" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon76.png" sizes="76x76" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon114.png" sizes="114x114" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon120.png" sizes="120x120" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon144.png" sizes="144x144" />
+    <link rel="apple-touch-icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/icon152.png" sizes="152x152" />
+    <meta name="msapplication-TileImage" content="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/favicon-144.png" />
+    <meta name="msapplication-TileColor" content="#B20099"/>
+    <meta name="application-name" content="name" />
+    <meta name="msapplication-square70x70logo" content="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/tile-tiny.png"/>
+    <meta name="msapplication-square150x150logo" content="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/tile-square.png"/>
+    <meta name="msapplication-wide310x150logo" content="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/tile-wide.png"/>
+    <meta name="msapplication-square310x310logo" content="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/tile-large.png"/>
+    <meta name='robots' content='noindex,follow' />
+    <link rel="icon" href="https://portal.axcient.com/wp-content/themes/axfourteenportal/library/images/fav/favicon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Axcient User Portal &raquo; Feed" href="https://portal.axcient.com/feed/" />
+    <link rel="alternate" type="application/rss+xml" title="Axcient User Portal &raquo; Comments Feed" href="https://portal.axcient.com/comments/feed/" />
+    <link rel='stylesheet' id='theme-style-css'  href='https://portal.axcient.com/wp-content/themes/axfourteenportal/library/css/style.css?v=20150401&#038;ver=4.0' type='text/css' media='all' />
+    <link rel='stylesheet' id='animate-css'  href='https://portal.axcient.com/wp-content/themes/axfourteenportal/library/css/animate.min.css?ver=4.0' type='text/css' media='all' />
+    <apex:stylesheet value="{!URLFOR($Resource.AxcientUserPortal, 'axcient-user-portal-resources/css/bootstrap.min.css')}"/>
+    <script type='text/javascript' src='https://portal.axcient.com/wp-includes/js/jquery/jquery.js?ver=1.11.1'></script>
+    <script type='text/javascript' src='https://portal.axcient.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+    <!--[if lt IE 9]><script src="https://portal.axcient.com/wp-content/themes/axfourteenportal/js/html5.js"></script><![endif]--><!--[if (gte IE 6)&(lte IE 8)]><script src="https://portal.axcient.com/wp-content/themes/axfourteenportal/js/selectivizr-min.js"></script><![endif]-->
+    <script type="text/javascript">
+        //TK
+        (function() {
+            var config = {
+                kitId: 'seu3fkf',
+                scriptTimeout: 3000
+            };
+            var h=document.getElementsByTagName("html")[0];h.className+=" wf-loading";
+            var t=setTimeout(function(){h.className=h.className.replace(/(\s|^)wf-loading(\s|$)/g," ");
+            h.className+=" wf-inactive"},config.scriptTimeout);var tk=document.createElement("script"),d=false;tk.src='//use.typekit.net/'+config.kitId+'.js';
+            tk.type="text/javascript";
+            tk.async="true";
+            tk.onload=tk.onreadystatechange=function(){var a=this.readyState;if(d||a&&a!="complete"&&a!="loaded")return;
+            d=true;
+            clearTimeout(t);
+            try{Typekit.load(config)}catch(b){}};
+            var s=document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(tk,s)
+        })();
+        //GA
+        (function(i,s,o,g,r,a,m){
+            i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)
+            },i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];
+            a.async=1;
+            a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-743216-7', 'auto');
+        ga('send', 'pageview');
+
+        jQuery(document).ready(function($) {
+    		if(!{!$ObjectType.Lead.fields.Name.Accessible}) {
+    			jQuery('.deal-reg-menu-item').hide();
+    		}
+            if(!{!AND($ObjectType.Account.fields.Name.Accessible, $ObjectType.Opportunity.fields.Name.Accessible)}) {
+                jQuery('.opp-list-menu-item').hide();
+            }
+    	});
+    </script>
+</head>
+<body class="home blog logged-in">
+
+<span style="display: none;">
+LEAD: {!$ObjectType.Lead.fields.Name.Accessible}
+ACCOUNT: {!$ObjectType.Account.fields.Name.Accessible}
+OPP: {!$ObjectType.Opportunity.fields.Name.Accessible}
+</span>
+
+    <div id="site-container" class="clearfix">
+        
+    
+        <nav id="primary-nav-mobile">
+            <a class="menu-toggle clearfix" href="#">
+                <i class="icon-reorder"></i>
+            </a>
+            <ul id="mobile-menu" class="clearfix">
+                <li class="menu-item menu-item-2190"><a href="{!$Page.PartnerDashboard}">Sales &amp; Marketing Tools</a>
+                    <ul class="sub-menu">
+                        <li class="menu-item"><a href="{!$Page.PartnerDashboard}">Dashboard</a></li>
+                        <apex:outputPanel layout="none" rendered="{!$ObjectType.Lead.fields.Name.Accessible == true}">
+                            <li class="menu-item"><a href="{!$Page.DealRegistrationList}">Deal Registrations</a></li>
+                        </apex:outputPanel>
+                        <li class="menu-item"><a href="/Partner/sfc/#workspaces">Marketing Assets</a></li>
+                        <apex:outputPanel layout="none" rendered="{!$ObjectType.Account.fields.Name.Accessible == true && $ObjectType.Opportunity.fields.Name.Accessible == true}">
+                            <li class="menu-item"><a href="{!$Page.EnhanceListTest}">Opportunities</a></li>
+                        </apex:outputPanel>
+                        <li class="menu-item inactive" title="Coming Soon"><a href="">MDFs</a></li>
+                        <li class="menu-item inactive" title="Coming Soon"><a href="">Reports</a></li>
+                        <li class="menu-item inactive" title="Coming Soon"><a href="">Training</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item menu-item-125"><a href="{!$Label.Axcient_Wordpress_Portal}/" class="sf-with-ul">Knowledge Base</a></li>
+                <li class="menu-item menu-item-260"><a href="{!$Label.Axcient_Wordpress_Portal}/cases/">Support Cases</a></li>
+                <li class="menu-item menu-item-1"><a href="{!$Label.Axcient_Wordpress_Portal}/login?action=logout">Sign Out</a></li>
+            </ul>
+        </nav>
+        <header id="site-header" class="clearfix" role="banner">
+            <div class="container">
+                <div id="logo">
+                    <a class="ax-logo"
+                       href="{!$Label.Axcient_Wordpress_Portal}/">
+                    </a>
+                </div>
+                <nav id="primary-nav" role="navigation" class="clearfix">
+                    <ul id="menu-primary-nav" class="nav sf-menu clearfix sf-js-enabled">
+                        <apex:outputPanel rendered="{!!isEndUser}" layout="none">
+                        <li class="menu-item menu-item-2190"><a href="{!$Page.PartnerDashboard}">Sales &amp; Marketing Tools</a></li>
+                        </apex:outputPanel>
+                        <li class="menu-item menu-item-125"><a href="{!$Label.Axcient_Wordpress_Portal}/" class="sf-with-ul">Knowledge Base</a>
+                            <ul class="sub-menu" style="display: none; visibility: hidden;">
+                                <li class="menu-item menu-item-814"><a href="{!$Label.Axcient_Wordpress_Portal}/documentation/">Documentation</a></li>
+                                <li class="menu-item menu-item-0814"><a href="{!$Label.Axcient_Wordpress_Portal}/downloads/">Downloads</a></li>
+                                <li class="menu-item menu-item-00814"><a href="{!$Label.Axcient_Wordpress_Portal}/forums/">Customer Forums</a></li>
+                                <li class="menu-item menu-item-00"></li>
+                                <li class="menu-item menu-item-127"><a href="{!$Label.Axcient_Wordpress_Portal}/category/bare-metal-restore/">Bare Metal Restore</a></li>
+                                <li class="menu-item menu-item-128"><a href="{!$Label.Axcient_Wordpress_Portal}/category/best-practices/">Best Practices</a></li>
+                                <li class="menu-item menu-item-131"><a href="{!$Label.Axcient_Wordpress_Portal}/category/onsite-backups/file-folder-backups/">File/Folder Backups</a></li>
+                                <li class="menu-item menu-item-547"><a href="{!$Label.Axcient_Wordpress_Portal}/category/hardware/">Hardware</a></li>
+                                <li class="menu-item menu-item-550"><a href="{!$Label.Axcient_Wordpress_Portal}/category/how-to-video/">How To Videos</a></li>
+                                <li class="menu-item menu-item-133"><a href="{!$Label.Axcient_Wordpress_Portal}/category/microsoft-exchange/">Microsoft Exchange</a></li>
+                                <li class="menu-item menu-item-132"><a href="{!$Label.Axcient_Wordpress_Portal}/category/onsite-backups/">Onsite Backups</a></li>
+                                <li class="menu-item menu-item-134"><a href="{!$Label.Axcient_Wordpress_Portal}/category/registration/">Registration</a></li>	
+                                <li class="menu-item menu-item-548"><a href="{!$Label.Axcient_Wordpress_Portal}/category/reports/">Reports</a></li>
+                                <li class="menu-item menu-item-137"><a href="{!$Label.Axcient_Wordpress_Portal}/category/restore-operations/">Restore Operations</a></li>
+                                <li class="menu-item menu-item-135"><a href="{!$Label.Axcient_Wordpress_Portal}/category/remote-management-console/">Web App</a></li>
+                                <li class="menu-item menu-item-138"><a href="{!$Label.Axcient_Wordpress_Portal}/category/virtual-appliance/">Virtual Appliance</a></li>
+                                <li class="menu-item menu-item-139"><a href="{!$Label.Axcient_Wordpress_Portal}/category/virtual-machine/">Virtual Machine</a></li>
+                            </ul>
+                        </li>
+                        <li class="menu-item menu-item-260"><a href="{!$Label.Axcient_Wordpress_Portal}/cases/">Support Cases</a></li>
+                        <li class="menu-item menu-item-1"><a href="{!$Label.Axcient_Wordpress_Portal}/login?action=logout">Sign Out</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <apex:form >
+            <apex:outputPanel rendered="{!!isEndUser}" layout="none">
+                <div class="menu">
+                    <div class="container">
+                        <div class="megamenu_container">
+                            <ul class="megamenu clearfix">
+                                <li class="bubble-bottom">
+                                    <a href="{!$Page.PartnerDashboard}" class="nav_item">Dashboard</a>	
+                                </li>
+                                <li class="bubble-bottom deal-reg-menu-item">
+                                    <a href="{!$Page.DealRegistrationList}" class="nav_item">Deal Registrations</a>	
+                                </li>
+                                <li class="bubble-bottom">
+                                    <a href="/Partner/sfc/#workspaces" class="nav_item">Marketing Assets</a>	
+                                </li>
+                                <li class="bubble-bottom opp-list-menu-item">
+                                    <a href="{!$Page.EnhanceListTest}" class="nav_item">Opportunities</a> 
+                                </li>
+                                <li class="bubble-bottom inactive" title="Coming Soon">
+                                    <a href="" class="nav_item">MDFs</a>	
+                                </li>
+                                <li class="bubble-bottom inactive" title="Coming Soon">
+                                    <a href="" class="nav_item">Reports</a>	
+                                </li>
+                                <li class="bubble-bottom">
+                                    <apex:commandLink styleClass="nav_item" target="_blank" action="{!gotoLitmos}" value="Training" />
+                                </li>
+                            </ul>	
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </apex:form>
+        <div id="primary" class="sidebar-off clearfix">
+            <div class="container">
+
+		        <apex:insert name="main-content" />
+
+			</div>
+        </div>
+        <a class="page-cta contact-cta"
+            href="mailto:portal@axcient.com?subject=User Portal Suggestion">
+            <span class="container clearfix">
+                <span class="icon-pencil"></span>
+                <span class="cta">
+                    Do you have suggestions on how we can improve the User Portal?
+                </span>
+                <span class="btn">
+                    Let Us Know
+                </span>
+                <span class="clear"></span>
+            </span>
+        </a>
+        <footer class="footer" role="contentinfo">
+            <div class="container">
+                <nav class="upper row" role="navigation">
+                    <div class="column col-fourth">
+                        <div class="footer-title">
+                            Sales &amp; Marketing
+                        </div>
+                        <a href="{!$Page.PartnerDashboard}" class="nav_item">Dashboard</a>
+                        <a href="{!$Page.DealRegistrationList}" class="nav_item deal-reg-menu-item">Deal Registrations</a>
+                        <a href="/Partner/sfc/#workspaces" class="nav_item">Marketing Assets</a>
+                        <a href="{!$Page.EnhanceListTest}" class="nav_item opp-list-menu-item">Opportunities</a>
+                        <a href="" class="nav_item inactive" title="Coming Soon">Request MDF</a>
+                        <a href="" class="nav_item inactive" title="Coming Soon">Reports</a>
+                        <!--<a href="" class="nav_item inactive" title="Coming Soon">Training</a>-->
+                        <apex:form ><apex:commandLink styleClass="nav_item" target="_blank" action="{!gotoLitmos}" value="Training" /></apex:form>
+                    </div>
+                    <div class="column col-fourth">
+                        <div class="footer-title">
+                            Product Support
+                        </div>
+                        <a href="{!$Label.Axcient_Wordpress_Portal}" title="View Knowledge Base">
+                            View Knowledge Base Articles
+                        </a>
+                        <a href="{!$Label.Axcient_Wordpress_Portal}/documentation/" title="Read Documentation">
+                            Read Documentation
+                        </a>
+                        <a href="{!$Label.Axcient_Wordpress_Portal}/cases/" title="Manage Support Cases">
+                            Manage Support Cases
+                        </a>
+                        <a href="{!$Label.Axcient_Wordpress_Portal}/cases/new-case/" title="Create a Support Case">
+                            Create a Support Case
+                        </a>
+                    </div>
+                    <div class="column col-fourth footer-title lightblue">
+                        <span>Are you certified?</span>
+                        <a class="ace" href="{!$Label.Axcient_Wordpress_Portal}/courses/ace-certification-course/">
+                            A.C.E. Training
+                        </a>
+                    </div>
+                    <div class="column col-fourth last">
+                        <a href="{!$Label.Axcient_Wordpress_Portal}/faq/">
+                            Read our FAQs
+                        </a>
+                        <a href="{!$Label.Axcient_Wordpress_Portal}/news/">
+                            Latest Product News
+                        </a>
+                        <a href="{!$Label.Axcient_Wordpress_Portal}/forums/">
+                            Customer Forums
+                        </a>
+                    </div>
+                    <div class="clear"></div>
+                </nav>
+            </div>
+        </footer>
+        <div class="footer-lower">
+            <div class="container">
+                <div class="lower">
+                    <div class="copyright left">
+                        Copyright Axcient © 2015. All rights reserved.
+                    </div>
+                    <div class="search right">
+                        <div class="social left">
+                            <a class="fb"
+                                href="https://www.facebook.com/pages/Axcient/249270515065"
+                                title="Axcient Facebook"
+                                target="_blank">
+                            </a>
+                            <a class="tw"
+                                href="https://twitter.com/axcient"
+                                title="Axcient Twitter"
+                                target="_blank">
+                            </a>
+                            <a class="yt"
+                                href="https://www.youtube.com/user/Axcient"
+                                title="Axcient YouTube"
+                                target="_blank">
+                            </a>
+                            <a class="gp"
+                                href="https://plus.google.com/103947482739264646300/posts"
+                                title="Axcient Google+"
+                                target="_blank">
+                            </a>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <apex:includeScript value="{!URLFOR($Resource.AxcientUserPortal, 'axcient-user-portal-resources/js/functions.js?ver=4.0')}" loadOnReady="true" />
+    <script type='text/javascript' src='https://portal.axcient.com/wp-content/themes/axfourteenportal/js/cssua.min.js?ver=4.0'></script>
+	</body>
+</html>
+</apex:page>

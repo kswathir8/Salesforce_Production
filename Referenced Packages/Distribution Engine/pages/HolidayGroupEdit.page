@@ -1,0 +1,25 @@
+<apex:page controller="n2de.HolidayController" tabStyle="Manage_Holidays__tab" sidebar="false">
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+	<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}" type="text/javascript"></script>
+	<c:CommonHelp help_page="distribution-holidays" />
+	<apex:form >
+		<apex:sectionHeader title="Distribution Holidays" subtitle="Create New Holiday Region"/>
+		
+		<apex:pageBlock >
+		
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton value="Save" action="{!saveHolidayGroup}"/>
+				<apex:commandButton value="Delete" action="{!deleteHolidayGroup}" rendered="{!$ObjectType.n2de__Holiday_group__c.Deletable}" onclick="if (!window.confirm('Are you sure?')) return false;"/>
+				<apex:commandButton value="Cancel" action="{!cancelHolidayGroup}" immediate="true"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection columns="2" collapsible="false">
+				<apex:inputField value="{!HolidayGroup.Name}" required="true" />
+			</apex:pageBlockSection>
+		
+		</apex:pageBlock>
+		
+		
+	</apex:form>
+<c:StatusPanel />
+</apex:page>

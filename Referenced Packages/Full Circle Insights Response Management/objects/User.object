@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>FCR_Email_Notification_Delegate__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The email address that will receive delegate notifications based on configuration settings.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The email address that will receive delegate notifications based on configuration settings.</inlineHelpText>
+        <label>Email Notification Delegate</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Email</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_User_Notification_Delegate__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The user that will receive delegate notifications based on configuration settings.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The user that will receive delegate notifications based on configuration settings.</inlineHelpText>
+        <label>User Notification Delegate</label>
+        <relationshipName>Notification_Record_Owners</relationshipName>
+        <restrictedAdminField>false</restrictedAdminField>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Hierarchy</type>
+    </fields>
+</CustomObject>

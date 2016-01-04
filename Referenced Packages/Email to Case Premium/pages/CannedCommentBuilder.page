@@ -1,0 +1,132 @@
+<apex:page standardController="E2CP__Canned_Comment__c" extensions="E2CP.CannedCommentBuilderCtrl" id="pg" title="{!IF(thisCC.Id == null,'New','Edit')} Canned Comment">
+
+
+<script>
+function insertField() {
+    
+    var myField = document.getElementById('pg:frm:pb:pbs2:Comment');
+    var sText = document.getElementById('pg:frm:pb:pbs2:pbsiFieldList:selFieldList').value;
+    
+    sText = '{' + sText + '}';
+             
+    if (document.selection) {  //IE
+        myField.focus();
+        sel = document.selection.createRange();
+        sel.text = sText;
+    }
+    else if (myField.selectionStart || myField.selectionStart == '0') { //firefox
+        var startPos = myField.selectionStart;
+        var endPos = myField.selectionEnd;
+        myField.value = myField.value.substring(0, startPos) + sText + myField.value.substring(endPos, myField.value.length);
+        setCaretToPos(myField,startPos+sText.length);
+    } 
+    else { 
+        myField.value += sText;
+    }
+    
+         
+}
+
+function setSelectionRange(input, selectionStart, selectionEnd) {
+    if (input.setSelectionRange) {
+        input.focus();
+        input.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (input.createTextRange) {
+        var range = input.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+}
+
+function setCaretToPos (input, pos) {
+    setSelectionRange(input, pos, pos);
+}
+
+</script>
+
+
+<script>
+function selectFirstField(){
+    try{
+        document.getElementById('pg:frm:pb:pbs2:pbsiFieldList:selFieldList').selectedIndex = 0;
+    }
+    catch(err){
+        //do nothing        
+    }
+}
+</script>
+
+<apex:form id="frm">
+
+<apex:pageMessages />
+
+<apex:pageBlock title="Canned Comment Edit" id="pb">
+
+<apex:pageBlockButtons >
+    <apex:commandButton action="{!Save}" value="Save" onclick="selectFirstField();"/>
+    <Apex:commandButton action="{!saveAndNew}" value="Save and New" onclick="selectFirstField();"/>
+    <apex:commandButton action="{!Cancel}" value="Cancel" onclick="selectFirstField();" />
+</apex:pageBlockButtons>
+
+<apex:pageBlockSection title="Information" columns="2">
+    <apex:inputField value="{!thisCC.E2CP__Category__c}" />
+    <apex:inputField value="{!thisCC.E2CP__Active__c}"/>
+    <apex:inputField value="{!thisCC.E2CP__Title__c}"/>
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Comment" columns="1" id="pbs2">
+
+    <apex:pageBlockSectionItem id="pbsiFieldList">
+        <apex:outputLabel value="Insert Field" />
+        <apex:outputPanel id="opFieldList">
+            <apex:selectList size="1" multiselect="false" id="selFieldList">
+                <apex:selectOptions value="{!FieldOptions}" />
+            </apex:selectList>
+            <input class="btn" id="btnInsertCanned" type="button" value="Insert" onclick="insertField();"/>
+        </apex:outputPanel>
+    </apex:pageBlockSectionItem>
+
+<apex:inputField value="{!thisCC.E2CP__Comment__c}" id="Comment" style="width:420px; height:120px;"/>
+
+</apex:pageBlockSection>
+
+
+
+</apex:pageBlock>
+
+
+</apex:form>
+
+<script>
+    //copies extra fields found in the controller to the list box
+    var sel = document.getElementById('pg:frm:pb:pbs2:pbsiFieldList:selFieldList');
+    
+    /*
+    var overflow = {
+        {!JSENCODE(overflow)}
+    };
+
+    for(var o in overflow){
+        var newOpt = new Option(overflow[o], o);
+        var selLength = sel.length; 
+        sel.options[selLength] = newOpt;
+    } 
+    */
+
+    var overflow = "{!JSENCODE(overflow)}";
+    
+    var os = overflow.split('~~~'); 
+
+    for(var i = 0; i < os.length; i++){
+        var newOpt = new Option(os[i].split('~~')[1], os[i].split('~~')[0]);
+        var selLength = sel.length; 
+        sel.options[selLength] = newOpt;
+    }
+    
+</script>
+
+
+</apex:page>

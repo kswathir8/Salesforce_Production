@@ -1,0 +1,53 @@
+<apex:component controller="FCRM.FCR_VFDualListComponentController" >
+    <apex:attribute name="AvailableIDs" assignTo="{!AvailableIDs27}" type="string[]" description="Avaialble IDs"/>
+    <apex:attribute name="AvailableStrings" assignTo="{!AvailableStrings27}" type="string[]" description="Avaialble Strings"/>
+    <apex:attribute name="SelectedIDs" assignTo="{!SelectedIDs27}" type="string[]" description="Selected IDs"/>
+    <apex:attribute name="SelectedStrings" assignTo="{!SelectedStrings27}" type="string[]" description="Selected Strings"/>
+    <apex:attribute name="ListSize" assignTo="{!ListSize27}" Type="Integer" description="Size of list" required="false" default="5"/>
+    <apex:attribute name="AllowReorder" assignTo="{!ShowReorderButtons}" type="Boolean" description="Allow reorder of selected items" required="false"/>
+    <apex:attribute name="MaxSelect" assignTo="{!MaxSelected}" type="Integer" description="Maximum number of selected items"/>
+    <apex:attribute name="LeftHeader" assignTo="{!PicklistLeftHeader}" type="String" description="Header over left picklist" default=""/>
+    <apex:attribute name="RightHeader" assignTo="{!PicklistRightHeader}" type="String" description="Header over left picklist" default=""/>
+    <apex:attribute name="HideAddRemove" assignTo="{!HideAddRemoveText}" type="Boolean" description="Header Add and Remove text on buttons" default="false"/>
+    <apex:attribute name="onchange" assignTo="{!onchangecommand}" type="String" description="Javascript to call on change"/>
+    <apex:outputPanel layout="block" id="idSelectComponent">
+        <table>
+            <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(PicklistLeftHeader)) && NOT(ISBLANK(PicklistRightHeader))}">
+            <tr>
+                <td style="text-align:center; font-weight:normal;">{!PicklistLeftHeader}</td>
+                <td></td>
+                <td style="text-align:center; font-weight:normal;">{!PicklistRightHeader}</td>
+            </tr>
+            </apex:outputPanel>
+            <tr>
+                <td>
+                    <apex:selectList value="{!SelectedAvailable}" size="{!ListSize}">
+                        <apex:selectOptions value="{!CurrentAvailable}" />
+                    </apex:selectList>
+                </td>
+                <td  style="vertical-align:middle;text-align:center">
+                    <apex:outputPanel layout="none" rendered="{!NOT(HideAddRemoveText)}">Add</apex:outputPanel><br />
+                    <apex:commandButton value=">" action="{!AddToSelected}" reRender="idSelectComponent" oncomplete="{!onchangecommand}"/><br />
+                    <apex:commandButton value="<" action="{!RemoveFromSelected}" reRender="idSelectComponent" oncomplete="{!onchangecommand}" /><br />
+                    <apex:outputPanel layout="none" rendered="{!NOT(HideAddRemoveText)}">Remove</apex:outputPanel>
+                </td>
+                <td>
+                    <apex:selectList value="{!SelectedSelected}" size="{!ListSize}">
+                        <apex:selectOptions value="{!CurrentSelected}" />
+                    </apex:selectList>
+                </td>
+                <td  style="vertical-align:middle;text-align:center">
+                    <apex:outputPanel rendered="{!ShowReorderButtons}" >
+                        <apex:commandButton value="Up" style="width:50px" action="{!MoveUp}" reRender="idSelectComponent"/><br />
+                        <apex:commandButton value="Down" style="width:50px" action="{!MoveDown}" reRender="idSelectComponent" /><br />
+                    </apex:outputPanel>
+                </td>
+                <td>
+                    <apex:outputPanel rendered="{!NOT(IsNull(AddToError))}">
+                        <apex:pagemessage severity="Error" summary="{!AddToError.Summary}" />
+                    </apex:outputPanel>
+                </td>
+            </tr>
+        </table> 
+    </apex:outputPanel>
+</apex:component>

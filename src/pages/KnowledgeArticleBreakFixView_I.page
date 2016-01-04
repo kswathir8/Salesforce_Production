@@ -1,0 +1,78 @@
+<apex:page standardController="Break_Fix__kav" showHeader="false" sidebar="false">
+   <apex:image url="{!$Resource.AxcientLogo_New}" />
+   <style>
+    .knowledgeTab .secondaryPalette, .individualPalette .knowledgeBlock .secondaryPalette {
+        background-color: transparent;
+        border-color: transparent;
+    }
+    .knowledgeTab .tertiaryPalette, .individualPalette .knowledgeBlock .tertiaryPalette, .layoutEdit .individualPalette .knowledgeBlock .tertiaryPalette {
+        background-color: #DCDCDC;
+    }
+    .apexp .bPageBlock.apexDefaultPageBlock .pbBody .pbSubheader {
+        color: #333333;
+    }
+    .labelStyle{    
+        font-size:91%;
+        font-weight:bold;
+        color:#53b2d1;
+    }
+    .globalBlock{
+        border: 1px;
+        width : 95%;
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .panelColFirst{
+        width:1%;
+    }
+    .panelColLeft{
+        width:10%;
+        text-align: left;
+        vertical-align:text-top;
+    }
+    .panelColRight{
+        width:95%;
+    }
+</style>
+ <apex:form >
+    <!-- Article View Top Links --> 
+        <apex:pageBlock mode="maindetail" id="articleViewLinks" title="">
+        <!-- <apex:outputpanel style="width:95%;text-align:right;border:0px;" layout="block" rendered="{!IF($CurrentPage.parameters.mode == 'p', false,true)}">                  
+                <a href="javascript:openPopupFocus('/{!Break_Fix__kav.KnowledgeArticleId}?mode=p', 'PrintableView');" title="Printable View (New Window)">
+                    <span class="configLinks">Printable View</span>
+                </a>
+            </apex:outputpanel>-->
+            <apex:outputpanel style="width:95%;text-align:right;border:0px;" layout="block">       
+                <a title="Help for this Page (New Window)" href="javascript:openPopupFocusEscapePounds('/help/doc/user_ed.jsp?loc=help&target=knowledge_article_view.htm&section=Salesforce_Knowledge&showSplash=true', 'Help', 700, 600, 'width=700,height=600,resizable=yes,toolbar=yes,status=no,scrollbars=yes,menubar=yes,directories=no,location=no,dependant=no', false, false);">
+                    <span style="font-size:80%;">Help for this Page</span>
+                <img class="helpIcon" title="" alt="" src="/s.gif"/>
+                </a>
+            </apex:outputpanel>
+            <apex:outputpanel styleClass="globalBlock" layout="block" rendered="{!IF($CurrentPage.parameters.mode == 'p', false,true)}">
+                <apex:sectionHeader subtitle="{!Break_Fix__kav.title}" title="Article"/>        
+            </apex:outputpanel>
+        </apex:pageBlock>
+    </apex:form>    
+    <!-- Article Details Field Set -->  
+   <apex:outputpanel styleClass="globalBlock">
+        <knowledge:articleRendererToolBar articleId="{!$CurrentPage.parameters.id}" canVote="true" />
+    </apex:outputpanel>
+      <!-- Article Content-->
+    <apex:outputpanel styleClass="globalBlock">
+        <apex:pageBlock title="Content" >
+            <apex:repeat value="{!$ObjectType.Break_Fix__kav.FieldSets.Break_Fix_Field_Set}" var="f">
+                <apex:panelGrid columns="3" style="width:100%;" cellspacing="5px" columnClasses="panelColFirst,panelColLeft,panelColRight" id="theGrid">
+                    <apex:outputLabel ></apex:outputLabel>
+                        <apex:outputLabel styleClass="labelStyle" value="{!f.Label}"/>
+                    <apex:panelGrid columns="1" style="width:100%;border-left:1px solid transparent;border-bottom:1px solid transparent;">
+                        <apex:outputField value="{!Break_Fix__kav[f]}"/>
+                    </apex:panelGrid>
+                </apex:panelGrid>
+            </apex:repeat>
+            <br/>
+            <apex:outputPanel ></apex:outputPanel>
+            <br/>
+        </apex:pageBlock>
+    </apex:outputpanel>
+    
+ </apex:page>

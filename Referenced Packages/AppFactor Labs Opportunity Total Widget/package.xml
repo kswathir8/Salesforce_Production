@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AppFactor Labs Opportunity Total Widget</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>The SFDC Opportunity Total Widget by AppFactor Labs connects to salesforce.com with your username/password and displays the total of all the Opportunities in your Salesforce instance right on your desktop.</description>
+    <namespacePrefix>WID</namespacePrefix>
+    <types>
+        <members>AppFactorLabsOpportunityTotalWidget</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>SFDCOpportunityTotalWidget</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>AppFactorWidget</members>
+        <members>AppFactorWidget/appfactorlabsGIF.gif</members>
+        <name>Document</name>
+    </types>
+    <types>
+        <members>Widget</members>
+        <name>Scontrol</name>
+    </types>
+    <version>35.0</version>
+</Package>

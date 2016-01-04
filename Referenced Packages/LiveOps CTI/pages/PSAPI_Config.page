@@ -1,0 +1,19 @@
+<apex:page controller="LiveOpsTransfer.CparseXML" sidebar="false" showHeader="false">
+    <apex:form >
+        <apex:PageMessages />
+        <apex:PageBlock title="PSAPI Configuration">
+            <p>Select XML file to Import Settings</p><br/>
+            <apex:inputFile value="{!contentFile}">
+            </apex:inputFile>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:commandButton value="Import" action="{!show}"/>
+            <p>Or</p><br/>
+            <p>Enter details manually</p><br/>
+            <p><apex:OutputLabel style="font-family:Arial;font-size:9pt;font-weight:bold;">PSAPI Host</apex:OutputLabel>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:InputText value="{!PSAPIHost}"/></p>
+            <p><apex:OutputLabel style="font-family:Arial;font-size:9pt;font-weight:bold;">PSAPI Port</apex:OutputLabel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:InputText value="{!PSAPIPort}"/></p><br/>
+            <apex:CommandButton value="Save" action="{!save}"/>
+        </apex:PageBlock>
+        <apex:Pagemessage severity="Info">Please configure this URL in Remote Site settings<b>(Your Name->Setup->Administration Setup->Security Controls->Remote Site Settings)</b></apex:Pagemessage>
+    </apex:form>
+</apex:page>

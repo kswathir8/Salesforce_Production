@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Sample: Chatter Active Response Notification</description>
+    <encodingKey>ISO-8859-1</encodingKey>
+    <name>Sample: Chatter Active Response Notification</name>
+    <style>none</style>
+    <subject>Additional Activity Notification - Email body populates to chatter, not the subject.</subject>
+    <type>text</type>
+</EmailTemplate>

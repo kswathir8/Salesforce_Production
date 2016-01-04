@@ -1,0 +1,218 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case"  >
+
+    <apex:sectionHeader title="RMA Wizard" subtitle="Step 3 of 6"/>
+    <apex:form id="theForm" > 
+      
+        <apex:pageBlock id="theSearchBlock" title="RMA Checklist" mode="edit" >
+            <apex:pageBlockButtons location="both" >
+                <apex:commandButton action="{!step1_1}" value="Previous" />
+                <apex:commandButton action="{!step3}" value="Next"  />
+            </apex:pageBlockButtons>
+          
+            <apex:pageBlockSection id="returnType" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Unit returning to Axcient</apex:outputLabel> 
+                    <apex:inputField value="{!QW.Type_of_return__c}" required="true"></apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="delay_60" columns="1" collapsible="false"> 
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >60 Day Delay?</apex:outputLabel>
+                    <apex:inputCheckbox value="{!QW.Delay_60_Days__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+          
+            <apex:pageBlockSection id="A1" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Is this a Return Shipping Label?</apex:outputLabel>
+                    <apex:inputField value="{!QW.Return_Shipping_Label__c}"  required="true">
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+          
+            <apex:pageBlockSection collapsible="false" id="candSearch" columns="1">
+                <apex:pageBlockSectionItem rendered="{!QW.Return_Shipping_Label__c='No'}" >
+                    <apex:outputLabel >Can the appliance boot?</apex:outputLabel>
+                    <apex:inputField value="{!QW.Can_Appliance_Boot__c}" required="true" >
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+                      
+            <apex:pageBlockSection id="Q2" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Can_Appliance_Boot__c = 'Yes'}" >
+                    <apex:outputLabel >Are there any yellow, amber,red lights on device?</apex:outputLabel>
+                    <apex:inputField value="{!QW.Lights_On_Device__c}" >
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                    </apex:inputField>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q21" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Can_Appliance_Boot__c = 'No'}" >
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q22" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Can_Appliance_Boot__c = 'No'}" >
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q31" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Lights_On_Device__c = 'No'}" >
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure? </apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q32" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Lights_On_Device__c = 'No'}" >
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q3" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Lights_On_Device__c = 'Yes'}" >
+                    <apex:outputLabel >Is it drive or RAID Cache Module issue?</apex:outputLabel>
+                    <apex:selectList value="{!QW.Drive_Or_Raid__c}" size="1" >
+                        <apex:selectOption itemValue="" itemLabel=""/>    
+                        <apex:selectOption itemValue="Drive" itemLabel="Drive"/>
+                        <apex:selectOption itemValue="RAID Cache Module" itemLabel="RAID Cache Module"/>
+                        <apex:selectOption itemValue="None of the above two" itemLabel="None of the above two"/>
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                        <apex:param name="a" assignTo="{!DriveORRaid}" value="{!QW.Drive_Or_Raid__c}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q41" columns="1"  collapsible="false" >
+                <!--   apex:pageBlockSectionItem rendered="IF(a.DriveOrRaid = 'Drive','True',IF(a.DriveOrRaid = 'RAID Cache Module',True,False))"      -->
+                <apex:pageBlockSectionItem rendered="{!QW.Drive_Or_Raid__c = 'Drive'}" >
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+      
+            <apex:pageBlockSection id="Q42" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Drive_Or_Raid__c = 'Drive'}" >
+                    <apex:outputLabel style="padding:0px 5px;font-size:95%;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q43" columns="1"  collapsible="false" >
+                <!--   apex:pageBlockSectionItem rendered="IF(a.DriveOrRaid = 'Drive','True',IF(a.DriveOrRaid = 'RAID Cache Module',True,False))"      -->
+                <apex:pageBlockSectionItem rendered="{!QW.Drive_Or_Raid__c = 'RAID Cache Module'}" >
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q44" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Drive_Or_Raid__c = 'RAID Cache Module'}" >
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q4" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Drive_Or_Raid__c = 'None of the above two'}" >
+                    <apex:outputLabel >Are there loud noises occuring?</apex:outputLabel>
+                    <apex:selectList value="{!QW.Loud_Noise__c}" size="1">
+                        <apex:selectOption itemValue="None" itemLabel="None"/>
+                        <apex:selectOption itemValue="Yes" itemLabel="Yes"/>
+                        <apex:selectOption itemValue="No" itemLabel="No"/>
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q6541" columns="1"  collapsible="false" >
+                <!--   apex:pageBlockSectionItem rendered="IF(a.DriveOrRaid = 'Drive','True',IF(a.DriveOrRaid = 'RAID Cache Module',True,False))"      -->
+                <apex:pageBlockSectionItem rendered="{!QW.Loud_Noise__c='No'}">
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+                  
+            <apex:pageBlockSection id="Q6525" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Loud_Noise__c='No'}">
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q5" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Loud_Noise__c = 'Yes'}" >
+                    <apex:outputLabel >Is it fan?</apex:outputLabel>
+                    <apex:selectList value="{!QW.Fan__c}" size="1">
+                        <apex:selectOption itemValue="None" itemLabel="None"/>
+                        <apex:selectOption itemValue="Yes" itemLabel="Yes"/>
+                        <apex:selectOption itemValue="No" itemLabel="No"/>
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                        <apex:param name="a" assignTo="{!Fan}" value="{!QW.Fan__c}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q6551" columns="1"  collapsible="false" >
+                <!--   apex:pageBlockSectionItem rendered="IF(a.DriveOrRaid = 'Drive','True',IF(a.DriveOrRaid = 'RAID Cache Module',True,False))"      -->
+                <apex:pageBlockSectionItem rendered="{!QW.Fan__c= 'Yes'}">
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q6225" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Fan__c= 'Yes'}">
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+                  
+            <apex:pageBlockSection id="Q6" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Fan__c = 'No'}" >
+                    <apex:outputLabel >Are there beeps upon booting?</apex:outputLabel>
+                    <apex:selectList value="{!QW.Beeps__c}" size="1">
+                        <apex:selectOption itemValue="None" itemLabel="None"/>
+                        <apex:selectOption itemValue="Yes" itemLabel="Yes"/>
+                        <apex:selectOption itemValue="No" itemLabel="No"/>
+                        <apex:actionSupport event="onchange" status="StatusChange" rerender="theForm" />
+                        <apex:param name="a" assignTo="{!Beep}" value="{!QW.Fan__c}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q651" columns="1"  collapsible="false" >
+                <!--   apex:pageBlockSectionItem rendered="IF(a.DriveOrRaid = 'Drive','True',IF(a.DriveOrRaid = 'RAID Cache Module',True,False))"      -->
+                <apex:pageBlockSectionItem rendered="{!QW.Beeps__c= 'Yes'}">
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q625" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Beeps__c= 'Yes'}">
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q621" columns="1"  collapsible="false" >
+                <!--   apex:pageBlockSectionItem rendered="IF(a.DriveOrRaid = 'Drive','True',IF(a.DriveOrRaid = 'RAID Cache Module',True,False))"      -->
+                <apex:pageBlockSectionItem rendered="{!QW.Beeps__c== 'No'}">
+                    <apex:outputLabel >Are there any other notes that you would like to add as a possible reason for failure?</apex:outputLabel>
+                    <apex:inputTextArea value="{!QW.Notes__c}" style="width: 360px; height: 80px"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="Q6245" columns="1"  collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!QW.Beeps__c== 'No'}">
+                    <apex:outputLabel style="padding:0px 5px;font-size:12;font-weight:bold;font-family: 'Verdana','Geneva',sans-serif;">Please hit the next button to create the RMA case</apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+    
+      </apex:pageBlock>
+      
+  </apex:form>
+</apex:page>

@@ -1,0 +1,227 @@
+<apex:component controller="n2de.StatusPanelController">
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery.scrollpanel-0.5.0.min.js')}"></script>
+	<style>
+		#sticky_footer {
+			position: fixed;
+			margin: 0 0 0 0;
+			bottom: 0px;
+			left: -0.5px;
+			width: 100%;
+			min-width: 650px;
+			height: 45px;
+			background-color: #333333;
+		    opacity: 0.8;
+		    filter: alpha(opacity=60);
+		    text-align: justify;
+		    z-index: 999999;
+		}
+		#sticky_footer .footer-container {
+			display:inline-block;
+			height: 100%;
+		}
+		#sticky_footer:after {
+		    content:" ";
+		    display:inline-block;
+		    width:100%;
+		}
+		.status-panel-tbl {
+			padding-top: 4px;
+			padding-bottom: 4px;
+			height: 100%;
+		}
+		.status-txt {
+			color: #fff;
+			padding-right: 5px;
+			padding-left: 5px;
+			text-decoration: none;
+		} 
+		.help-link {
+			color: #9dcc58;
+			text-decoration: underline;
+		}
+		#warn_list {
+			padding-top: 3px;
+    		display: inline-block;
+			min-width: 180px;
+			max-width: 300px;
+		    height: 40px;
+		}
+   		.sp-scrollbar {
+	        width: 10px;
+	        background-color: #ccc;
+	        cursor: pointer;
+	    }
+       	.sp-thumb {
+           	background-color: #aaa;
+       	}
+   		.sp-scrollbar.active.sp-thumb {
+           	background-color: #999;
+       	}
+		.link-btn {
+			background-color: #ADD180;
+			padding-right: 10px;
+			padding-left: 10px;
+			border-radius: 4px;
+		}
+		.sml-image {
+			width: 20px;
+			padding-left: 5px;
+		}
+		
+		#blocking_mask{
+			z-index: 999999;
+			height: 100%;
+			width: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: rgba(0, 0, 0, .7);
+			margin: 0;
+			padding: 0;
+		}
+		#info_block {
+			border-radius: 5px; 
+			background-color: white; 
+			color: black;
+			font-size: 14px;
+			padding: 40px;
+			position: absolute; 
+			left: 35%; 
+			top: 50%;
+		}
+	</style>
+	
+	<script>
+		$(document).ready(function() {
+			$('#warn_list').scrollpanel();
+		});
+	</script>
+
+	<apex:outputPanel layout="none" rendered="{!IsManager}">
+		<div id="sticky_footer">
+		
+			<div class="footer-container" style="width: 40%; vertical-align: top;">
+				<table class="status-panel-tbl" style="float: left;">
+					<tbody>
+						<tr>
+							<td rowspan="2"><img src="{!URLFOR($Resource.n2de__DEResources, 'images/de_icon_whitegreen.png')}"/></td>
+							
+							<apex:outputPanel layout="none" rendered="{!NOT(SchedulerStatus.Aborted) && NOT(SchedulerStatus.Delayed) && SchedulerStatus.SchedulerOn}">
+								<td><span class="status-txt">Scheduler running every {!SchedulerStatus.Frequency}</span></td>
+							</apex:outputPanel>
+							<apex:outputPanel layout="none" rendered="{!SchedulerStatus.SchedulerOn && SchedulerStatus.Aborted}">
+								<td rowspan="2"><img src="{!URLFOR($Resource.DEResources, 'images/redwarning32_flat.png')}" class="sml-image"/></td>
+								<td><span class="status-txt">Scheduler has aborted</span>&nbsp;&nbsp;&nbsp;<span style="color:#fff;">[</span><a class="help-link" href="http://help.nc-squared.com/faq-distribution-engine-aborted" target="_blank">Help</a><span style="color:#fff;">]</span></td>
+							</apex:outputPanel>
+							<apex:outputPanel layout="none" rendered="{!NOT(SchedulerStatus.SchedulerOn) && NOT(SchedulerStatus.Delayed) && NOT(SchedulerStatus.Aborted)}">
+								<td><span class="status-txt">Scheduler is OFF</span></td>
+							</apex:outputPanel>
+						</tr>
+						
+						<tr>
+							<td><span class="status-txt">Last run at {!SchedulerStatus.LastRun}</span></td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<apex:outputPanel layout="none" rendered="{!SchedulerStatus.Notifications.size > 0}">
+					<table class="status-panel-tbl" style="float: left;">
+						<tbody>
+							<tr>
+								<td><img title="{!SchedulerStatus.Notifications.size} warnings" src="{!URLFOR($Resource.DEResources, 'images/de_green_bell.png')}" style="width: 28px; padding-left: 10px;"/></td>
+							</tr>
+						</tbody>
+					</table>
+					<div id="warn_list">
+						<apex:repeat value="{!SchedulerStatus.Notifications}" var="n">
+							<apex:outputPanel layout="none" rendered="{!n.textLink == null}">
+								<span class="status-txt" style="cursor: help;" title="{!n.detail}">{!n.message}</span>
+							</apex:outputPanel>
+							<apex:outputPanel layout="none" rendered="{!n.textLink != null}">
+								<a href="{!n.textLink}" title="{!n.detail}" class="status-txt">{!n.message}</a>
+							</apex:outputPanel>
+							<apex:outputPanel layout="none" rendered="{!n.helpLink != null}">
+								<span style="color:#fff;">[</span><a href="{!n.helpLink}" class="help-link" target="_blank">Help</a><span style="color: #fff;">]</span>
+							</apex:outputPanel>
+							<br/>
+						</apex:repeat>
+					</div>
+				</apex:outputPanel>
+			</div>
+			
+			<div class="footer-container" id="version_detail" style="width: 10%;">
+				<table class="status-panel-tbl" style="margin-left: auto; margin-right: auto;">
+					<tbody>	
+					<tr>
+						<td><a href="http://help.nc-squared.com/armadillo-release" target="_blank"><img title="Distribution Engine - Armadillo Release" src="{!URLFOR($Resource.DEResources, 'images/DE_version_logo.png')}" style="width: 48px;"/></a></td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="footer-container" style="width: 40%;">
+				<table class="status-panel-tbl" style="float: right; padding-right: 5px;">
+					<tbody>	
+					<apex:outputPanel layout="none" rendered="{!NOT(PackageDetails.IsDev)}">
+						<apex:outputPanel layout="none" rendered="{!PackageDetails.LicenseStatus = 'Trial' && PackageDetails.DaysToExpiry != null}">
+							<tr>
+								<apex:outputPanel layout="none" rendered="{!PackageDetails.DaysToExpiry <= 7}">
+									<td rowspan="2"><img src="{!URLFOR($Resource.DEResources, 'images/redwarning32_flat.png')}" class="sml-image"/></td>
+								</apex:outputPanel>
+								<td><span class="status-txt"><b>Your trial expires in {!PackageDetails.DaysToExpiry} days</b></span></td>
+								<td rowspan="2" class="link-btn"><a style="text-decoration: none; font-weight: bold;" href="http://help.nc-squared.com/purchasing-licences" target="_blank">Buy</a></td>
+							</tr>
+							<tr>
+								<td ><span class="status-txt"><span style="color:#fff;">[</span><a class="help-link" href="http://help.nc-squared.com/home" target="_blank">Getting started</a><span style="color:#fff;">]</span></span></td>
+							</tr>
+						</apex:outputPanel>
+						
+						<apex:outputPanel layout="none" rendered="{!PackageDetails.IsSandbox}">
+							<tr>
+								<td><span class="status-txt"><b>Sandbox: Does not expire</b></span></td>
+							</tr>
+							<tr>
+								<td ><span class="status-txt"><span style="color:#fff;">[</span><a class="help-link" href="http://help.nc-squared.com/home" target="_blank">Help</a><span style="color:#fff;">]</span></span></td>
+							</tr>
+						</apex:outputPanel>
+						
+						<apex:outputPanel layout="none" rendered="{!PackageDetails.LicenseStatus = 'Active' && PackageDetails.DaysToExpiry != null}">
+							<tr>
+								<td rowspan="2"><img src="{!URLFOR($Resource.DEResources, 'images/redwarning32_flat.png')}" class="sml-image"/></td>
+								<td><span class="status-txt"><b>Your license expires in {!PackageDetails.DaysToExpiry} days</b></span></td>
+							</tr>
+							<tr>
+								<td ><span class="status-txt"><span style="color:#fff;">[</span><a class="help-link" href="http://help.nc-squared.com/contact-us-support" target="_blank">Why?</a><span style="color:#fff;">]</span></span></td>
+							</tr>
+						</apex:outputPanel>
+						
+						<apex:outputPanel layout="none" rendered="{!PackageDetails.LicenseStatus = 'Active' && PackageDetails.DaysToExpiry == null}">
+							<tr>
+								<td><span class="status-txt"><b>Active edition</b></span></td>
+							</tr>
+						</apex:outputPanel>
+					</apex:outputPanel>
+					<apex:outputPanel layout="none" rendered="{!PackageDetails.IsDev}">
+						<tr>
+							<td><img src="{!URLFOR($Resource.DEResources, 'images/redwarning32_flat.png')}" class="sml-image"/></td>
+							<td><span class="status-txt"><b>Developer Edition: Not supported</b></span></td>
+						</tr>
+					</apex:outputPanel>
+					</tbody>
+				</table>
+			</div>
+			
+		</div>
+	</apex:outputPanel>
+	
+	<apex:outputPanel rendered="{!PackageDetails.IsDev && PackageDetails.LicenseCount <= 5}">
+		<div id="blocking_mask">
+			<div id="info_block">
+				<span>Sorry, we do not currently support Developer Edition.<br/><br/>
+				If you have a customer requirement, please get in touch - we'd be happy to help.<br/>
+				<a href="mailto:hello@nc-squared.com">hello@nc-squared.com</a>
+				</span>
+			</div>
+		</div>
+	</apex:outputPanel>
+</apex:component>

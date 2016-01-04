@@ -1,0 +1,64 @@
+<apex:page controller="n2de.LicensedUsersController" sidebar="false" tabstyle="Settings__tab">
+	<style>
+		.disabled {
+			background-color: #ededed; 
+		}
+	</style>
+	<apex:form >
+		<apex:sectionHeader title="Settings" subtitle="Home"/>
+		<c:CommonHeader />
+		<c:CommonMask />
+		<c:CommonHelp help_page="licensed-users-list"/>
+		<apex:pageBlock title="Licensed Users" id="page_block">
+			<apex:pageMessages />
+			
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!backToSettings}" value="Back" />
+			</apex:pageBlockButtons>
+			
+			<apex:outputPanel layout="block" rendered="{!NOT(IsSandbox)}">
+				<apex:outputText id="license_count" style="float: right;" value="Used {!TotalRecords} of {!AllowedLicenses} licenses"/>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" rendered="{!IsSandbox}">
+				<apex:outputText id="sb_license_count" style="float: right;" value="Used {!TotalRecords} licenses"/>
+			</apex:outputPanel>
+			<br/><br/>
+			<apex:pageBlockTable value="{!licensedUserList}" var="user" id="ul_table" headerClass="headerRow">
+				<apex:column headerValue="Name" styleClass="{!IF(user.user.IsActive==false, 'disabled', '')}" title="{!IF(user.user.IsActive==false, 'User is not active', '')}">
+					<apex:outputLink value="/{!user.user.Id}">{!user.user.Name}</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Managed package license" styleClass="{!IF(user.user.IsActive==false, 'disabled', '')}">
+					<img src="/img/checkbox_{!IF(user.isManagedPackageLicense, '', 'un')}checked.gif"/>
+				</apex:column>
+				<apex:column headerValue="Team member" styleClass="{!IF(user.user.IsActive==false, 'disabled', '')}">
+					<img src="/img/checkbox_{!IF(user.isTeamMember, '', 'un')}checked.gif" />
+				</apex:column>
+			</apex:pageBlockTable>
+				
+			<apex:toolbar styleClass="pagingToolBar">
+				<apex:toolbarGroup itemSeparator="none" location="left">
+					<apex:outputPanel rendered="{!totalRecords > 10}">
+						<apex:outputText >Display &nbsp;</apex:outputText>
+						<apex:selectList value="{!rowsPerPage}" size="1">
+							<apex:selectOptions value="{!rowsPerPageOptionList}"/>
+							<apex:actionSupport event="onchange" action="{!resetPage}" reRender="page_block" onSubmit="showMask()" onComplete="hideMask()" />
+						</apex:selectList>
+						<apex:outputText > records per page</apex:outputText>
+					</apex:outputPanel>
+				</apex:toolbarGroup>
+				<apex:toolbarGroup itemSeparator="line" location="right">
+					<apex:commandLink value="<Previous page" action="{!previousPage}"  rendered="{!hasPrevious}" reRender="page_block" onclick="showMask()" onComplete="hideMask()"/>
+					<apex:commandLink value="Next page>" action="{!nextPage}" rendered="{!hasNext}" reRender="page_block" onclick="showMask()" onComplete="hideMask()"/>
+				</apex:toolbarGroup>
+			</apex:toolbar>
+		</apex:pageBlock>
+	</apex:form>
+	<style>
+		.pagingToolBar {
+			background-color: #F3F3EC;
+			background-image: none;
+			border: none;
+		}
+	</style>
+	<c:StatusPanel />
+</apex:page>

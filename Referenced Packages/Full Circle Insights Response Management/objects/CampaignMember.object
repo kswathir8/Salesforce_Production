@@ -1,0 +1,1090 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>FCR_18_Character_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Displays 18 Character Campaign Member ID</description>
+        <externalId>false</externalId>
+        <formula>CASESAFEID(Id)</formula>
+        <inlineHelpText>Displays 18 Character Campaign Member ID</inlineHelpText>
+        <label>Campaign Member 18 Character ID</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_Opportunity_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Administrative field to determine if a response is tied to an opportunity, and if so, the status of that opportunity</description>
+        <externalId>false</externalId>
+        <formula>IF(OR(ISBLANK(ContactId), ISBLANK( FCR_Opportunity__c ),  ISPICKVAL(FCR_Response_Status__c, &apos;Resolved - Non-Response RT&apos;)  ),
+    0,
+    IF(FCR_Opportunity__r.IsClosed ,
+         IF( FCR_Opportunity__r.IsWon , 2, 3),
+        1)
+)
+/*
+0 - Lead or no opportunity
+1 - Open opportunity
+2 - Opportunity closed won
+3 - Opportunity closed lost
+*/</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Admin Opportunity Status</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_Response_Control__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Numeric field to override standard processing of responses during evaluation</description>
+        <externalId>false</externalId>
+        <label>Admin Response Control</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_Response_Day__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Converts the response date field (date time) to a response date for report processing</description>
+        <externalId>false</externalId>
+        <formula>if(ISBLANK(FCR_Response_Date__c),DATE(1970,1,1),DATEVALUE(FCR_Response_Date__c ))</formula>
+        <label>Response Day</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_SyncPending__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set when a field sync to this response is pending (async)
+1 - Sync the fields if SyncOnUpdate
+2 - Sync the fields if SyncOnCreate
+3 - Clear the fields.</description>
+        <externalId>false</externalId>
+        <label>Admin SyncPending</label>
+        <precision>1</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_SyncTest__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Used internally by the response management system for testing purposes</description>
+        <externalId>false</externalId>
+        <label>Admin Sync Test</label>
+        <length>40</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Admin_Update_Counter__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>This counter is changed any time this object is updated by the response management system. Look for changes in this value during validation rules to disable the rule and allow the update.</description>
+        <externalId>false</externalId>
+        <label>Admin Update Counter</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Campaign_Repeat_Parent__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Lookup to the cascade parent campaign, or the campaign (if this is not a repeat)</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This field is used in reporting to group all responses by Repeat Parent Campaign.</inlineHelpText>
+        <label>Campaign Name (Repeat Parent)</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipLabel>Campaign Members (Campaign Name (Repeat Parent))</relationshipLabel>
+        <relationshipName>Campaign_Members_With_Repeats</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_CascadeID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This formula field is used to simplify queries for cascaded campaignmembers.
+First part is the campaignID if there is no parent, or the parent campaignID if there is. Second part is the contactID if present, otherwise the lead ID</description>
+        <externalId>false</externalId>
+        <formula>IF(ISBLANK(Campaign.FCR_CascadeParent__c), CampaignId , Campaign.FCR_CascadeParent__c )  + BLANKVALUE( ContactId , LeadId )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Admin_CascadeID</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_ClosedOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed won opportunity revenue for primary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_ClosedOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue for secondary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_ClosedOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue for tertiary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Converted_Lead__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that the response was active when the lead was converted</description>
+        <externalId>false</externalId>
+        <label>Converted Lead</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Current_Lead_Contact_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Displays the current status of the related lead or contact. Looks at the standard lead status field or the Full Circle CRM Contact Status field.</description>
+        <externalId>false</externalId>
+        <formula>IF(NOT(ISBLANK( ContactId )), TEXT(Contact.FCR_Status__c) ,  TEXT(Lead.Status) )</formula>
+        <inlineHelpText>Displays the current status of the related lead or contact.</inlineHelpText>
+        <label>Current Lead/Contact Status</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Dated_Opportunity_Amount__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Opportunity amount based on dated conversion - set during campaign influence</description>
+        <externalId>false</externalId>
+        <label>Dated Opportunity Amount</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_FCCRM_Logo__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IMAGE(&quot;/resource/Full_Circle_CRM_Sm_Logo&quot;, &quot;Full Circle CRM&quot;,25, 80)</formula>
+        <label>||</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_First_Owner_Assigned__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>First Owner (non-queue) assigned a response.</inlineHelpText>
+        <label>First Owner Assigned</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>Response_First_Owned</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_First_Owner_Type__c</fullName>
+        <deprecated>false</deprecated>
+        <description>First Owner Assigned Type - User or Queue</description>
+        <externalId>false</externalId>
+        <inlineHelpText>First Owner Assigned Type - User or Queue</inlineHelpText>
+        <label>First Owner Type</label>
+        <picklist>
+            <picklistValues>
+                <fullName>User</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Queue</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_First_Owner_Worked__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>First Owner to set a lead/contact status to a working status when the response is active</inlineHelpText>
+        <label>First Owner Worked</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>Response_First_Worked</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_First_Queue_Assigned__c</fullName>
+        <deprecated>false</deprecated>
+        <description>If first owner assigned is a lead queue - queue name will be set here.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If first owner assigned is a lead queue - queue name will be set here.</inlineHelpText>
+        <label>First Queue Assigned</label>
+        <length>50</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Inquiry_Target_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date Inquiry or Target was set</description>
+        <externalId>false</externalId>
+        <label>Inquiry/Target Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Inquiry_Target__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Has responded to a Marketing Campaign, or is a Sales Target</description>
+        <externalId>false</externalId>
+        <label>Inquiry/Target</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Inquiry_to_MQR__c</fullName>
+        <deprecated>false</deprecated>
+        <description># Days from Inquiry/Target to MQR/QR - Evaluates to blank if MQR/QR Date if blank.</description>
+        <externalId>false</externalId>
+        <formula>FCR_QR_Date__c - FCR_Inquiry_Target_Date__c</formula>
+        <inlineHelpText># Days from Inquiry/Target to MQR/QR</inlineHelpText>
+        <label>Inquiry to MQR</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Last_Modified_By_Date_Formula__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>LastModifiedDate</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Last Modified By Date Formula</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Last_Modified_By_Formula__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>LastModifiedBy.FirstName &amp; &quot; &quot; &amp; LastModifiedBy.LastName</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Last Modified By Formula</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Lead_Contact_18_Digit_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>CASESAFEID(BLANKVALUE( ContactId , LeadId ))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Lead/Contact 18 Digit ID</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_LostOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue for primary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_LostOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue for secondary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_LostOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue for tertiary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_MQR_to_SAR__c</fullName>
+        <deprecated>false</deprecated>
+        <description># Days from MQR/QR to SAR - Evaluates to blank if MQR/QR Date if blank.</description>
+        <externalId>false</externalId>
+        <formula>FCR_SAR_Date__c -  FCR_QR_Date__c</formula>
+        <inlineHelpText># Days from MQR/QR to SAR.</inlineHelpText>
+        <label>MQR to SAR</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Member_Type_On_Create__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Admin field specifying whether the CampaignMember was originally created by a lead or a contact</description>
+        <externalId>false</externalId>
+        <label>Member Type On Create</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Lead</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Contact</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Name_Created_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Displays the lead or contact Name Created Date.</description>
+        <externalId>false</externalId>
+        <formula>IF(IsBlank(ContactId ), Lead.FCR_Name_Created_Date__c, Contact.FCR_Name_Created_Date__c )</formula>
+        <inlineHelpText>Displays the lead or contact Name Created Date.</inlineHelpText>
+        <label>Name Created Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Net_New_Lead__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Checked if associated lead or contact was created within 5 minutes of this response.</description>
+        <externalId>false</externalId>
+        <label>Net New Name</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Non_Response_Audit__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Audit field for existing responses. Indicates the most recent time when a response was updated to a member status not configured as a response.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Audit field for existing responses. Indicates the most recent time when a response was updated to a member status not configured as a response.</inlineHelpText>
+        <label>Non Response Audit</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Nurture_Timeout__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set to true when the lead/contact was set to nurture time out and therefore this response was not processed by the system.</description>
+        <externalId>false</externalId>
+        <label>Nurture Timeout</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_OpenOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue for primary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_OpenOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue for secondary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_OpenOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue for tertiary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Amount__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>if( FCR_Dated_Opportunity_Amount__c !=0,  FCR_Dated_Opportunity_Amount__c, FCR_Opportunity__r.Amount)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Opportunity Amount</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Cleared__c</fullName>
+        <deprecated>false</deprecated>
+        <description>If an opportunity was associated to a Campaign and then deleted - the date of deletion is set here.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If an opportunity was associated to a Campaign and then deleted - the date of deletion is set here.</inlineHelpText>
+        <label>Opportunity Cleared</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Closed_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>FCR_Opportunity__r.CloseDate</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Opportunity Closed Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Closed_Won__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Evaluates to &quot;True&quot; if Opportunity is Won - else is blank.  Requires that the opportunity name is populated.</description>
+        <externalId>false</externalId>
+        <formula>IF(
+AND(
+NOT(ISBLANK( FCR_Opportunity__c )),
+FCR_Opportunity__r.IsWon = True), &quot;True&quot;, null)</formula>
+        <inlineHelpText>Evaluates to &quot;True&quot; if Opportunity is Won - else is blank. Requires that the opportunity name is populated.</inlineHelpText>
+        <label>Opportunity Closed Won</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Closed__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF(
+AND(
+NOT(ISBLANK( FCR_Opportunity__c )),
+ FCR_Opportunity__r.IsClosed  = True), &quot;True&quot;, null)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Opportunity Closed</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Count__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Evaluates to 1 if there is a related opportunity - used for funnel reports.</description>
+        <externalId>false</externalId>
+        <formula>IF ( NOT(ISBLANK( FCR_Opportunity__c )),1,0)</formula>
+        <inlineHelpText>Evaluates to 1 if there is a related opportunity - used for funnel reports.</inlineHelpText>
+        <label>Opportunity Count</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Create_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>DATEVALUE(FCR_Opportunity__r.CreatedDate)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Opportunity Create Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Created_by__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>User that created the opportunity</description>
+        <externalId>false</externalId>
+        <label>Opportunity Created by</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>Campaign_Members</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Response_Error__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Evaluates to true if Response Id field on related opportunity does not match Campaign Member Id</description>
+        <externalId>false</externalId>
+        <formula>IF(ISBLANK( FCR_Opportunity__c),FALSE,
+   IF( LEFT(FCR_Opportunity__r.FCR_Response_ID__c,15) &lt;&gt; Id , TRUE, FALSE))</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Evaluates to true if Response Id field on related opportunity does not match Campaign Member Id</inlineHelpText>
+        <label>Opportunity Response Error</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Value_Lost__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Amount of related lost opportunity. Based on standard opportunity Amount field.</description>
+        <externalId>false</externalId>
+        <formula>IF( 
+AND( 
+NOT(ISBLANK( FCR_Opportunity__c )), 
+ FCR_Opportunity__r.IsClosed = True,
+  FCR_Opportunity__r.IsWon = False 
+) , FCR_Opportunity_Amount__c , 0)</formula>
+        <inlineHelpText>Amount of related lost opportunity. Based on standard opportunity Amount field.</inlineHelpText>
+        <label>Opportunity Value Lost</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity_Value_Won__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Amount of related Won opportunity. Based on standard opportunity Amount field.</description>
+        <externalId>false</externalId>
+        <formula>IF( NOT(ISBLANK(FCR_Opportunity_Closed_Won__c)) ,  FCR_Opportunity_Amount__c , 0)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Amount of related Won opportunity. Based on standard opportunity Amount field.</inlineHelpText>
+        <label>Opportunity Value Won</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Opportunity__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>If an opportunity was created as a result of this MQR follow up the Opportunity Name field will be populated.</description>
+        <externalId>false</externalId>
+        <label>Opportunity Name</label>
+        <referenceTo>Opportunity</referenceTo>
+        <relationshipLabel>Campaign Members</relationshipLabel>
+        <relationshipName>Campaign_Members</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Original_Campaign__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Populated on Full Circle Response Recovery Campaign to indicate the original Campaign ID for failed association</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Populated on Full Circle Response Recovery Campaign to indicate the original Campaign ID for failed association</inlineHelpText>
+        <label>Original Campaign</label>
+        <length>20</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Precedence_Campaign__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Set to the campaign of the response specified in FCR_Precedence_Response__c</description>
+        <externalId>false</externalId>
+        <label>Precedence Campaign</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipLabel>Precedence Campaign Members</relationshipLabel>
+        <relationshipName>Precedence_Campaign_Members</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Precedence_Replaced_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Specifies the date at which this response was replaced by a response to a precedence campaign</description>
+        <externalId>false</externalId>
+        <label>Precedence Replaced Date</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Precedence_Response_Link__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF(
+NOT(ISBLANK(FCR_Precedence_Response__c)),HYPERLINK(&quot;/&quot; &amp;  FCR_Precedence_Response__c,&quot;View Precedence Response&quot;),&quot;&quot;)</formula>
+        <inlineHelpText>If populated, Click here to view the precedence response</inlineHelpText>
+        <label>Precedence Response Link</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Precedence_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Set to the ID of a precedence response that replace this one when it was active.</description>
+        <externalId>false</externalId>
+        <label>Precedence Response ID</label>
+        <length>20</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_QR_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date MQR Achieved</description>
+        <externalId>false</externalId>
+        <label>MQR/QT Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_QR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>System checks this field if the record has met the score qualification threshold.</description>
+        <externalId>false</externalId>
+        <label>MQR/QT</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Repeat_Count__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description># of this repeat 1 = first repeat response.</description>
+        <externalId>false</externalId>
+        <label>Repeat Count</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Replaced_Campaign__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Specifies the ID of the campaign of that was replaced by this response.</description>
+        <externalId>false</externalId>
+        <label>Replaced Campaign</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipLabel>Replaced Campaign Members</relationshipLabel>
+        <relationshipName>Replaced_Campaign_Members</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Replaced_Response_Link__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF( 
+NOT(ISBLANK( FCR_Replaced_Response__c )),HYPERLINK(&quot;/&quot; &amp; FCR_Replaced_Response__c,&quot;View Replaced Response&quot;),&quot;&quot;)</formula>
+        <inlineHelpText>If populated, click here to view the replaced response.</inlineHelpText>
+        <label>Replaced Response Link</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Replaced_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Specifies the ID of the response that was replaced by this response (this is a precedence response)</description>
+        <externalId>false</externalId>
+        <label>Replaced Response ID</label>
+        <length>20</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Response_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Response date</description>
+        <externalId>false</externalId>
+        <label>Response Date</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Response_Engagement_Level__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Displays engagement level for responses.</description>
+        <externalId>false</externalId>
+        <formula>IF ( ISPICKVAL( FCR_Response_Status__c , &quot;Resolved - No Action Required&quot;), &quot;1. No Action Required&quot;,
+IF ( ISPICKVAL( FCR_Response_Status__c , &quot;Legacy&quot;), &quot;1. No Action Required&quot;,  
+IF ( ISPICKVAL( FCR_Response_Status__c , &quot;Resolved - Already Engaged&quot;), &quot;3. Already Engaged&quot;, 
+IF ( ISPICKVAL (FCR_Response_Status__c , &quot;Not A Response&quot;), &quot;Not A Response&quot;, 
+IF (ISBLANK( FCR_Response_Date__c ), &quot;Not A Response&quot;, 
+&quot;2. Engagement&quot;)))))</formula>
+        <inlineHelpText>Displays engagement level for responses.</inlineHelpText>
+        <label>Response Engagement Level</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Response_Score__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Score assigned to this response</description>
+        <externalId>false</externalId>
+        <label>Response Score</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Response_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Current response status</description>
+        <externalId>false</externalId>
+        <label>Response Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Open - Not Contacted</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Working</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Qualifying</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Validation</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Requalify</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sales Nurture</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Unqualified</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sent to Partner</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Recycle to Marketing</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Garbage</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Qualified - New Opportunity</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Resolved - Already Engaged</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Resolved - No Action Required</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Resolved - Opportunity Won</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Resolved - Opportunity Lost</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Not a Response</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Unmapped</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Legacy</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Convert-Merged</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Not Engaged</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Revenue_Timestamp__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Timestamp of batch request that set campaign influence revenue data</description>
+        <externalId>false</externalId>
+        <label>Revenue Timestamp</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SAR_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Sales accepted response date</description>
+        <externalId>false</externalId>
+        <label>SAR Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SAR_Owner__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Owner at the time when the record status mapping to SAR is set on the lead, contact or opportunity.</description>
+        <externalId>false</externalId>
+        <label>SAR Owner</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>SAR_Campaign_Members</relationshipName>
+        <required>false</required>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SAR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set if this is a sales accepted response (sync from lead/contact status)</description>
+        <externalId>false</externalId>
+        <label>SAR</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SAR_to_SQR__c</fullName>
+        <deprecated>false</deprecated>
+        <description># Days from SAR to SQR - Evaluates to blank if SQR Date if blank.</description>
+        <externalId>false</externalId>
+        <formula>FCR_SQR_Date__c -  FCR_SAR_Date__c</formula>
+        <inlineHelpText># Days from SAR to SQR</inlineHelpText>
+        <label>SAR to SQR</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_SQR_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date SQR Set (Converted to Opportunity)</description>
+        <externalId>false</externalId>
+        <label>SQR Date</label>
+        <required>false</required>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SQR_Won__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>SQR Won</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SQR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Response was Qualified (converted)</description>
+        <externalId>false</externalId>
+        <label>SQR</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_SQR_to_Closed_Won__c</fullName>
+        <deprecated>false</deprecated>
+        <description># Days from SQR to Closed/Won - Evaluates to blank if Closed/Won Date if blank.</description>
+        <externalId>false</externalId>
+        <formula>IF(  FCR_Opportunity_Closed_Won__c = &quot;True&quot;, FCR_Opportunity_Closed_Date__c -  FCR_SQR_Date__c , null)</formula>
+        <inlineHelpText># Days from SQR to Closed/Won</inlineHelpText>
+        <label>SQR to Closed/Won</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Status_Age__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>IF( 
+NOT(ISBLANK(FCR_Status_Last_Set__c)), 
+ROUND(NOW()-FCR_Status_Last_Set__c, 0), null)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Status Age</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_Status_Last_Set__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date/time when status was last updated</description>
+        <externalId>false</externalId>
+        <label>Status Last Set</label>
+        <required>false</required>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>FCR_Superpower_Field__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This field will always be cleared after being set. Please see Full Circle CRM Documentation for use of this field.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This field will always be cleared after being set. Please see Full Circle CRM Documentation for use of this field.</inlineHelpText>
+        <label>FCCRM Superpower Field</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>FCR_TQR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that this Response passed threshold and proceeded to be evaluated. On Lead/Contact passing organizations, FCR_QR will also be set.</description>
+        <externalId>false</externalId>
+        <label>Threshold QR</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>FCR_TotalOpRevenueModel1__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 1</description>
+        <externalId>false</externalId>
+        <formula>FCR_ClosedOpRevenueModel1__c + FCR_OpenOpRevenueModel1__c + FCR_LostOpRevenueModel1__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 1</inlineHelpText>
+        <label>Total Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_TotalOpRevenueModel2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 2</description>
+        <externalId>false</externalId>
+        <formula>FCR_ClosedOpRevenueModel2__c + FCR_OpenOpRevenueModel2__c + FCR_LostOpRevenueModel2__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 2</inlineHelpText>
+        <label>Total Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_TotalOpRevenueModel3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 3</description>
+        <externalId>false</externalId>
+        <formula>FCR_ClosedOpRevenueModel3__c + FCR_OpenOpRevenueModel3__c + FCR_LostOpRevenueModel3__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 3</inlineHelpText>
+        <label>Total Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>FCR_View_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Used for related list views on Lead and Contact page layouts</description>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&quot;/&quot; &amp; Id,&quot;View Response&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>View Response</label>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Value_Open__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Amount of related open opportunity. Based on standard opportunity Amount field.</description>
+        <externalId>false</externalId>
+        <formula>IF( 
+AND(
+NOT(ISBLANK( FCR_Opportunity__c )), 
+ FCR_Opportunity__r.IsClosed = False
+) , FCR_Opportunity_Amount__c , 0)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Amount of related open opportunity. Based on standard opportunity Amount field.</inlineHelpText>
+        <label>Opportunity Value Open</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+</CustomObject>

@@ -1,0 +1,3 @@
+<apex:page standardController="Opportunity">
+	<c:InlineLogs2 recordName="Opportunity" recordId="{!opportunity.Id}"/>
+</apex:page>

@@ -1,0 +1,21 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case" >
+
+	<apex:sectionHeader title="RMA Wizard" subtitle="Step 2 of 6"/>
+	
+	<apex:form id="theForm" >
+		<apex:pageBlock id="theSearchBlock" title="Service ID Confirmation if applicable" mode="edit" >
+			<apex:pageBlockButtons location="both" >
+				<apex:commandButton action="{!step1}" value="Previous" />          
+				<apex:commandButton action="{!step2}" value="Next" />
+			</apex:pageBlockButtons>
+   
+			<apex:pageBlockSection collapsible="false" id="item2" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel >Please confirm the Asset</apex:outputLabel>
+					<apex:inputfield value="{!Questionnaire_Wizard__c.RMAAsset__c}" required="true"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+
+</apex:page>

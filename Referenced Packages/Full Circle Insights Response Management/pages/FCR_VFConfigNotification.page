@@ -1,0 +1,176 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Notification Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Notification Configuration" help="https://www.fullcirclecrm.com/fcrm/app/notifications/">
+    <apex:pageMessages />
+    <apex:form >
+        <apex:actionFunction name="locationupdated" action="{!NotificationLocationChanged}"  />
+        <apex:actionFunction name="updatesource" reRender="idSourceAddress"/>
+        <apex:pageBlock title="Notification source address">
+            <apex:outputPanel id="idSourceAddress" layout="block">
+                <apex:pageblockSection columns="2">
+                    <apex:outputText rendered="{!NOT(EmailOptionsVisible)}" value="You must set up one or more Organization Wide Email Addresses that are available to all users and profiles" />
+                    <apex:SelectList rendered="{!EmailOptionsVisible}" onchange="updatesource()" label="Notifications will be sent from:" value="{!CurrentEmailAddressID}" size="1">
+                        <apex:selectOptions value="{!OrgWideEmailAddresses}" />
+                    </apex:SelectList>
+                    <apex:commandButton rendered="{!EmailOptionsVisible}" disabled="{!OrgWideEmailAddressSet}" value="Update notification source address" reRender="idSourceAddress" action="{!SetOrgWideEmailAddress}" oncomplete="updatediagnostics()"/>
+                </apex:pageblockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+        <apex:pageblock id="ideverything" mode="edit" >
+            <apex:outputText style="font-weight:bold;margin-left:10px;margin-right:5px" value="Select location" />
+            <apex:selectList style="width:160px" value="{!NotificationLocation}" size="0" onchange="locationupdated()">
+                <apex:selectOptions value="{!NotificationLocationList}" />
+            </apex:selectList>
+            <apex:outputPanel id="idLocationOption">
+                <apex:inputField required="false" onchange="locationupdated()" rendered="{!IF(NotificationLocation='user',true, false)}" value="{!DummyNotificationCM.FCRM__FCR_Opportunity_Created_by__c}"/>
+                <apex:inputField required="false" onchange="locationupdated()" rendered="{!IF(NotificationLocation='profile',true, false)}" value="{!DummyNotificationuser.ProfileID}"/>
+            </apex:outputPanel>
+            <br /><br />
+            <apex:outputPanel id="idCurrentInfo">
+                <apex:outputText style="font-weight:bold;margin-left:10px;margin-right:5px" value="Effective Notification Settings - {!NotificationLocationName}"/>
+
+                <apex:pageBlockSection rendered="{!ISNULL(NotificationOrgDefaults)}" columns="1">
+                    <apex:outputText >Organization defaults not set - you must set organization defaults before user and profile overrides</apex:outputText>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection rendered="{!NOT(ISNULL(NotificationOrgDefaults))}" columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Enable Email notifications" />
+                        <apex:OutputText value="{!IF(CurrentNotificationInfo.sourceinfo.FCRM__Enable_Email_Notifications__c,'Yes','No')}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Enable Chatter notifications" />
+                        <apex:outputtext value="{!IF(CurrentNotificationInfo.sourceinfo.FCRM__Enable_Chatter_Notifications__c,'Yes','No')}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Enable notifications for response prompt campaigns" 
+                        title="By default, assignments to campaigns that are specified as response UI prompts is disabled." />
+                        <apex:outputText value="{!IF(CurrentNotificationInfo.sourceinfo.FCRM__Enable_Response_Prompt_Notifications__c,'Yes','No')}" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner notification level" />
+                        <apex:outputText value="{!NotificationLevels[CurrentNotificationInfo.sourceinfo.FCRM__Owner_Notification_Level__c]}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Delegate notification level" />
+                        <apex:outputText value="{!NotificationLevels[CurrentNotificationInfo.sourceinfo.FCRM__Delegate_Notification_Level__c]}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Block owner assignment emails on leads" 
+                        title="This option blocks owner assignment email notifications due to new responses on leads even if enabled due to the notification level." />
+                        <apex:outputText value="{!IF(CurrentNotificationInfo.sourceinfo.FCRM__Exclude_L1_On_Leads__c,'Yes','No')}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Block owner assignment emails on contacts"
+                        title="This option blocks owner assignment email notifications due to new responses on contacts even if enabled due to the notification level." />
+                        <apex:outputText value="{!IF(CurrentNotificationInfo.sourceinfo.FCRM__Exclude_L1_On_Contacts__c,'Yes','No')}" />
+                    </apex:pageBlockSectionItem>
+
+                    <apex:repeat value="{!TemplateRepeats}" var="idx">
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!CurrentNotificationInfo.TemplateLabels[idx]}" />
+                            <apex:OutputText value="{!CurrentNotificationInfo.TemplateNames[idx]}"/>
+                        </apex:pageBlockSectionItem>
+                    </apex:repeat>
+                
+           
+                </apex:pageBlockSection>
+                
+                
+            </apex:outputPanel>
+            <br />
+            <apex:outputPanel id="idEditInfo" rendered="{!NOT(IsNULL(NotificationInfoToEdit))}">
+                <apex:outputText style="font-weight:bold;margin-left:10px;margin-right:5px" value="Edit Notification Settings"/>
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Enable Email notifications" />
+                        <apex:inputCheckbox value="{!NotificationInfoToEdit.sourceinfo.FCRM__Enable_Email_Notifications__c}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Enable Chatter notifications" />
+                        <apex:inputCheckbox value="{!NotificationInfoToEdit.sourceinfo.FCRM__Enable_Chatter_Notifications__c}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Enable notifications for response prompt campaign assignments" />
+                        <apex:inputCheckbox value="{!NotificationInfoToEdit.sourceinfo.FCRM__Enable_Response_Prompt_Notifications__c}" />
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner notification level" />
+                        <apex:selectList size="0" value="{!NotificationInfoToEdit.ownerlevel}">
+                            <apex:selectOptions value="{!NotificationLevelOptions}" />
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Delegate notification level" />
+                        <apex:selectList size="0" value="{!NotificationInfoToEdit.delegatelevel}">
+                            <apex:selectOptions value="{!NotificationLevelOptions}" />
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageMessage rendered="{!DelegateNotificationError}" severity="Error" summary="Delegate notification level may not be higher than owner notification level" />
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Block owner assignment emails on leads" />
+                        <apex:inputCheckbox value="{!NotificationInfoToEdit.sourceinfo.FCRM__Exclude_L1_On_Leads__c}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Block owner assignment emails on contacts" />
+                        <apex:inputCheckbox value="{!NotificationInfoToEdit.sourceinfo.FCRM__Exclude_L1_On_Contacts__c}" />
+                    </apex:pageBlockSectionItem>
+
+                    <apex:repeat value="{!TemplateRepeats}" var="idx">
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel for="idtemplate" value="{!NotificationInfoToEdit.TemplateLabels[idx]}" />
+                            <apex:inputField style="width:400px" required="false" id="idtemplate" value="{!dummytemplateobjs[idx].parentid}"/>
+                        </apex:pageBlockSectionItem>
+                    </apex:repeat>
+                
+                </apex:pageBlockSection>
+            
+            </apex:outputPanel>
+
+            <apex:pageblockSection id="idOverrides" columns="1" title="Overrides" >
+                <apex:outputtext value="The following overrides are currently defined:" />
+                <apex:dataTable value="{!OverrideList}" var="ovr">
+                    <apex:column width="40px" >
+                        <apex:commandLink value="Select" title="Select this entry as the current location" action="{!SelectOverride}">
+                            <apex:param name="overrideid" value="{!ovr.setupid}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:column >
+                        <apex:outputtext value="{!ovr.Name}" />
+                    </apex:column>
+                </apex:dataTable>
+                
+            </apex:pageblockSection>
+
+            <apex:pageblockSection id="idNotificationFields" columns="1" title="Additional Notification Fields" >
+                <apex:outputtext value="You can specify custom fields that should be available for notification templates (most standard fields are available by default)" />
+                <apex:commandButton value="Select notification fields" action="{!getConfigNotificationFields}"/>                
+            </apex:pageblockSection>
+
+            <apex:actionFunction name="updatediagnostics" reRender="idDiagnostics"/>
+            <apex:pageblockSection id="idDiagnostics" columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on currently saved notification data.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!NotificationDiagnosticInfo}" />
+            </apex:pageblockSection>
+
+
+            <apex:pageBlockButtons id="idBlockButtons" >
+                <apex:commandButton disabled="{!NOT(ISNULL(NotificationInfoToEdit))}" value="Edit for location" action="{!NotificationEditCurrent}" title="Specify an override to the notification settings for the specified level" />
+                <apex:commandButton disabled="{!NotificationLocationName<>'Overridden'}" value="Clear for location" action="{!NotificationDiscardCurrent}" title="Remove an existing override to the notification settings for the specified level"/> 
+                <apex:commandButton disabled="{!ISNULL(NotificationInfoToEdit)}" value="Apply Changes" action="{!NotificationApplyChanges}" /> 
+                <apex:commandButton value="Return to main" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    <script type="text/javascript">
+        if({!UpdatesApplied}) updatediagnostics();
+    </script>
+    </apex:SectionHeader>
+        <script type="text/javascript">    
+        swapicontitle('Profile Lookup','Select Profile');
+        swapicontitle('Opportunity Created','Select User');
+    </script>
+</apex:page>

@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>Defines the influence contribution of a single opportunity to a single CampaignMember</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <externalSharingModel>ReadWrite</externalSharingModel>
+    <fields>
+        <fullName>Account__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Account related to this influence entry</description>
+        <externalId>false</externalId>
+        <label>Account</label>
+        <referenceTo>Account</referenceTo>
+        <relationshipName>Campaign_Influence_Entries</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Admin_Update_Counter__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Update counter</description>
+        <externalId>false</externalId>
+        <label>Admin Update Counter</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Campaign__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Campaign related to this influence entry.</description>
+        <externalId>false</externalId>
+        <label>Campaign</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipName>Campaign_Influence_Entries</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Cascade_Parent_Campaign__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Cascade parent campaign</description>
+        <externalId>false</externalId>
+        <label>Campaign (Repeat Parent)</label>
+        <referenceTo>Campaign</referenceTo>
+        <relationshipLabel>Campaign Influence Detail (Cascade Parent Campaign)</relationshipLabel>
+        <relationshipName>Campaign_Influence_DetailCP</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>ClosedOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed won opportunity revenue for primary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>ClosedOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue for secondary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>ClosedOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Closed opportunity revenue for tertiary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Closed Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>Contact__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Contact related to this influence entry</description>
+        <externalId>false</externalId>
+        <label>Contact</label>
+        <referenceTo>Contact</referenceTo>
+        <relationshipName>Campaign_Influence_Entries</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Count__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Evaluates to 1 - Use for counting campaign influence detail records in report.</description>
+        <externalId>false</externalId>
+        <formula>1</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Evaluates to 1 - Use for counting campaign influence detail records in report.</inlineHelpText>
+        <label>Count</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Days_Before_Opportunity_Create__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Evaluates to number of days before opportunity create date based on response date. Same day is 0, after opportunity create is blank.</description>
+        <externalId>false</externalId>
+        <formula>IF( Opportunity__r.CreatedDate - Response_Date__c &gt;= 0, Opportunity__r.CreatedDate - Response_Date__c, NULL)</formula>
+        <inlineHelpText>Evaluates to number of days before opportunity create date based on response date. Same day is 0, after opportunity create is blank.</inlineHelpText>
+        <label>Days Before Opportunity Create</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>HasInfluenceModel1__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that this entry has an influence contribution from model 1</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates that this entry has an influence contribution from model 1</inlineHelpText>
+        <label>Has Influence Model 1</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>HasInfluenceModel2__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that this entry has an influence contribution from model 2</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates that this entry has an influence contribution from model 2</inlineHelpText>
+        <label>Has Influence Model 2</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>HasInfluenceModel3__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that this entry has an influence contribution from model 3</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates that this entry has an influence contribution from model 3</inlineHelpText>
+        <label>Has Influence Model 3</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Inquiry_Target_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date Inquiry or Target was set</description>
+        <externalId>false</externalId>
+        <label>Inquiry/Target Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Inquiry_Target__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Has responded to a Marketing Campaign, or is a Sales Target</description>
+        <externalId>false</externalId>
+        <label>Inquiry/Target</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Lead__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Lead</label>
+        <referenceTo>Lead</referenceTo>
+        <relationshipLabel>Campaign Influence Detail</relationshipLabel>
+        <relationshipName>Campaign_Influence_Detail</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>LostOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue for primary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>LostOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue for secondary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>LostOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Lost opportunity revenue for tertiary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Lost Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>Member_Type_On_Create__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Member Type On Create</label>
+        <length>40</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Name_Created_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Displays the lead or contact Name Created Date.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Displays the lead or contact Name Created Date.</inlineHelpText>
+        <label>Name Created Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Net_New_Name__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Checked if associated lead or contact was created within 5 minutes of this response.</description>
+        <externalId>false</externalId>
+        <label>Net New Name</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Next_Opportunity_Stage__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Value of the next Opportunity Stage, if there was an opportunity stage progression after the related Campaign Member Date.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Value of the next Opportunity Stage, if there was an opportunity stage progression after the related Campaign Member Date.</inlineHelpText>
+        <label>Next Opportunity Stage</label>
+        <length>40</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OpenOpRevenueModel1__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue for primary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>OpenOpRevenueModel2__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue for secondary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>OpenOpRevenueModel3__c</fullName>
+        <defaultValue>0</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Open opportunity revenue for tertiary campaign influence model</description>
+        <externalId>false</externalId>
+        <label>Open Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>4</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Stage_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date the value in the ‘Opportunity Stage’ field was set.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Date the value in the ‘Opportunity Stage’ field was set.</inlineHelpText>
+        <label>Opportunity Stage Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Stage_Progression_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date the value in the ‘Next Opportunity Stage’ field was set.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Date the value in the ‘Next Opportunity Stage’ field was set.</inlineHelpText>
+        <label>Opportunity Stage Progression Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Stage__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Value of the Opportunity Stage at the date the Campaign Member Date is calculated. If there is no value, the Campaign Member was pre-opportunity.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Value of the Opportunity Stage at the date the Campaign Member Date is calculated. If there is no value, the Campaign Member was pre-opportunity.</inlineHelpText>
+        <label>Opportunity Stage</label>
+        <length>40</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Timeframe__c</fullName>
+        <deprecated>false</deprecated>
+        <description>This formula evaluates whether a response came in before the influenced opportunity was created (Pre-Opportunity), or during the time the opportunity was open (Opportunity).</description>
+        <externalId>false</externalId>
+        <formula>IF(Response_Date__c &lt;  Opportunity__r.CreatedDate , &quot;Pre-Opportunity&quot;, &quot;Opportunity&quot;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>This formula evaluates whether a response came in before the influenced opportunity was created (Pre-Opportunity), or during the time the opportunity was open (Opportunity).</inlineHelpText>
+        <label>Opportunity Timeframe</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Opportunity__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Opportunity related to this influence entry</description>
+        <externalId>false</externalId>
+        <label>Opportunity</label>
+        <referenceTo>Opportunity</referenceTo>
+        <relationshipName>Campaign_Influence_Entries</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>QR_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date MQR Achieved</description>
+        <externalId>false</externalId>
+        <label>MQR/QT Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>QR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>System checks this field if the record has met the score qualification threshold.</description>
+        <externalId>false</externalId>
+        <label>MQR/QT</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Response_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date of the underlying response</description>
+        <externalId>false</externalId>
+        <label>Response Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Response_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>ID of the related response (CampaignMember)</description>
+        <externalId>false</externalId>
+        <label>Response ID</label>
+        <length>20</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Response_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Response status</description>
+        <externalId>false</externalId>
+        <label>Response Status</label>
+        <length>40</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>SAR_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Sales accepted response date</description>
+        <externalId>false</externalId>
+        <label>SAR Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>SAR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Set if this is a sales accepted response (sync from lead/contact status)</description>
+        <externalId>false</externalId>
+        <label>SAR</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>SQR_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Date SQR Set (Converted to Opportunity)</description>
+        <externalId>false</externalId>
+        <label>SQR Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>SQR_Won__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>SQR Won</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>SQR__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Response was Qualified (converted)</description>
+        <externalId>false</externalId>
+        <label>SQR</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Test_Record__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Test Record</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Tipping_Point_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>If true, this indicates that this response is the tipping point response on the opportunity</description>
+        <externalId>false</externalId>
+        <formula>IF( Opportunity__r.FCR_Response_ID__c = Response_ID__c , TRUE, FALSE)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>If true, this indicates that this response is the tipping point response on the opportunity</inlineHelpText>
+        <label>Tipping Point Response</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>TotalOpRevenueModel1__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 1</description>
+        <externalId>false</externalId>
+        <formula>ClosedOpRevenueModel1__c + OpenOpRevenueModel1__c + LostOpRevenueModel1__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 1</inlineHelpText>
+        <label>Total Op Revenue Model1</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>TotalOpRevenueModel2__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 2</description>
+        <externalId>false</externalId>
+        <formula>ClosedOpRevenueModel2__c + OpenOpRevenueModel2__c + LostOpRevenueModel2__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 2</inlineHelpText>
+        <label>Total Op Revenue Model2</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>TotalOpRevenueModel3__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Total Influence Model 3</description>
+        <externalId>false</externalId>
+        <formula>ClosedOpRevenueModel3__c + OpenOpRevenueModel3__c + LostOpRevenueModel3__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Total Influence Model 3</inlineHelpText>
+        <label>Total Op Revenue Model3</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>UniqueID__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Value of response ID concatonated with opportunity ID (18 character version).
+Optionally appending with _15 or 18 character ID, where it&apos;s the ID of a subsequent level, currently only product supported</description>
+        <externalId>false</externalId>
+        <label>UniqueID</label>
+        <length>60</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Unix_Op_Close_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Opportunity close time in seconds from Jan 1, 1970 (based on 23:59:59 on the close date)</description>
+        <externalId>false</externalId>
+        <label>Unix Op Close Time</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Unix_Op_Create_Time__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Opportunity creation time in ms from Jan 1, 1970</description>
+        <externalId>false</externalId>
+        <label>Unix Op Create Time</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <label>Campaign Influence Detail</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>Campaign__c</columns>
+        <columns>ClosedOpRevenueModel1__c</columns>
+        <columns>LostOpRevenueModel1__c</columns>
+        <columns>OpenOpRevenueModel1__c</columns>
+        <columns>Response_ID__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <nameField>
+        <displayFormat>CI-{0}</displayFormat>
+        <label>Campaign Influence Entry Name</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Campaign Influence Detail</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

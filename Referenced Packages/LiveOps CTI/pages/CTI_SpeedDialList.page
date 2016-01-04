@@ -1,0 +1,45 @@
+<apex:page controller="LiveOpsTransfer.CCTISpeedDialList" language="{!$CurrentPage.parameters.lang}">
+<apex:form >
+    <p><apex:OutputLabel rendered="{!m_boolShowError}" style="font-family:Arial;font-size:18pt;color:red;font-weight:bold;">{!$Label.liveopstransfer__ErrorLabel}</apex:OutputLabel></p>
+    <apex:actionFunction name="SearchAction" action="{!Search}" reRender="page"/>
+    <apex:InputText value="{!m_strAlias}" onkeyup="methodcall();" onkeypress="return handleEnter(this, event)"/>&nbsp;&nbsp;
+    <apex:commandButton value="{!$Label.liveopstransfer__Search}" action="{!Search}" reRender="Table"/>&nbsp;&nbsp;
+    <apex:commandButton value="{!$Label.liveopstransfer__Showall}" action="{!ShowAll}" reRender="Table"/>&nbsp;&nbsp;
+    <apex:commandButton value="{!$Label.liveopstransfer__Back}" onclick="javascript:window.history.go(-1)" reRender="Table"/><p></p>
+    <apex:PageBlock id="page">
+        <p><apex:outputLabel style="font-family:Arial;font-size:14pt;font-weight:bold;" rendered="{!m_boolShowAnonymous}">{!$Label.liveopstransfer__AnonymousList}</apex:outputLabel>
+        <apex:outputLabel style="font-family:Arial;font-size:14pt;font-weight:bold;" rendered="{!m_boolShowListName}">{!m_strListName}</apex:outputLabel></p><br/>
+        <apex:PageBlockTable id="Table" value="{!SDList.targets}" var="parameter" cellpadding="5" rows="{!m_intPageSize}" rendered="{!m_boolShowTable}" >
+            <apex:column >
+                <apex:facet name="header">{!$Label.liveopstransfer__Action}</apex:facet>
+                <apex:commandLink value="{!$Label.liveopstransfer__Call}" onclick="javascript:sendCTIMessage('/TRANSFER_CALL?SPEEDDIALLIST_ID={!m_intListID}&ALIAS={!parameter.alias}&WRAPPINGCAMPAIGNID={!parameter.wrapping_campaign_id}&TARGET={!parameter.target}&TYPE={!parameter.type}&LINE_NUMBER=1')" reRender="Table"/>    
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.liveopstransfer__Alias}</apex:facet>
+                <apex:outputText value="{!parameter.alias}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.liveopstransfer__Type}</apex:facet>
+                <apex:outputLabel rendered="{!parameter.type == 'campaign_id'}">{!$Label.liveopstransfer__Campaign}</apex:outputLabel>
+                <apex:outputLabel rendered="{!parameter.type == 'phone'}">{!$Label.liveopstransfer__Phone}</apex:outputLabel>
+                <apex:outputLabel rendered="{!parameter.type == 'rep_id'}">{!$Label.liveopstransfer__Agent}</apex:outputLabel>
+                <apex:outputLabel rendered="{!parameter.type == 'pool_id'}">{!$Label.liveopstransfer__Pool}</apex:outputLabel>
+            </apex:column>
+        </apex:PageBlockTable>
+        <apex:commandLink value="{!$Label.liveopstransfer__Showmore}" action="{!pageSizeIncrement}" rendered="{!m_boolEnabled}" reRender="page"/>
+    </apex:PageBlock>
+    </apex:form>
+    
+    <script type="text/javascript">
+        function stopRKey(evt) { 
+            var evt = (evt) ? evt : ((event) ? event : null); 
+            var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+            if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+            } 
+            document.onkeypress = stopRKey;
+        function methodcall()
+        {
+            SearchAction();
+        }
+    </script>
+</apex:page>

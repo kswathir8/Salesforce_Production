@@ -1,0 +1,204 @@
+<apex:page standardController="n2de__Team_member__c" extensions="n2de.TeamMemberDetailController" sidebar="false">
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.10.1.min.js')}" type="text/javascript"></script>
+<style>
+<!-- Replace default header icon -->
+img.pageTitleIcon{
+	display: none;
+}
+.content{
+	background-image: url({!URLFOR($Resource.DEResources, 'images/teammember32.png')});
+	background-repeat: no-repeat;
+	background-position-x: 2px;
+}
+</style>
+	<apex:form >
+		<apex:sectionHeader title="Distribution Team Member" subtitle="{!MemberName}"/>
+		<apex:pageBlock id="team_member" title="Team Member">
+		
+			<apex:pageMessages />
+		
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!edit}" value="Edit" rendered="{!RecordAccess.HasEditAccess}"/>
+				<apex:commandButton action="{!deleteTeamMember}" value="Delete" rendered="{!RecordAccess.HasDeleteAccess}" onclick="if (!window.confirm('Are you sure?')) return false;"/>
+				<apex:commandButton action="{!backToSummary}" value="Back" />
+				&nbsp;
+				<apex:commandButton action="{!switchMemberActivity}" value="{!IF(teamMember.n2de__Is_active__c, 'Deactivate Member', 'Activate Member')}"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Information" columns="2" collapsible="false">
+				<apex:outputField value="{!teamMember.n2de__User__c}" rendered="{!NOT(IsDistributeToQueue)}"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Team_member__c.Fields.n2de__Queue_id__c.InlineHelpText}" rendered="{!IsDistributeToQueue}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Team_member__c.Fields.n2de__Queue_id__c.Label}"/>
+					<apex:outputText value="{!MemberQueueName}"/>
+				</apex:pageBlockSectionItem>
+				<apex:outputField value="{!teamMember.n2de__Team__c}"/>
+				<apex:outputField value="{!teamMember.n2de__Is_active__c}" />
+				<apex:outputField value="{!teamMember.n2de__Last_assignment_date__c}" />
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Number of active {!ObjectName}s"/>
+					<apex:outputField value="{!teamMember.n2de__Number_of_active_objects__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:outputField value="{!teamMember.n2de__Daily_assignment_count__c}" />
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="Distribution settings" columns="1" collapsible="false" rendered="false">
+				<apex:outputField value="{!teamMember.n2de__Quota__c}"/>
+				<!--  <apex:outputField value="{!teamMember.Member_cap__c}"/>	-->
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="Distribution hours" columns="1" collapsible="false" rendered="{!NOT(IsDistributeToQueue)}">
+				<apex:outputField value="{!teamMember.n2de__Is_member_distribution_hours__c}"/>
+				<apex:pageBlockSectionItem rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Shift_name__c.Label}"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!DistributionHours.n2de__Shift_name__c}" rendered="{!DistributionHours.n2de__Is_shift_hours__c}"/>
+						<apex:outputText value="--Custom hours--" rendered="{!NOT(DistributionHours.n2de__Is_shift_hours__c)}"/>
+						&nbsp;&nbsp;&nbsp;<apex:outputLink value="/apex/{!NamespacePrefix}ShiftHours?returnTo=TeamMemberDetailView&obj={!teamMember.Id}">Manage shift hours</apex:outputLink>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Timezone__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Timezone__c.Label}"/>
+					<apex:outputText value="{!TimezoneDescription}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Mon_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Monday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Mon_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Mon_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Mon_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Mon_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Mon_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Mon_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Tue_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Tuesday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Tue_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Tue_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Tue_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Tue_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Tue_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Tue_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Wed_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Wednesday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Wed_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Wed_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Wed_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Wed_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Wed_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Wed_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Thu_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Thursday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Thu_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Thu_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Thu_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Thu_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Thu_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Thu_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Fri_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Friday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Fri_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Fri_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Fri_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Fri_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Fri_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Fri_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Sat_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Saturday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Sat_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Sat_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Sat_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Sat_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Sat_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Sat_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Distribution_hours__c.Fields.n2de__Sun_availability__c.InlineHelpText}" rendered="{!teamMember.n2de__Is_member_distribution_hours__c}">
+					<apex:outputLabel value="Sunday"/>
+					<apex:outputPanel >
+						<apex:outputText value="{!distributionHours.n2de__Sun_availability__c}"/>
+						&nbsp;&nbsp;&nbsp;
+						<apex:outputPanel rendered="{!distributionHours.n2de__Sun_availability__c=='Set hours'}">
+							<apex:outputText value="{!distributionHours.n2de__Sun_start_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Sun_start_min__c}"/>
+							<apex:outputLabel value=" to "/>
+							<apex:outputText value="{!distributionHours.n2de__Sun_end_hour__c}"/>
+							<apex:outputText value=":"/>
+							<apex:outputText value="{!distributionHours.n2de__Sun_end_min__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="History" columns="2" collapsible="false">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Created By" for="created_by"/>
+					<apex:outputPanel >
+						<apex:outputField id="created_by" value="{!teamMember.CreatedById}"/>,&nbsp;
+						<apex:outputField value="{!teamMember.CreatedDate}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Last Modified By" for="modified_by"/>
+					<apex:outputPanel >
+						<apex:outputPanel rendered="{!teamMember.n2de__Last_edited_date__c==null}">
+							<apex:outputField id="modified_by" value="{!teamMember.LastModifiedById}"/>,&nbsp;
+							<apex:outputField value="{!teamMember.LastModifiedDate}"/>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!teamMember.n2de__Last_edited_date__c!=null}">
+							<apex:outputField value="{!teamMember.n2de__Last_edited_by__c}"/>,&nbsp;
+							<apex:outputField value="{!teamMember.n2de__Last_edited_date__c}"/>
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+		</apex:pageBlock>
+		<c:HistoryTable historyList="{!latestHistory}" blockTitle="Team Member History" sectionTitle="Team Member Change History"/>
+	</apex:form>
+<c:StatusPanel />
+</apex:page>

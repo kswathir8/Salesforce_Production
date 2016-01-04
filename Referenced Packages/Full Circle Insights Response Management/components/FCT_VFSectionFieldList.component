@@ -1,0 +1,18 @@
+<apex:component controller="FCRM.FCT_SectionFieldListController" >
+  <apex:attribute name="obj" type="SObject" description="Target object" assignTo="{!TargetObject}"/>
+  <apex:attribute name="columns" type="Integer" description="Section columns" assignTo="{!SectionColumns}" default="1" />
+  <apex:attribute name="defaultfields" type="String" description="Comma separated list of default fields" assignTo="{!DefaultFieldcsv}" />
+  <apex:attribute name="fieldset" type="String" description="API Name of fieldset defining fields" assignTo="{!fieldsetname}"/>
+  <apex:attribute name="labeloverrides" type="String" description="Comma separated list of field label override pairs: field,override" assignTo="{!FieldLabelOverrides}" />
+  <apex:attribute name="currencydatefield" type="String" description="API name of a date or datetime field to use for dated conversion of currency fields" assignTo="{!convertCurrenciesDate}" />
+  <apex:pageblockSection id="idSFSection" columns="{!SectionColumns}" collapsible="false" showHeader="false">
+      <apex:repeat value="{!FieldList}" var="fieldname">
+          <apex:outputField rendered="{!LEN(FieldLabels[fieldname])==0 && LEN(FieldValues[fieldname])==0}" value="{!TargetObject[fieldname]}"/>
+          <apex:outputField rendered="{!LEN(FieldLabels[fieldname])>0 && LEN(FieldValues[fieldname])==0}" label="{!FieldLabels[fieldname]}" value="{!TargetObject[fieldname]}"/>
+          <apex:pageBlockSectionItem rendered="{!LEN(FieldValues[fieldname])>0}">
+              <apex:outputText value="{!FieldLabels[fieldname]}" />
+              <apex:outputText value="{!FieldValues[fieldname]}" />
+          </apex:pageBlockSectionItem>
+      </apex:repeat>
+  </apex:pageblockSection>
+</apex:component>

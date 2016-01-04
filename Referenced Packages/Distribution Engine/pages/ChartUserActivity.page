@@ -1,0 +1,103 @@
+<apex:page controller="n2de.ChartDistributionController" sidebar="false" tabstyle="Distribution_Analytics__tab">
+<script src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.10.1.min.js')}" type="text/javascript"></script>
+<style>
+.date_footer td{
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+}
+</style>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization',
+       'version':'1','packages':['timeline']}]}"></script>
+       <c:CommonMask />
+<script type="text/javascript">
+	$(document).ready(function() {
+		showMask();
+		$("#date_range").change(function() {
+			showMask();
+			drawChart();
+		});
+	});
+	
+	var teamId = '';
+	google.setOnLoadCallback(drawChart);
+	
+	function drawChart() {
+  
+	var dateRange = $("#date_range").val();
+	Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ChartDistributionController.getUserActivity}',teamId,dateRange,
+		function(result, event){  
+  			if (result && result.length > 0) {
+  				$('#error_cont').html('');
+				var container = document.getElementById('user_activity_chart_containter');
+				var chart = new google.visualization.Timeline(container);
+				var dataTable = new google.visualization.DataTable();
+	
+				dataTable.addColumn({ type: 'string', id: 'Name' });
+				dataTable.addColumn({ type: 'string', id: 'Activity' });
+				dataTable.addColumn({ type: 'date', id: 'Start Activity' });
+				dataTable.addColumn({ type: 'date', id: 'End Activity' });
+				for(var i=0; i<result.length; i++){
+				   var thisRow = result[i];
+				   	if(thisRow.activityList != undefined){
+						for(var j=0; j<thisRow.activityList.length; j++){
+				    		var thisActivity = thisRow.activityList[j];
+				    		var thisDate = thisActivity.startDate;
+				    		thisDate.month = thisDate.month - 1;
+				    		var nextDate = thisActivity.endDate;
+				    		nextDate.month = nextDate.month - 1;
+				  			dataTable.addRow([ thisRow.userName,  thisActivity.actionName,  new Date(thisDate.year,thisDate.month,thisDate.day,thisDate.hour,thisDate.minute,thisDate.second), 
+				  				new Date(nextDate.year,nextDate.month,nextDate.day,nextDate.hour,nextDate.minute,nextDate.second) ]);
+				    	}
+					}
+				}
+	
+				var colours = [];
+				var startsWithLogIn = false;
+				var numberRows = dataTable.getNumberOfRows();
+				if (numberRows >= 1) {
+					var firstAction = dataTable.getValue(0, 1);
+					if (firstAction == 'Log in') {
+						colours.push('#8d8');
+						startsWithLogIn = true;
+					} else {
+						colours.push('#708090');
+					}
+		
+					if (startsWithLogIn) {
+						colours.push('#708090');
+					} else {
+						colours.push('#8d8');
+					}
+				} else {
+					colours = ['#708090','#8d8'];
+	 			}
+	
+	 
+				var options = {
+					colors: colours,
+					timeline: { colorByRowLabel: false, groupByRowLabel: true, avoidOverlappingGridLines: false, width: 4	500px },
+				};
+	
+				chart.draw(dataTable, options);
+			} else {
+				$('#error_cont').html('<span>No data for this period</span>');
+			}
+			hideMask();
+		}, 
+		{escape:true});
+  
+	}
+</script>
+
+<apex:sectionHeader title="Analytics" subtitle="User login activity"/>
+<br/>
+<select id="date_range">
+<option value="today">Today</option>
+<option value="this_week">This week</option>
+<option value="this_year">This year</option>
+</select>
+<br/><br/>
+<div id="error_cont"></div>
+<div id="user_activity_chart_containter" style="height: 2000px;"></div>
+<c:StatusPanel />
+</apex:page>

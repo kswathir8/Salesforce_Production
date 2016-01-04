@@ -1,0 +1,151 @@
+<apex:page controller="FCRM.FCR_VFConfigMainController" title="Assignment Configuration" tabStyle="Full_Circle_CRM__tab" action="{!RedirectIfNotValid}">
+    <apex:includeScript value="{!$Resource.FCRM__FCR_ScriptLibrary}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FCRM__FCRStyleSheet)}"/>
+    <apex:SectionHeader title="Full Circle CRM Assignment Configuration" help="https://www.fullcirclecrm.com/fcrm/app/assignment/">
+    <apex:pageMessages />
+    <apex:form >
+        <apex:pageblock mode="edit" >
+            <apex:pageBlockSection columns="2" title="Global Settings">
+                    <apex:inputcheckbox label="Do Not Trigger Assignments for Response Prompt Campaigns" id="idRPCAssign" value="{!NoResponsePromptUIAssignment}" />
+                <apex:outputText >When selected, if a user selects a response prompt from the drop down UI - assignments will not trigger.</apex:outputText>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="2" title="Lead Assignment">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignLeadByOwner" value="Use owner assignment" />
+                    <apex:inputfield required="false" id="idAssignLeadByOwner" value="{!AssignmentLeadByOwner.OwnerID}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText >This option allows you to specify assignment by setting the lead owner to a specific user or queue. 
+                Some assignment engines work by detecting an ownership change to an "assignment" queue. Leave blank or clear to allow other types of assignment. 
+                This is the highest priority option.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignLeadOwnerIsFinal" value="Lead owner assignment is final" />
+                    <apex:inputcheckbox id="idAssignLeadOwnerIsFinal" value="{!AssignLeadOwnerIsFinal}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText >This option indicates that the owner assignment (above) is the actual final owner of the lead (rather than 
+                a queue that will trigger reassignment). When checked, the system will send any requested notifications directly to the 
+                owner specified above instead of waiting for reassignment to complete. This option is ignored if owner assignment is not in use.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignLeadByField" value="Use field to trigger assignment" />
+                    <apex:selectList id="idAssignLeadByField" value="{!AssignLeadUsingField}" size="0">
+                        <apex:selectOptions value="{!LeadAssignmentCheckboxes}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Use this option to specify a checkbox field on the lead that will be set to trigger assignment. 
+                This can be used to trigger assignment with some assignment engines, or to trigger your own workflows or APEX code to perform 
+                assignment. Be sure to clear this field after the lead is assigned. Leave or set to '-- Select Field --' to allow assignment using assignment rules (below).
+                </apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignmentRule" value="Use Assignment Rule" />
+                    <apex:selectList id="idAssignmentRule" value="{!AssignLeadUsingRule}" size="0">
+                        <apex:selectOptions value="{!LeadAssignmentRules}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Select the assignment rule to use if not setting assignment using an owner or field. 
+                Select Default Rule to use the current active field. Otherwise, specify the assignment rule to use.</apex:outputText>
+            
+            </apex:pageBlockSection>
+            <apex:actionFunction name="SetNewLead" action="{!ClickedNewLeadQ}" reRender="idAssignable" >
+                <apex:param name="qname" value="1"/>
+            </apex:actionFunction>
+            <apex:pageBlockSection id="idReassignable" columns="2" title="Lead Reassignment Queues and Users">
+                <apex:datatable width="100%" id="idAssignable" value="{!LeadProcessingQueues}" var="que">
+                    <apex:column value="{!que.QueueUserName}" headerValue="Name"/>
+                    <apex:column headerClass="CenterHeader" styleClass="CenterHeader" headerValue="Type">
+                        <apex:outputText rendered="{!que.IsQueue}" value="Queue" />
+                        <apex:outputText rendered="{!NOT(que.IsQueue)}" value="User" />
+                    </apex:column>
+                    <apex:column headerClass="CenterHeader" styleClass="CenterHeader" headerValue="New Lead Processing">
+                        <apex:inputCheckbox onclick="SetNewLead('{!que.name}');" value="{!que.NewLeadQueue}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:commandButton value="Remove" action="{!RemoveProcessingQueue}" reRender="idAssignable">
+                            <apex:param name="toremove" value="{!que.name}"/>
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:datatable>
+                <apex:outputText >Leads owned by these queues and users are subject to reassignment</apex:outputText>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idQueueSelect" value="Select Reassignment Queue" />
+                    <apex:selectList id="idQueueSelect" value="{!NewAssignmentQueue}" size="0">
+                        <apex:selectOptions value="{!AvailableQueues}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText value="You can specify that a lead queue or a user is subject to reassignment" />
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idQueueSelect" value="Select a reassignment user" />
+                    <apex:inputField required="false" value="{!NewAssignmentUser.FCRM__FCR_Opportunity_Created_by__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:outputText value="" />
+                <apex:pageBlockSectionItem >
+                    <apex:pageMessage severity="Error" summary="{!AddQueueOrUserError}" rendered="{!NOT(ISBlank(AddQueueOrUserError))}" />
+                    <apex:commandButton action="{!AddNewQueueOrUser}" reRender="idReassignable" value="Insert queue or user"/>
+                </apex:pageBlockSectionItem>
+    
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="2" title="Contact Assignment">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignContactByOwner" value="Use owner assignment" />
+                    <apex:inputfield id="idAssignContactByOwner" value="{!DummyCM3.FCRM__FCR_Opportunity_Created_by__c}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText >This option allows you to specify assignment by setting the contact owner to a specific user. 
+                Some assignment engines work by detecting an ownership change to an "assignment" queue. Leave blank or clear to allow other types of assignment. 
+                This is the highest priority option.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignContactOwnerIsFinal" value="Contact owner assignment is final" />
+                    <apex:inputcheckbox id="idAssignContactOwnerIsFinal" value="{!AssignContactOwnerIsFinal}" />
+                </apex:pageBlockSectionItem>
+                <apex:outputText >This option indicates that the owner assignment (above) is the actual final owner of the contact (rather than 
+                a user that will trigger reassignment). When checked, the system will send any requested notifications directly to the 
+                owner specified above instead of waiting for reassignment to complete. This option is ignored if owner assignment is not in use.</apex:outputText>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignContactByField" value="Use field to trigger assignment" />
+                    <apex:selectList id="idAssignContactByField" value="{!AssignContactUsingField}" size="0">
+                        <apex:selectOptions value="{!ContactAssignmentCheckboxes}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Use this option to specify a checkbox field on the contact that will be set to trigger assignment. 
+                This can be used to trigger assignment with some assignment engines, or to trigger your own workflows or APEX code to perform 
+                assignment. Be sure to clear this field after the contact is assigned.
+                </apex:outputText>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="idAssignContactControlField" value="Contact assignment control field" />
+                    <apex:selectList id="idAssignContactControlField" value="{!AssignContactControlField}" size="0">
+                        <apex:selectOptions value="{!ContactAssignmentControlOptions}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputText >Specify a checkbox field that controls whether a contact is subject to reassignment. If left blank, no contacts 
+                will be reassigned. If set, this field will be tested to determine if a specific contact should be reassigned. This feature 
+                is used for contacts in place of the Lead Reassignment Queues/users feature that is used with leads. 
+                This may also be a text formula field that returns "true" or "false".
+                </apex:outputText>
+
+ 
+            
+            </apex:pageBlockSection>
+
+            <apex:pageblockSection columns="1" title="Diagnostic Report" >
+                <apex:outputText >The following diagnostic status is based on the currently saved data. Save the page and then return to the page for an updated report.</apex:outputText>
+                <c:FCR_VFDiagnosticList DiagnosticInfo="{!AssignmentDiagnosticInfo}" />
+            </apex:pageblockSection>
+
+        
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save and return to main" action="{!AssignmentSave}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!getConfigMainReference}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+    </apex:form>
+    </apex:SectionHeader>
+    <script type="text/javascript">    
+        swapicontitle('Opportunity Created','Select User');
+        swapicontitle('Lead Owner','Select User');
+    </script> 
+</apex:page>

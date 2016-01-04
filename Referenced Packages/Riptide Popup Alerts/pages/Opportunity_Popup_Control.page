@@ -1,0 +1,21 @@
+<apex:page standardController="Opportunity">
+
+  <script type="text/javascript"> 
+    var s = "";
+    var a = "{!JSENCODE(Opportunity.Account.rrpu__Alert_Message__c)}";
+    if (a.length > 0)
+    { 
+      s += "Account Alert: " + a + "\n"; 
+    } 
+    var o = "{!JSENCODE(Opportunity.rrpu__Alert_Message__c)}";
+    if (o.length > 0)
+    { 
+      s += "Opportunity Alert: " + o + "\n"; 
+    } 
+    if (s.length > 0)
+    { 
+      window.alert(s); 
+    } 
+  </script> 
+  
+</apex:page>

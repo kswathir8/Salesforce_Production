@@ -1,0 +1,67 @@
+<apex:page standardController="Questionnaire_Wizard__c" extensions="RMAWizard" tabStyle="Case"  >
+ 
+  <apex:sectionHeader title="RMA Wizard" subtitle="Step 6 of 6"/>
+  <apex:form id="theForm" > 
+
+      
+     <apex:pageBlock id="theSearchBlock" title="Confirmation" mode="edit" >
+           <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!step6}" value="Previous" />          
+           <apex:commandButton action="{!save}" value="Save" />
+          </apex:pageBlockButtons>
+          
+      
+      <apex:pageBlockSection id="Q4" columns="2" title="Contact and Asset Information"  collapsible="false"  >
+      <apex:outputField value="{!Questionnaire_Wizard__c.Contact__c}" />
+      <apex:outputField value="{!Questionnaire_Wizard__c.RMAAsset__c}" />
+      <apex:outputField value="{!Questionnaire_Wizard__c.Account__c}" />
+      
+      <apex:outputField value="{!Questionnaire_Wizard__c.Related_Case__c}" />
+      <apex:outputField value="{!Questionnaire_Wizard__c.Service_ID__c}" />    
+      
+      </apex:pageBlockSection>
+      
+      <apex:pageBlockSection id="Q5" columns="2" title="RMA Checklist Items"  collapsible="false"  >
+      <apex:outputField value="{!QW.Return_Shipping_Label__c}" />
+      <apex:outputField value="{!QW.Can_Appliance_Boot__c}" />    
+      <apex:outputField value="{!QW.Lights_On_Device__c}" />
+      <apex:outputField value="{!QW.Drive_Or_Raid__c}" />
+      <apex:outputField value="{!QW.Loud_Noise__c}" />
+      <apex:outputField value="{!QW.Fan__c}" />
+      <apex:outputField value="{!QW.Beeps__c}" />
+      <apex:outputField value="{!QW.Notes__c}" />
+      </apex:pageBlockSection>
+  
+  
+      <apex:pageBlockSection id="Q6" columns="2" title="RMA Details"  collapsible="false"  >
+      <apex:outputField value="{!Questionnaire_Wizard__c.RMA_Type__c}" />
+      <apex:outputField value="{!Questionnaire_Wizard__c.Reason__c}" />    
+      <apex:outputField value="{!Questionnaire_Wizard__c.Firmware_Version__c}" />
+      <apex:outputField value="{!Questionnaire_Wizard__c.Model__c}" />
+      <apex:outputField value="{!Questionnaire_Wizard__c.Type_of_return__c}" />
+      </apex:pageBlockSection>
+
+      <apex:pageBlockSection id="Q7" columns="2" title="Shipping Information"  collapsible="false"  >
+      <apex:outputField value="{!QW.Ship_To__c}" />
+      <apex:outputField value="{!QW.Account__c}" />    
+      <apex:outputField value="{!QW.ShippingStreet__c}" />
+      <apex:outputField value="{!QW.ShippingCity__c}" />
+      <apex:outputField value="{!QW.ShippingState__c}" />
+      <apex:outputField value="{!QW.ShippingPostalCode__c}"/>
+      <apex:outputField value="{!QW.ShippingCountry__c}"/>   
+      </apex:pageBlockSection>
+      
+      <apex:pageBlockSection id="Q9" columns="2" title="Additional Information"  collapsible="false"  >
+      <apex:outputField value="{!QW.Additional_Email_1__c}" />
+      <apex:outputField value="{!QW.Additional_Email_2__c}" />
+      <apex:outputField value="{!QW.Additional_Email_3__c}" />
+      
+      </apex:pageBlockSection>
+
+
+      </apex:pageBlock>
+  
+       
+       
+  </apex:form>
+</apex:page>

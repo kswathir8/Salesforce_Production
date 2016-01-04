@@ -1,0 +1,154 @@
+<apex:page controller="n2de.HolidayController" tabStyle="Manage_Holidays__tab" sidebar="false">
+<c:CommonHelp help_page="distribution-holidays" />
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/combobox.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/requiredBlockUtil.js')}"></script>
+<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/combobox.css')}" type="text/css" />
+
+	<script>
+		$(document).ready(function() {
+			$('.hol_form').on("keyup keypress", function(e) {
+			  	var code = e.keyCode || e.which; 
+			  	if (code  == 13) {               
+			    	e.preventDefault();
+			    	return false;
+				}
+			});	
+		
+			$('.hours_sel option[value="24:30"]').remove();
+			var allDay = '{!HolidayRecord.n2de__Is_all_day__c}';
+			
+			var startTime;
+			var endTime;
+			if (allDay != 'true') {
+				var sh = $('[id$=hol_start_hour]').val();
+				var sm = $('[id$=hol_start_min]').val();
+				startTime = sh + ':' + sm;
+				$('#holiday_start option[value="' + startTime + '"]').attr('selected', 'selected');
+				var eh = $('[id$=hol_end_hour]').val();
+				var em = $('[id$=hol_end_min]').val();
+				endTime = eh + ':' + em;
+				$('#holiday_end option[value="' + endTime + '"]').attr('selected', 'selected');
+			}
+			
+			$('#holiday_start').combobox({
+				isstart: true,
+				onchange: function(options, value) {
+					setTimes(value, options.isstart);
+				},
+				placeholder: '--:--',
+				presetValue: startTime
+			});
+			$('#holiday_end').combobox({
+				isstart: false,
+				onchange: function(options, value) {
+					setTimes(value, options.isstart);
+				},
+				placeholder: '--:--',
+				presetValue: endTime
+			});
+			
+			if (allDay == 'true') {
+				$('#holiday_start').combobox('disable');
+				$('#holiday_end').combobox('disable');
+			}
+			
+			$('.all_day').change(function () {
+				if($(this).is(":checked")) {
+					$('#holiday_start').combobox('disable');
+					$('#holiday_end').combobox('disable');
+				} else {
+					$('#holiday_start').combobox('enable');
+					$('#holiday_end').combobox('enable');
+				}			
+			});
+		});
+		
+		function setTimes(time, isStart) {
+			var splitTime = time.split(':');
+			if (splitTime.length == 2) {
+				if (isStart) {
+					$('[id$=hol_start_hour]').val(splitTime[0]);
+					$('[id$=hol_start_min]').val(splitTime[1]);
+				} else {
+					$('[id$=hol_end_hour]').val(splitTime[0]);
+					$('[id$=hol_end_min]').val(splitTime[1]);
+				}
+			} else {
+				if (isStart) {
+					$('[id$=hol_start_hour]').val('');
+					$('[id$=hol_start_min]').val('');
+				} else {
+					$('[id$=hol_end_hour]').val('');
+					$('[id$=hol_end_min]').val('');
+				}
+			}
+		}
+	
+	</script>
+
+	<apex:form styleClass="hol_form">
+		<apex:sectionHeader title="Distribution Holiday Edit" subtitle="New Holiday"/>
+		
+		<apex:pageBlock title="Holiday Edit" mode="edit">
+		
+			<apex:pageMessages />
+		
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton value="Save" action="{!saveHoliday}"/>
+				<apex:commandButton value="Cancel" action="{!cancelHoliday}"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Holiday Information" columns="2" collapsible="false">
+				<apex:inputField value="{!HolidayRecord.Name}" styleClass="requiredIndicator"/>
+				<apex:outputField value="{!HolidayRecord.n2de__Holiday_group__c}"/>
+				<apex:inputField value="{!HolidayRecord.n2de__Date__c}" styleClass="requiredIndicator"/>
+				<apex:pageBlockSectionItem helpText="Determine which timezone this holiday record is for. ">
+					<apex:outputLabel value="Timezone"/>
+					<apex:selectList value="{!HolidayRecord.n2de__Timezone__c}" size="1">
+						<apex:selectOptions value="{!TimezoneOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:inputField value="{!HolidayRecord.n2de__Is_all_day__c}" styleClass="all_day"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Holiday__c.Fields.n2de__Start_hour__c.InlineHelpText}">
+					<apex:outputLabel value="Time"/>
+					<apex:outputPanel id="holiday_hours">
+						<select id="holiday_start" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!HolidayStartHoursOptionList}" var="h">
+								<apex:repeat value="{!HolidayMinutesOptionList}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+						<apex:inputHidden value="{!HolidayRecord.n2de__Start_hour__c}" id="hol_start_hour"/>
+						<apex:inputHidden value="{!HolidayRecord.n2de__Start_min__c}" id="hol_start_min"/>
+						<apex:outputLabel value="to"/>
+						<select id="holiday_end" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!HolidayEndHoursOptionList}" var="h">
+								<apex:repeat value="{!HolidayMinutesOptionList}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+						<apex:inputHidden value="{!HolidayRecord.n2de__End_hour__c}" id="hol_end_hour"/>
+						<apex:inputHidden value="{!HolidayRecord.n2de__End_min__c}" id="hol_end_min"/>
+					</apex:outputPanel>
+					
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+		</apex:pageBlock>
+	</apex:form>
+	
+	<script>
+		jQuery(document).ready(function($){
+			//Add default required field identifier
+			RequiredBlockUtil.addRequiredBlock('.requiredIndicator');
+		});
+	</script>
+<c:StatusPanel />
+</apex:page>

@@ -1,0 +1,3 @@
+<apex:page standardController="Contact" showHeader="false" >
+    <c:FCR_VFResponseInfo record="{!Contact}" />
+</apex:page>

@@ -1,0 +1,193 @@
+<apex:page controller="n2de.OutOfOfficeController" tabStyle="Out_of_office__tab" sidebar="false">
+	
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-1.7.1.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/jquery-ui-1.10.4.min.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/combobox.js')}"></script>
+	<script type="text/javascript" src="{!URLFOR($Resource.DEResources, 'scripts/requiredBlockUtil.js')}"></script>
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/jquery-ui-1.10.4.css')}" type="text/css" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.DEResources, 'css/combobox.css')}" type="text/css" />
+	
+	<c:CommonHelp help_page="distribution-ooo"/>
+	<c:CommonMask />
+	
+	<script>
+		$(document).ready(function() {	
+			$('.oo_form').on("keyup keypress", function(e) {
+			  	var code = e.keyCode || e.which; 
+			  	if (code  == 13) {               
+			    	e.preventDefault();
+			    	return false;
+				}
+			});
+			
+			$('.hours_sel option[value="24:30"]').remove();
+			var startAllDay = '{!OutOfOfficeRecord.n2de__Start_is_all_day__c}';
+			var endAllDay = '{!OutOfOfficeRecord.n2de__End_is_all_day__c}';
+			
+			var startTime;
+			var endTime;
+			if (startAllDay != 'true') {
+				var sh = $('[id$=oo_start_hour]').val();
+				var sm = $('[id$=oo_start_min]').val();
+				startTime = sh + ':' + sm;
+				$('#oo_start option[value="' + startTime + '"]').attr('selected', 'selected');
+			}
+			if (endAllDay != 'true') {
+				var eh = $('[id$=oo_end_hour]').val();
+				var em = $('[id$=oo_end_min]').val();
+				endTime = eh + ':' + em;
+				$('#oo_end option[value="' + endTime + '"]').attr('selected', 'selected');
+			}
+			
+			$('#oo_start').combobox({
+				isstart: true,
+				onchange: function(options, value) {
+					setTimes(value, options.isstart);
+				},
+				placeholder: '--:--',
+				presetValue: startTime
+			});
+			$('#oo_end').combobox({
+				isstart: false,
+				onchange: function(options, value) {
+					setTimes(value, options.isstart);
+				},
+				placeholder: '--:--',
+				presetValue: endTime
+			});
+			
+
+			if (startAllDay == 'true') {
+				$('#oo_start').combobox('disable');
+			}
+			if (endAllDay == 'true') {
+				$('#oo_end').combobox('disable');
+			}
+			
+			$('.start_allday').change(function () {
+				if($(this).is(":checked")) {
+					$('#oo_start').combobox('disable');
+				} else {
+					$('#oo_start').combobox('enable');
+				}		
+			});
+			
+			$('.end_allday').change(function () {
+				if($(this).is(":checked")) {
+					$('#oo_end').combobox('disable');
+				} else {
+					$('#oo_end').combobox('enable');
+				}		
+			});
+		});
+		
+		function setTimes(time, isStart) {
+			var splitTime = time.split(':');
+			if (splitTime.length == 2) {
+				if (isStart) {
+					$('[id$=oo_start_hour]').val(splitTime[0]);
+					$('[id$=oo_start_min]').val(splitTime[1]);
+				} else {
+					$('[id$=oo_end_hour]').val(splitTime[0]);
+					$('[id$=oo_end_min]').val(splitTime[1]);
+				}
+			} else {
+				if (isStart) {
+					$('[id$=oo_start_hour]').val('');
+					$('[id$=oo_start_min]').val('');
+				} else {
+					$('[id$=oo_end_hour]').val('');
+					$('[id$=oo_end_min]').val('');
+				}
+			}
+		}
+
+	</script>
+	
+	<apex:form styleClass="oo_form">
+		<apex:sectionHeader title="Distribution Out of Office Edit" subtitle="{!IF(OutOfOfficeRecord.Id=='', 'New Out Of Office', OutOfOfficeRecord.Name)}"/>
+		
+		<apex:pageBlock title="Out of Office Edit" mode="edit">
+		
+			<apex:pageMessages />
+		
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton value="Save" action="{!saveOutOfOffice}" styleClass="saveOutOfOffice"/>
+				<apex:commandButton value="Cancel" action="{!cancelOutOfOffice}"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Out of Office Information" columns="2" collapsible="false">
+				<apex:pageBlockSectionItem rendered="{!selectedType =='User'}">
+					<apex:outputLabel value="User"/>
+					<apex:outputText value="{!UserName}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!selectedType =='Queue'}">
+					<apex:outputLabel value="Queue"/>
+					<apex:outputText value="{!QueueName}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:inputField value="{!OutOfOfficeRecord.Name}" styleClass="requiredIndicator "/>
+				<apex:pageBlockSectionItem helpText="Determine which timezone this out of office record is for. The user {!username} is on {!targetUserTimezone} time (you are on {!currentUserTimezone} time)." rendered="{!selectedType == 'User'}">
+					<apex:outputLabel value="Timezone"/>
+					<apex:selectList value="{!OutOfOfficeRecord.n2de__Timezone__c}" size="1">
+						<apex:selectOptions value="{!TimezoneOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="Determine which timezone this out of office record is for. You are on {!currentUserTimezone} time." rendered="{!selectedType == 'Queue'}">
+					<apex:outputLabel value="Timezone"/>
+					<apex:selectList value="{!OutOfOfficeRecord.n2de__Timezone__c}" size="1">
+						<apex:selectOptions value="{!TimezoneOptionList}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+
+				<apex:inputField value="{!OutOfOfficeRecord.n2de__Start_date__c}" styleClass="requiredIndicator startDate"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Out_of_office__c.Fields.n2de__Start_hour__c.InlineHelpText}">
+					<apex:outputLabel value="Time"/>
+					 <apex:outputPanel id="start_hours">
+						<select id="oo_start" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!OutOfOfficeStartHoursOptionList}" var="h">
+								<apex:repeat value="{!OutOfOfficeMinutesOptionList}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+						<apex:inputField value="{!OutOfOfficeRecord.n2de__Start_is_all_day__c}" styleClass="start_allday"/>
+						<apex:outputLabel value="All day"/>
+						<apex:inputHidden value="{!OutOfOfficeRecord.n2de__Start_hour__c}" id="oo_start_hour"/>
+						<apex:inputHidden value="{!OutOfOfficeRecord.n2de__Start_min__c}" id="oo_start_min"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				
+				<apex:inputField value="{!OutOfOfficeRecord.n2de__End_date__c}" styleClass="requiredIndicator endDate"/>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.n2de__Out_of_office__c.Fields.n2de__Start_hour__c.InlineHelpText}">
+					<apex:outputLabel value="Time"/>
+					 <apex:outputPanel id="end_hours">
+						<select id="oo_end" class="hours_sel">
+							<option value=""/>
+							<apex:repeat value="{!OutOfOfficeEndHoursOptionList}" var="h">
+								<apex:repeat value="{!OutOfOfficeMinutesOptionList}" var="m">
+									<option value="{!h.value}:{!m.value}">{!h.label}:{!m.label}</option>
+								</apex:repeat>
+			 				</apex:repeat>
+						</select>
+						<apex:inputField value="{!OutOfOfficeRecord.n2de__End_is_all_day__c}" styleClass="end_allday"/>
+						<apex:outputLabel value="All day"/>
+						<apex:inputHidden value="{!OutOfOfficeRecord.n2de__End_hour__c}" id="oo_end_hour"/>
+						<apex:inputHidden value="{!OutOfOfficeRecord.n2de__End_min__c}" id="oo_end_min"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+			</apex:pageBlockSection>
+			
+		</apex:pageBlock>
+	</apex:form>
+	
+	<script>
+		jQuery(document).ready(function($){
+			//Add default required field identifier
+			RequiredBlockUtil.addRequiredBlock('.requiredIndicator');
+		});
+	</script>
+<c:StatusPanel />
+</apex:page>

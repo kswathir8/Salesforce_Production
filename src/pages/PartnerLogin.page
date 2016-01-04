@@ -1,0 +1,171 @@
+<apex:page docType="html-5.0" controller="PartnerLoginController" showHeader="false" sidebar="false" standardStylesheets="false">
+<html lang="en-US" id="login-bkg">
+<head>
+<meta charset="UTF-8" />
+<meta content="width=device-width,minimum-scale=1,maximum-scale=1" name="viewport" />
+<meta name="format-detection" content="telephone=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(n,e,t){function r(t){if(!e[t]){var o=e[t]={exports:{}};n[t][0].call(o.exports,function(e){var o=n[t][1][e];return r(o?o:e)},o,o.exports)}return e[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<t.length;o++)r(t[o]);return r}({QJf3ax:[function(n,e){function t(n){function e(e,t,a){n&&n(e,t,a),a||(a={});for(var u=c(e),f=u.length,s=i(a,o,r),p=0;f>p;p++)u[p].apply(s,t);return s}function a(n,e){f[n]=c(n).concat(e)}function c(n){return f[n]||[]}function u(){return t(e)}var f={};return{on:a,emit:e,create:u,listeners:c,_events:f}}function r(){return{}}var o="nr@context",i=n("gos");e.exports=t()},{gos:"7eSDFh"}],ee:[function(n,e){e.exports=n("QJf3ax")},{}],3:[function(n,e){function t(n){return function(){r(n,[(new Date).getTime()].concat(i(arguments)))}}var r=n("handle"),o=n(1),i=n(2);"undefined"==typeof window.newrelic&&(newrelic=window.NREUM);var a=["setPageViewName","addPageAction","setCustomAttribute","finished","addToTrace","inlineHit","noticeError"];o(a,function(n,e){window.NREUM[e]=t("api-"+e)}),e.exports=window.NREUM},{1:12,2:13,handle:"D5DuLP"}],gos:[function(n,e){e.exports=n("7eSDFh")},{}],"7eSDFh":[function(n,e){function t(n,e,t){if(r.call(n,e))return n[e];var o=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(n,e,{value:o,writable:!0,enumerable:!1}),o}catch(i){}return n[e]=o,o}var r=Object.prototype.hasOwnProperty;e.exports=t},{}],D5DuLP:[function(n,e){function t(n,e,t){return r.listeners(n).length?r.emit(n,e,t):(o[n]||(o[n]=[]),void o[n].push(e))}var r=n("ee").create(),o={};e.exports=t,t.ee=r,r.q=o},{ee:"QJf3ax"}],handle:[function(n,e){e.exports=n("D5DuLP")},{}],XL7HBI:[function(n,e){function t(n){var e=typeof n;return!n||"object"!==e&&"function"!==e?-1:n===window?0:i(n,o,function(){return r++})}var r=1,o="nr@id",i=n("gos");e.exports=t},{gos:"7eSDFh"}],id:[function(n,e){e.exports=n("XL7HBI")},{}],loader:[function(n,e){e.exports=n("G9z0Bl")},{}],G9z0Bl:[function(n,e){function t(){var n=h.info=NREUM.info;if(n&&n.licenseKey&&n.applicationID&&f&&f.body){c(l,function(e,t){e in n||(n[e]=t)}),h.proto="https"===d.split(":")[0]||n.sslForHttp?"https://":"http://",a("mark",["onload",i()]);var e=f.createElement("script");e.src=h.proto+n.agent,f.body.appendChild(e)}}function r(){"complete"===f.readyState&&o()}function o(){a("mark",["domContent",i()])}function i(){return(new Date).getTime()}var a=n("handle"),c=n(1),u=(n(2),window),f=u.document,s="addEventListener",p="attachEvent",d=(""+location).split("?")[0],l={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-593.min.js"},h=e.exports={offset:i(),origin:d,features:{}};f[s]?(f[s]("DOMContentLoaded",o,!1),u[s]("load",t,!1)):(f[p]("onreadystatechange",r),u[p]("onload",t)),a("mark",["firstbyte",i()])},{1:12,2:3,handle:"D5DuLP"}],12:[function(n,e){function t(n,e){var t=[],o="",i=0;for(o in n)r.call(n,o)&&(t[i]=e(o,n[o]),i+=1);return t}var r=Object.prototype.hasOwnProperty;e.exports=t},{}],13:[function(n,e){function t(n,e,t){e||(e=0),"undefined"==typeof t&&(t=n?n.length:0);for(var r=-1,o=t-e||0,i=Array(0>o?0:o);++r<o;)i[r]=n[e+r];return i}e.exports=t},{}]},{},["G9z0Bl"]);
+</script>
+<title>Portal Login &#8211; Axcient User Portal</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="profile" href="//gmpg.org/xfn/11" />
+<link rel="pingback" href="{!$Label.Axcient_Wordpress_Portal}/xmlrpc.php" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon57.png" sizes="57x57" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon72.png" sizes="72x72" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon76.png" sizes="76x76" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon114.png" sizes="114x114" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon120.png" sizes="120x120" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon144.png" sizes="144x144" />
+<link rel="apple-touch-icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/icon152.png" sizes="152x152" />
+<meta name="msapplication-TileImage" content="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/favicon-144.png" />
+<meta name="msapplication-TileColor" content="#B20099"/>
+<meta name="application-name" content="name" />
+<meta name="msapplication-square70x70logo" content="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/tile-tiny.png"/>
+<meta name="msapplication-square150x150logo" content="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/tile-square.png"/>
+<meta name="msapplication-wide310x150logo" content="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/tile-wide.png"/>
+<meta name="msapplication-square310x310logo" content="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/tile-large.png"/>
+<link rel="icon" href="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/fav/favicon.png" />
+<meta name="robots" content="noindex,follow" />
+<link rel="alternate" type="application/rss+xml" title="Axcient User Portal &raquo; Feed" href="{!$Label.Axcient_Wordpress_Portal}/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Axcient User Portal &raquo; Comments Feed" href="{!$Label.Axcient_Wordpress_Portal}/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Axcient User Portal &raquo; Portal Login Comments Feed" href="{!$Label.Axcient_Wordpress_Portal}/login/feed/" />
+<link rel='stylesheet' id='date-picker-css-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/sfwd-lms/assets/jquery-ui.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='ax_sf_css-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/ax-sf-portal/validation/css/validationEngine.jquery.css?ver=1.0.0' type='text/css' media='all' />
+<link rel='stylesheet' id='fancybox-style-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/light/css/jquery.fancybox.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='wpProQuiz_front_style-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/sfwd-lms/wp-pro-quiz/css/wpProQuiz_front.min.css?ver=0.28' type='text/css' media='all' />
+<link rel='stylesheet' id='learndash_style-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/sfwd-lms/assets/style.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='parent-style-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/css/style.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='child-style-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal-bbpress/style.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='chosen-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/css/chosen.min.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='theme-style-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/css/style.css?v=20150401&#038;ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='animate-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/css/animate.min.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='slider-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/css/flexslider.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='shortcodes-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/framework/shortcodes/shortcodes.css?ver=4.1.8' type='text/css' media='all' />
+<link rel='stylesheet' id='mycred-widget-css' href='{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/mycred/assets/css/widget.css?ver=1.6.3.1' type='text/css' media='all' />
+<script type='text/javascript' src='{!$Label.Axcient_Wordpress_Portal}/wp-includes/js/jquery/jquery.js?ver=1.11.1'></script>
+<script type='text/javascript' src='{!$Label.Axcient_Wordpress_Portal}/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="{!$Label.Axcient_Wordpress_Portal}/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="{!$Label.Axcient_Wordpress_Portal}/wp-includes/wlwmanifest.xml" />
+<meta name="generator" content="WordPress 4.1.8" />
+<link rel='canonical' href='{!$Label.Axcient_Wordpress_Portal}/login/' />
+<link rel='shortlink' href='{!$Label.Axcient_Wordpress_Portal}/?p=4' />
+<!--[if lt IE 9]><script src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/html5.js"></script><![endif]--><!--[if (gte IE 6)&(lte IE 8)]><script src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/selectivizr-min.js"></script><![endif]--> 
+
+<script type="text/javascript">
+//TK
+(function() {
+var config = {
+kitId: 'fwl0qns',
+scriptTimeout: 3000
+};
+var h=document.getElementsByTagName("html")[0];h.className+=" wf-loading";
+var t=setTimeout(function(){h.className=h.className.replace(/(\s|^)wf-loading(\s|$)/g," ");
+h.className+=" wf-inactive"},config.scriptTimeout);var tk=document.createElement("script"),d=false;tk.src='//use.typekit.net/'+config.kitId+'.js';
+tk.type="text/javascript";
+tk.async="true";
+tk.onload=tk.onreadystatechange=function(){var a=this.readyState;if(d||a&&a!="complete"&&a!="loaded")return;
+d=true;
+clearTimeout(t);
+try{Typekit.load(config)}catch(b){}};
+var s=document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(tk,s)
+})();
+//GA
+(function(i,s,o,g,r,a,m){
+i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)
+},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];
+a.async=1;
+a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-743216-7', 'auto');
+ga('send', 'pageview');
+</script>
+
+<style>
+    .messageCell {
+        padding: 12px;
+        margin: 12px 0px;
+        background: #EA1C24 none repeat scroll 0% 0%;
+        color: #FFF;
+    }
+
+    .messageCell h4 {
+        display: none;
+    }
+</style>
+</head>
+<body class="page page-id-4 page-template page-template-login page-template-login-php">
+    <div class="ie">Internet Explorer 6 and 7 are no longer supported by Microsoft. For best viewability, please use a supported version of IE or another browser.</div>
+    <!-- #site-container -->
+    <div id="site-container" class="clearfix">
+        <div class="login-intro clearfix">
+            <h1 style="opacity:0;">Our all-new, powerfully simple User Portal puts the power in your hands.
+                <span style="opacity:0;">Manage support cases, read knowledge base articles, utilize sales tools, watch how-to videos, get help from peers and much more.</span>
+            </h1>
+            <div class="devices">
+                <img class="devices-monitor"
+                style="opacity:0;"
+                src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/devices-monitor.png" />
+                <img class="devices-tablet"
+                style="opacity:0;"
+                src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/devices-tablet.png" />
+                <img class="devices-phone"
+                style="opacity:0;"
+                src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/library/images/devices-phone.png" />
+            </div>
+        </div>
+        <div class="login-sidebar clearfix">
+            <div class="login-box">
+                <div class="up-logo">Axcient User Portal</div>
+                <apex:form id="login">
+                    <apex:pageMessages />
+                    <p>Please log in using your Axcient provided portal credentials</p>
+                    <div class="login-input">
+                        <div class="login-name-block"></div>
+                        <!--<input type="text" class="login-name validate[required,custom[email]]" name="user" placeholder="Email" />-->
+                        <apex:inputText id="inputUsername" value="{!username}" styleClass="login-name validate[required,custom[email]]" />
+                    
+                        <div class="clear"></div>
+                        <div class="login-password-block"></div>
+                        <!--<input type="password" class="login-password validate[required]" name="password" placeholder="Password" />-->
+                        <apex:inputSecret id="inputPassword" value="{!password}" styleClass="login-password validate[required]" />
+                    </div>
+                    <div class="login-submit clearfix">
+                        <a class="forgot" href="{!$Page.PartnerForgotPassword}" title="Click here to reset your password">Reset Password</a>
+                        <!--<button type="submit" class="login-button" name="submit">Log In</button>-->
+                        <apex:commandButton action="{!login}" styleClass="login-button new-case" value="Log In" />
+                    </div>
+                </apex:form>
+            </div>
+            <a href="http://axcient.com/partners/#partner" title="Request User Portal Access" class="bottom-link">Request User Portal Access</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <script type="text/javascript">
+    // load live search
+    jQuery(document).ready(function() {
+    jQuery('#live-search #s').liveSearch({url: '{!$Label.Axcient_Wordpress_Portal}/index.php?ajax=1&s='});
+    });
+    </script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/ax-sf-portal/validation/js/languages/jquery.validationEngine-en.js?ver=1.0.0"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/ax-sf-portal/validation/js/jquery.validationEngine.js?ver=1.0.0"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/ax-sf-portal/js/ax_sf_custom.js?ver=1.0.0"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal-bbpress/js/editor.js?ver=2.5.4-5380"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/light/js/jquery.fancybox.pack.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/plugins/light/js/light.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/functions.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/cssua.min.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/framework/shortcodes/shortcodes.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/jquery.flexslider-min.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/jquery.waypoints.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/chosen.jquery.min.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-includes/js/comment-reply.min.js?ver=4.1.8"></script>
+    <script type="text/javascript" src="{!$Label.Axcient_Wordpress_Portal}/wp-content/themes/axfourteenportal/js/jquery.livesearch.js?ver=4.1.8"></script>
+    <script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"1198810682","applicationID":"3384139","transactionName":"ZQQAY0VQCEoAUxIPWVxOI1RDWAlXTkAHAVMfDQ1QXl8=","queueTime":0,"applicationTime":260,"ttGuid":"","agentToken":"","atts":"SUMDFQ1KG0Q=","errorBeacon":"bam.nr-data.net","agent":"js-agent.newrelic.com\/nr-593.min.js"}</script>
+    
+</body>
+</html>
+
+</apex:page>

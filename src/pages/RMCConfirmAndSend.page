@@ -1,0 +1,37 @@
+<apex:page standardController="Asset" extensions="RMCApplianceCreation" tabStyle="Asset" sidebar="false" wizard="true" showChat="false" >
+<apex:sectionHeader subtitle="Confirmation"/>
+<apex:form id="theForm" > 
+
+<apex:pageBlock id="b1" >
+<apex:pageMessages ></apex:pageMessages>
+ <apex:pageBlockButtons location="both" >
+           <apex:commandButton action="{!Step1}" value="Previous" />
+           <apex:commandButton action="{!saveSF}" value="Create Appliance in RMC" />
+ </apex:pageBlockButtons>
+
+
+<apex:pageBlockSection id="Q4" columns="1"   collapsible="false"  >
+      <apex:outputField value="{!asst.RMC_Serial_Number__c }" />
+      <apex:outputField value="{!asst.RMC_Model_Number__c}"  />
+      <apex:outputField value="{!asst.RMC_Package__c}"  />
+      <apex:outputField value="{!asst.RMC_Offsite_Capacity__c}"  />
+      <apex:outputField value="{!asst.RMC_Server_Entitlements__c}" />
+      <apex:outputField value="{!asst.RMC_Non_Server_Entitlement__c}" />
+      <apex:outputField value="{!asst.RMC_Alias__c}" />
+      <apex:outputField value="{!asst.Data_Center__c}" />
+      <apex:outputField value="{!asst.RMC_Checkbox__c}" />
+      <apex:outputField value="{!asst.RMC_NOC_Support__c}" />
+      <apex:outputField value="{!asst.RMC_Partner__c}"  />
+      <apex:outputField value="{!asst.RMC_Client__c}"  />
+      
+      
+
+      
+</apex:pageBlockSection>
+</apex:pageBlock>
+</apex:form>
+
+
+
+
+</apex:page>
